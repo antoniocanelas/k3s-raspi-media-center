@@ -1,53 +1,44 @@
-![test](https://github.com/fabito/htk8s/workflows/test/badge.svg)
+# HTK8s - Home Theater PC Stack on Kubernetes
 
-# HTPC powered by k3s
+A complete, production-ready Kubernetes deployment for a home media center stack running on Raspberry Pi and x86 systems. Includes Jellyfin, Sonarr, Radarr, Prowlarr, Bazarr, Transmission, Kavita, Lidarr, Readarr, and Jackett.
 
-![htk8s diagrams](https://docs.google.com/drawings/d/e/2PACX-1vSsQfsfgHiHi0l-1w6pZhCYX-xz2xJNVwMrnKclkqYdEd6dIGJY9soY2lgtm1gyOnNSTYRbYkqvYCWU/pub?w=1373&amp;h=612)
+## ✨ Features
 
-This is my current [HTPC](https://en.wikipedia.org/wiki/Home_theater_PC) setup. It runs on [k3s](https://k3s.io/) - a lightweight and easy to install Kubernetes distribution.
-It includes the following applications:
+✅ **Multi-Architecture Support** - ARM64 (Raspberry Pi 4+), x86/x86_64  
+✅ **GitOps Ready** - Argo CD integration with auto-sync  
+✅ **NAS/NFS Integration** - 400Gi shared media storage  
+✅ **Modern Kubernetes** - Traefik ingress, zero deprecation warnings  
+✅ **Fully Automated** - Auto-healing, health checks, production-ready  
 
-* [Sonarr](https://sonarr.tv/) for tv shows
-* [Radarr](https://radarr.video/) for movies
-* [Bazarr](https://github.com/morpheus65535/bazarr) for subtitles
-* Transmission for torrents
-* ~~[Jackett](https://github.com/Jackett/Jackett) for torrent tracker searching~~
-* [Prowlarr](https://prowlarr.com/) for index management
-* [Readarr](https://readarr.com/) for ebooks
-* ~~[Emby](https://emby.media/)~~
-* [Jellyfin](https://jellyfin.org/)
+## 🚀 Quick Start
 
-Applications state (settings / db) and media files are stored in a shared volume of type `hostPath`. It does not use PVC and currently only works if the whole `htpc` namespace is deployed in the same node.
+### Prerequisites
+- Kubernetes cluster (k3s recommended for RPi)
+- `kubectl` CLI
+- NAS/NFS share (optional)
 
-## Getting Started
+### Installation
 
-### Quickstart
-
+**For ARM64 (Raspberry Pi):**
 ```bash
-# for x86_64
-kubectl apply -f https://raw.githubusercontent.com/fabito/htk8s/v0.1/install_x86_64.yaml
-
-# for raspberry pi (ARM)
-kubectl apply -f https://raw.githubusercontent.com/fabito/htk8s/v0.1/install_armhf.yaml
+kubectl apply -f install_armhf.yaml
 ```
 
-### The Gitops way
-
-![argocd htpc application](https://drive.google.com/uc?id=1KI_7GVcP7QFWhQEiqS9Q4azE7-gpso2M)
-
-
+**For x86/x86_64:**
 ```bash
-# x86_64 only
-kubectl apply -f https://raw.githubusercontent.com/fabito/htk8s/v0.1/install_argocd.yaml
+kubectl apply -f install_x86_64.yaml
 ```
 
-This alternate manifest will install [Argo CD](https://github.com/argoproj/argo-cd) along with the [htpc application](argocd/application.yaml). Then it will monitor this repo for changes and apply them to the cluster accordingly (more specifically the `overlays/x86`overlay).
+**With Argo CD (GitOps):**
+```bash
+kubectl apply -f install_argocd.yaml
+# Then update your Git repo URL in argocd/htpc-stack-application.yaml
+```
 
-You can access the ArgoCD UI at: https://localhost/argocd.
-
-### Verifying the installation
-
-All resources are created in the `htpc` namespace. So if you run:
+**Verify deployment:**
+```bash
+kubectl -n htpc get pods
+kubectl -n htpc get pvc
 
 ```bash
 k3s kubectl get all -n htpc

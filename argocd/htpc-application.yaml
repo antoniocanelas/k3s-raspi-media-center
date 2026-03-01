@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: htpc-stack
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/yourusername/htk8s  # Update this to your repo
+    targetRevision: HEAD
+    path: overlays/armhf
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: htpc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+  revisionHistoryLimit: 10
+

@@ -1,3 +1,5 @@
+# This is an auto-generated file. DO NOT EDIT
+# Warning: 'vars' is deprecated. Please use 'replacements' instead. [EXPERIMENTAL] Run 'kustomize edit fix' to update your Kustomization automatically.
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -19,7 +21,6 @@ spec:
     protocol: TCP
     targetPort: 6767
   selector:
-    app: htpc
     run: bazarr
 ---
 apiVersion: v1
@@ -36,7 +37,6 @@ spec:
     protocol: TCP
     targetPort: 9117
   selector:
-    app: htpc
     run: jackett
 ---
 apiVersion: v1
@@ -53,7 +53,6 @@ spec:
     protocol: TCP
     targetPort: 8096
   selector:
-    app: htpc
     run: jellyfin
 ---
 apiVersion: v1
@@ -70,7 +69,6 @@ spec:
     protocol: TCP
     targetPort: 5000
   selector:
-    app: htpc
     app.kubernetes.io/name: kavita
 ---
 apiVersion: v1
@@ -87,7 +85,6 @@ spec:
     protocol: TCP
     targetPort: 8686
   selector:
-    app: htpc
     run: lidarr
 ---
 apiVersion: v1
@@ -104,7 +101,6 @@ spec:
     protocol: TCP
     targetPort: 9696
   selector:
-    app: htpc
     run: prowlarr
 ---
 apiVersion: v1
@@ -121,7 +117,6 @@ spec:
     protocol: TCP
     targetPort: 7878
   selector:
-    app: htpc
     run: radarr
 ---
 apiVersion: v1
@@ -138,7 +133,6 @@ spec:
     protocol: TCP
     targetPort: 8787
   selector:
-    app: htpc
     run: readarr
 ---
 apiVersion: v1
@@ -155,7 +149,6 @@ spec:
     protocol: TCP
     targetPort: 8989
   selector:
-    app: htpc
     run: sonarr
 ---
 apiVersion: v1
@@ -172,7 +165,6 @@ spec:
     protocol: TCP
     targetPort: 9091
   selector:
-    app: htpc
     run: transmission
 ---
 apiVersion: v1
@@ -223,12 +215,10 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: htpc
       run: bazarr
   template:
     metadata:
       labels:
-        app: htpc
         run: bazarr
     spec:
       containers:
@@ -308,12 +298,10 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: htpc
       run: jackett
   template:
     metadata:
       labels:
-        app: htpc
         run: jackett
     spec:
       containers:
@@ -369,12 +357,10 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: htpc
       run: jellyfin
   template:
     metadata:
       labels:
-        app: htpc
         run: jellyfin
     spec:
       containers:
@@ -428,12 +414,10 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: htpc
       app.kubernetes.io/name: kavita
   template:
     metadata:
       labels:
-        app: htpc
         app.kubernetes.io/name: kavita
     spec:
       containers:
@@ -523,12 +507,10 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: htpc
       run: lidarr
   template:
     metadata:
       labels:
-        app: htpc
         run: lidarr
     spec:
       containers:
@@ -613,12 +595,10 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: htpc
       run: prowlarr
   template:
     metadata:
       labels:
-        app: htpc
         run: prowlarr
     spec:
       containers:
@@ -707,12 +687,10 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: htpc
       run: radarr
   template:
     metadata:
       labels:
-        app: htpc
         run: radarr
     spec:
       containers:
@@ -806,12 +784,10 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: htpc
       run: readarr
   template:
     metadata:
       labels:
-        app: htpc
         run: readarr
     spec:
       containers:
@@ -920,12 +896,10 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: htpc
       run: sonarr
   template:
     metadata:
       labels:
-        app: htpc
         run: sonarr
     spec:
       containers:
@@ -1028,12 +1002,10 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: htpc
       run: transmission
   template:
     metadata:
       labels:
-        app: htpc
         run: transmission
     spec:
       containers:

@@ -3,8 +3,9 @@ kind: Kustomization
 
 namespace: htpc
 
-commonLabels:
-  app: htpc
+labels:
+- pairs:
+    app: htpc
 
 resources:
 - namespace.yaml
@@ -21,10 +22,12 @@ resources:
 - lidarr
 - arr-nfs.yaml
 
-patchesStrategicMerge:
-- volumes_patch.yaml
-- env_variables_patch.yaml
+patches:
+- path: volumes_patch.yaml
+- path: env_variables_patch.yaml
 
+# Note: vars is still experimental in replacement but works for substitution
+# Will be replaced with replacements in future Kustomize versions
 vars:
   - name: SONARR
     objref:

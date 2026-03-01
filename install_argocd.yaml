@@ -11060,6 +11060,28 @@ spec:
     automated:
       prune: false
 ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: htpc-stack
+  namespace: argocd
+spec:
+  destination:
+    namespace: htpc
+    server: https://kubernetes.default.svc
+  project: default
+  revisionHistoryLimit: 10
+  source:
+    path: overlays/armhf
+    repoURL: https://github.com/yourusername/htk8s
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
