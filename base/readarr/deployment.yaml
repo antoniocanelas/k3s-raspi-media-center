@@ -52,7 +52,7 @@ spec:
           subPath: readarr
       containers:
       - name: readarr
-        image: lscr.io/linuxserver/readarr:develop
+        image: lscr.io/linuxserver/readarr:nightly-0.4.16.2788-ls395
         env:
         - name: PUID
           value: "1000"
