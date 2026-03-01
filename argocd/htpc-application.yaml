@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/yourusername/htk8s  # Update this to your repo
+    repoURL: https://github.com/antoniocanelas/htk8s
     targetRevision: HEAD
     path: overlays/armhf
   destination:
