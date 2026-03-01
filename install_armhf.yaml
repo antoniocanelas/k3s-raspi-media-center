@@ -239,7 +239,7 @@ spec:
           value: "1000"
         - name: PGID
           value: "1000"
-        image: linuxserver/bazarr:arm32v6-latest
+        image: linuxserver/bazarr:arm64v8-latest
         name: bazarr
         ports:
         - containerPort: 6767
@@ -324,7 +324,7 @@ spec:
           value: "1000"
         - name: PGID
           value: "1000"
-        image: linuxserver/jackett:arm32v6-latest
+        image: linuxserver/jackett:arm64v8-latest
         name: jackett
         ports:
         - containerPort: 9117
@@ -385,7 +385,7 @@ spec:
           value: "1000"
         - name: PGID
           value: "1000"
-        image: lscr.io/linuxserver/jellyfin:arm32v7-latest
+        image: lscr.io/linuxserver/jellyfin:arm64v8-latest
         name: jellyfin
         ports:
         - containerPort: 8096
@@ -547,7 +547,7 @@ spec:
           value: enabled
         - name: LIDARR__AUTH__APIKEY
           value: htk8s-api-key-secure
-        image: lscr.io/linuxserver/lidarr:arm32v7-latest
+        image: lscr.io/linuxserver/lidarr:arm64v8-latest
         livenessProbe:
           exec:
             command:
@@ -723,7 +723,7 @@ spec:
           value: "1000"
         - name: PGID
           value: "1000"
-        image: linuxserver/radarr:arm32v6-latest
+        image: linuxserver/radarr:arm64v8-latest
         livenessProbe:
           exec:
             command:
@@ -822,7 +822,7 @@ spec:
           value: "1000"
         - name: TZ
           value: Pacific/Auckland
-        image: lscr.io/linuxserver/readarr
+        image: lscr.io/linuxserver/readarr:develop
         livenessProbe:
           exec:
             command:
@@ -936,7 +936,7 @@ spec:
           value: "1000"
         - name: PGID
           value: "1000"
-        image: linuxserver/sonarr:arm32v6-latest
+        image: linuxserver/sonarr:arm64v8-latest
         livenessProbe:
           exec:
             command:
@@ -1039,7 +1039,7 @@ spec:
           value: ""
         - name: HOST_WHITELIST
           value: ""
-        image: linuxserver/transmission:arm32v6-latest
+        image: linuxserver/transmission:arm64v8-latest
         name: transmission
         ports:
         - containerPort: 9091

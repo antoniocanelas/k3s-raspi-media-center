@@ -46,7 +46,7 @@ spec:
           value: enabled
         - name: LIDARR__AUTH__APIKEY
           value: htk8s-api-key-secure
-        image: lscr.io/linuxserver/lidarr
+        image: lscr.io/linuxserver/lidarr:arm64v8-latest
         name: lidarr
         ports:
         - containerPort: 8686

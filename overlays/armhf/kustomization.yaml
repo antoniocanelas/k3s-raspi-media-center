@@ -6,19 +6,19 @@ bases:
 
 images:
   - name: linuxserver/jackett
-    newTag: arm32v6-latest
+    newTag: arm64v8-latest
   - name: linuxserver/sonarr
-    newTag: arm32v6-latest
+    newTag: arm64v8-latest
   - name: linuxserver/radarr
-    newTag: arm32v6-latest
+    newTag: arm64v8-latest
   - name: linuxserver/bazarr
-    newTag: arm32v6-latest
+    newTag: arm64v8-latest
   - name: linuxserver/transmission
-    newTag: arm32v6-latest
+    newTag: arm64v8-latest
   - name: emby/embyserver
-    newName: emby/embyserver_arm32v7
+    newName: emby/embyserver
     newTag: latest
   - name: lscr.io/linuxserver/jellyfin
-    newTag: arm32v7-latest
+    newTag: arm64v8-latest
   - name: lscr.io/linuxserver/lidarr
-    newTag: arm32v7-latest
+    newTag: arm64v8-latest
