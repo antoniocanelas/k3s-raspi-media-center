@@ -4,7 +4,9 @@ kind: IngressRoute
 metadata:
   name: htpc
 spec:
-  entryPoints: []
+  entryPoints:
+    - web
+    - websecure
   routes:
   - kind: Rule
     match: PathPrefix(`/`)

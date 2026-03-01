@@ -13,3 +13,8 @@ resources:
 
 patchesStrategicMerge:
 - argo-server_patch.yaml
+
+images:
+- name: redis
+  newName: arm64v8/redis
+  newTag: 7.0.5-alpine
