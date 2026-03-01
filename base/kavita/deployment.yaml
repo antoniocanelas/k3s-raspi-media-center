@@ -15,7 +15,10 @@ spec:
       initContainers:
       - name: chown
         image: busybox
-        command: ["sh", "-c", "chown -R 1000:1000 /config /books /comics /manga"]
+        command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /config /books /comics /manga
         volumeMounts:
         - mountPath: /config
           name: htpc-home
@@ -31,20 +34,17 @@ spec:
           subPath: media/books/comics
       - name: config
         image: busybox
-        command: ["sh", "-c"]
+        command:
+        - sh
+        - -c
         securityContext:
           runAsUser: 1000
           runAsGroup: 1000
         args:
-          - |
-            echo 'Customizing Kavita config...'
-            if [[ ! -f /config/appsettings.json ]]; then
-              echo '{"BaseUrl": "/$(KAVITA)"}' > /config/appsettings.json
-              echo 'Kavita appsettings.json created.'
-            else
-              echo 'Kavita appsettings.json already exists.'
-            fi
-            echo 'Done customizing Kavita config.'
+        - "echo 'Customizing Kavita config...'\nif [[ ! -f /config/appsettings.json\
+          \ ]]; then\n  echo '{\"BaseUrl\": \"/$(KAVITA)\"}' > /config/appsettings.json\n\
+          \  echo 'Kavita appsettings.json created.'\nelse\n  echo 'Kavita appsettings.json\
+          \ already exists.'\nfi\necho 'Done customizing Kavita config.'\n"
         volumeMounts:
         - mountPath: /config
           name: htpc-home
@@ -54,9 +54,9 @@ spec:
         image: lscr.io/linuxserver/kavita:latest
         env:
         - name: PUID
-          value: "1000"
+          value: '1000'
         - name: PGID
-          value: "1000"
+          value: '1000'
         - name: TZ
           value: Pacific/Auckland
         ports:
@@ -76,4 +76,8 @@ spec:
           name: htpc-home
           subPath: media/books/comics
       securityContext:
-        fsGroup: 1000 # Should match PGID in configMap
+        fsGroup: 1000
+      volumes:
+      - name: arr-data-pvc
+        persistentVolumeClaim:
+          claimName: arr-data-pvc

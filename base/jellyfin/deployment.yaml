@@ -36,17 +36,11 @@ spec:
           protocol: TCP
         volumeMounts: 
         - mountPath: /config 
-          name: htpc-home
+          name: arr-data-pvc
           subPath: jellyfin
-        - mountPath: /tv 
-          name: htpc-home
-          subPath: media/tv
-        - mountPath: /movies 
-          name: htpc-home
-          subPath: media/movies
-        - mountPath: /books
-          name: htpc-home
-          subPath: media/books
-        - mountPath: /music
-          name: htpc-home
-          subPath: media/music
+        - mountPath: /data
+          name: arr-data-pvc
+      volumes:
+      - name: arr-data-pvc
+        persistentVolumeClaim:
+          claimName: arr-data-pvc

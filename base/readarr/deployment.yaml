@@ -19,7 +19,10 @@ spec:
       initContainers:
       - name: chown
         image: busybox
-        command: ["sh", "-c", "chown -R 1000:1000 /config /books /comics /audiobooks"]
+        command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /config /books /comics /audiobooks
         volumeMounts:
         - mountPath: /config
           name: htpc-home
@@ -35,19 +38,18 @@ spec:
           subPath: media/books/comics
       - name: config
         image: busybox
-        command: ["sh", "-c"]
+        command:
+        - sh
+        - -c
         securityContext:
           runAsUser: 1000
           runAsGroup: 1000
         args:
-          - |
-            echo 'Customizing config...'
-            if [[ ! -f /config/config.xml ]]; then
-              echo '<Config><UrlBase>/$(READARR)</UrlBase></Config>'> /config/config.xml
-            fi
-            echo 'Done customizing.'
-        volumeMounts: 
-        - mountPath: /config 
+        - "echo 'Customizing config...'\nif [[ ! -f /config/config.xml ]]; then\n\
+          \  echo '<Config><UrlBase>/$(READARR)</UrlBase></Config>'> /config/config.xml\n\
+          fi\necho 'Done customizing.'\n"
+        volumeMounts:
+        - mountPath: /config
           name: htpc-home
           subPath: readarr
       containers:
@@ -55,9 +57,9 @@ spec:
         image: lscr.io/linuxserver/readarr:nightly-0.4.16.2788-ls395
         env:
         - name: PUID
-          value: "1000"
+          value: '1000'
         - name: PGID
-          value: "1000"
+          value: '1000'
         - name: TZ
           value: Pacific/Auckland
         ports:
@@ -67,7 +69,8 @@ spec:
             command:
             - /bin/sh
             - -c
-            - curl "http://localhost:8787/readarr/api/v1/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+            - curl "http://localhost:8787/readarr/api/v1/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}'
+              </config/config.xml)"
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
@@ -75,7 +78,8 @@ spec:
             command:
             - /bin/sh
             - -c
-            - curl "http://localhost:8787/readarr/api/v1/system/status?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+            - curl "http://localhost:8787/readarr/api/v1/system/status?ApiKey=$(sed
+              -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
           initialDelaySeconds: 30
           periodSeconds: 10
         volumeMounts:
@@ -96,3 +100,7 @@ spec:
           subPath: downloads
         - mountPath: /data
           name: htpc-home
+      volumes:
+      - name: arr-data-pvc
+        persistentVolumeClaim:
+          claimName: arr-data-pvc

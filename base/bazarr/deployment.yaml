@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,70 +15,40 @@ spec:
         run: bazarr
     spec:
       securityContext:
-        # runAsUser: 1000
-        # runAsGroup: 1000
         fsGroup: 1000
       initContainers:
       - name: wait-for-sonarr-and-radarr
         image: busybox
-        command: ['sh', '-c', 'until wget -qO- sonarr:8989/sonarr &> /dev/null && wget -qO- radarr:7878/radarr &> /dev/null; do echo waiting for sonarr and radarr; sleep 2; done;']
+        command:
+        - sh
+        - -c
+        - until wget -qO- sonarr:8989/sonarr &> /dev/null && wget -qO- radarr:7878/radarr
+          &> /dev/null; do echo waiting for sonarr and radarr; sleep 2; done;
       - name: config
         image: busybox
-        command: 
-        - "sh"
-        - "-c"
-        - |
-          mkdir -p /htpc/bazarr/config
-          export RADARR_API_KEY=$(cat /htpc/radarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
-          export SONARR_API_KEY=$(cat /htpc/sonarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
-          cat << EOF > /htpc/bazarr/config/config.ini
-          [sonarr]
-          apikey = ${SONARR_API_KEY}
-          full_update = Daily
-          ip = $(SONARR)
-          only_monitored = False
-          base_url = /$(SONARR)
-          ssl = False
-          port = 8989
-
-          [radarr]
-          apikey = ${RADARR_API_KEY}
-          full_update = Daily
-          ip = $(RADARR)
-          only_monitored = False
-          base_url = /$(RADARR)
-          ssl = False
-          port = 7878
-
-          [general]
-          movie_default_hi = False
-          movie_default_language = []
-          ip = 0.0.0.0
-          use_scenename = True
-          use_postprocessing = False
-          enabled_providers = subscene,tvsubtitles
-          auto_update = True
-          port = 6767
-          use_radarr = True
-          base_url = /bazarr/
-          page_size = 25
-          minimum_score_movie = 70
-          branch = master
-          single_language = False
-          use_sonarr = True
-          serie_default_hi = False
-          path_mappings_movie = [['/movies', '/movies'], ['', ''], ['', ''], ['', ''], ['', '']]
-          serie_default_enabled = False
-          movie_default_enabled = False
-          serie_default_language = []
-          path_mappings = [['/tv', '/tv'], ['', ''], ['', ''], ['', ''], ['', '']]
-          postprocessing_cmd = 
-          minimum_score = 90
-          debug = False
-          use_embedded_subs = True
-          adaptive_searching = False
-          EOF
-        volumeMounts: 
+        command:
+        - sh
+        - -c
+        - "mkdir -p /htpc/bazarr/config\nexport RADARR_API_KEY=$(cat /htpc/radarr/config.xml\
+          \ | sed -ne \"/ApiKey/{s/.*<ApiKey>\\(.*\\)<\\/ApiKey>.*/\\1/p;q;}\")\n\
+          export SONARR_API_KEY=$(cat /htpc/sonarr/config.xml | sed -ne \"/ApiKey/{s/.*<ApiKey>\\\
+          (.*\\)<\\/ApiKey>.*/\\1/p;q;}\")\ncat << EOF > /htpc/bazarr/config/config.ini\n\
+          [sonarr]\napikey = ${SONARR_API_KEY}\nfull_update = Daily\nip = $(SONARR)\n\
+          only_monitored = False\nbase_url = /$(SONARR)\nssl = False\nport = 8989\n\
+          \n[radarr]\napikey = ${RADARR_API_KEY}\nfull_update = Daily\nip = $(RADARR)\n\
+          only_monitored = False\nbase_url = /$(RADARR)\nssl = False\nport = 7878\n\
+          \n[general]\nmovie_default_hi = False\nmovie_default_language = []\nip =\
+          \ 0.0.0.0\nuse_scenename = True\nuse_postprocessing = False\nenabled_providers\
+          \ = subscene,tvsubtitles\nauto_update = True\nport = 6767\nuse_radarr =\
+          \ True\nbase_url = /bazarr/\npage_size = 25\nminimum_score_movie = 70\n\
+          branch = master\nsingle_language = False\nuse_sonarr = True\nserie_default_hi\
+          \ = False\npath_mappings_movie = [['/movies', '/movies'], ['', ''], ['',\
+          \ ''], ['', ''], ['', '']]\nserie_default_enabled = False\nmovie_default_enabled\
+          \ = False\nserie_default_language = []\npath_mappings = [['/tv', '/tv'],\
+          \ ['', ''], ['', ''], ['', ''], ['', '']]\npostprocessing_cmd = \nminimum_score\
+          \ = 90\ndebug = False\nuse_embedded_subs = True\nadaptive_searching = False\n\
+          EOF\n"
+        volumeMounts:
         - mountPath: /htpc
           name: htpc-home
       containers:
@@ -87,31 +56,19 @@ spec:
         - name: TZ
           value: Pacific/Auckland
         - name: PUID
-          value: "1000"
+          value: '1000'
         - name: PGID
-          value: "1000"
+          value: '1000'
         image: linuxserver/bazarr
         name: bazarr
-        # livenessProbe:
-        #   httpGet:
-        #     path: /bazarr
-        #     port: webui        
-        #   initialDelaySeconds: 200
-        #   periodSeconds: 15
-        # readinessProbe:
-        #   httpGet:
-        #     path: /bazarr
-        #     port: webui        
-        #   initialDelaySeconds: 200
-        #   periodSeconds: 15 
         ports:
         - containerPort: 6767
           name: webui
-        volumeMounts: 
-        - mountPath: /config 
+        volumeMounts:
+        - mountPath: /config
           name: htpc-home
           subPath: bazarr
-        - mountPath: /movies 
+        - mountPath: /movies
           name: htpc-home
           subPath: media/movies
         - mountPath: /tv
@@ -119,3 +76,7 @@ spec:
           subPath: media/tv
         - mountPath: /data
           name: htpc-home
+      volumes:
+      - name: arr-data-pvc
+        persistentVolumeClaim:
+          claimName: arr-data-pvc

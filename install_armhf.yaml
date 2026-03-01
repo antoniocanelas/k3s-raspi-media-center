@@ -282,6 +282,9 @@ spec:
       - name: htpc-home
         persistentVolumeClaim:
           claimName: arr-data-pvc
+      - name: arr-data-pvc
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -341,6 +344,9 @@ spec:
       - name: htpc-home
         persistentVolumeClaim:
           claimName: arr-data-pvc
+      - name: arr-data-pvc
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -379,24 +385,17 @@ spec:
           protocol: TCP
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: arr-data-pvc
           subPath: jellyfin
-        - mountPath: /tv
-          name: htpc-home
-          subPath: media/tv
-        - mountPath: /movies
-          name: htpc-home
-          subPath: media/movies
-        - mountPath: /books
-          name: htpc-home
-          subPath: media/books
-        - mountPath: /music
-          name: htpc-home
-          subPath: media/music
+        - mountPath: /data
+          name: arr-data-pvc
       securityContext:
         fsGroup: 1000
       volumes:
       - name: htpc-home
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
+      - name: arr-data-pvc
         persistentVolumeClaim:
           claimName: arr-data-pvc
 ---
@@ -491,6 +490,9 @@ spec:
       - name: htpc-home
         persistentVolumeClaim:
           claimName: arr-data-pvc
+      - name: arr-data-pvc
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -577,6 +579,9 @@ spec:
         fsGroup: 1000
       volumes:
       - name: htpc-home
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
+      - name: arr-data-pvc
         persistentVolumeClaim:
           claimName: arr-data-pvc
 ---
@@ -669,6 +674,9 @@ spec:
         fsGroup: 1000
       volumes:
       - name: htpc-home
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
+      - name: arr-data-pvc
         persistentVolumeClaim:
           claimName: arr-data-pvc
 ---
@@ -766,6 +774,9 @@ spec:
         fsGroup: 1000
       volumes:
       - name: htpc-home
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
+      - name: arr-data-pvc
         persistentVolumeClaim:
           claimName: arr-data-pvc
 ---
@@ -880,6 +891,9 @@ spec:
       - name: htpc-home
         persistentVolumeClaim:
           claimName: arr-data-pvc
+      - name: arr-data-pvc
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -986,6 +1000,9 @@ spec:
       - name: htpc-home
         persistentVolumeClaim:
           claimName: arr-data-pvc
+      - name: arr-data-pvc
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1063,6 +1080,9 @@ spec:
         fsGroup: 1000
       volumes:
       - name: htpc-home
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
+      - name: arr-data-pvc
         persistentVolumeClaim:
           claimName: arr-data-pvc
 ---

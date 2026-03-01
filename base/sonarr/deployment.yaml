@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,30 +15,34 @@ spec:
         run: sonarr
     spec:
       securityContext:
-        # runAsUser: 1000
-        # runAsGroup: 1000
-        fsGroup: 1000    
+        fsGroup: 1000
       initContainers:
       - name: chown
         image: busybox
-        command: ["sh", "-c", "chown -R 1000:1000 /config && chown -R 1000:1000 /tv"]
+        command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /config && chown -R 1000:1000 /tv
         volumeMounts:
-        - mountPath: /config 
+        - mountPath: /config
           name: htpc-home
-          subPath: sonarr    
-        - mountPath: /tv 
+          subPath: sonarr
+        - mountPath: /tv
           name: htpc-home
-          subPath: media/tv                
+          subPath: media/tv
       - name: config
         image: busybox
-        command: ["sh", "-c"]
+        command:
+        - sh
+        - -c
         securityContext:
           runAsUser: 1000
           runAsGroup: 1000
         args:
-          - "echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/$(SONARR)</UrlBase></Config>'> /config/config.xml;echo end;"
-        volumeMounts: 
-        - mountPath: /config 
+        - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/$(SONARR)</UrlBase></Config>'>
+          /config/config.xml;echo end;
+        volumeMounts:
+        - mountPath: /config
           name: htpc-home
           subPath: sonarr
       containers:
@@ -47,9 +50,9 @@ spec:
         - name: TZ
           value: Pacific/Auckland
         - name: PUID
-          value: "1000"
+          value: '1000'
         - name: PGID
-          value: "1000"
+          value: '1000'
         image: linuxserver/sonarr
         name: sonarr
         ports:
@@ -60,7 +63,8 @@ spec:
             command:
             - /bin/sh
             - -c
-            - curl "http://localhost:8989/sonarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+            - curl "http://localhost:8989/sonarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}'
+              </config/config.xml)"
           initialDelaySeconds: 90
           periodSeconds: 10
         readinessProbe:
@@ -68,7 +72,8 @@ spec:
             command:
             - /bin/sh
             - -c
-            - curl "http://localhost:8989/sonarr/api/system/status?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+            - curl "http://localhost:8989/sonarr/api/system/status?ApiKey=$(sed -ne
+              '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
           initialDelaySeconds: 60
           periodSeconds: 10
         startupProbe:
@@ -76,18 +81,23 @@ spec:
             command:
             - /bin/sh
             - -c
-            - curl "http://localhost:8989/sonarr/api/system/status?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+            - curl "http://localhost:8989/sonarr/api/system/status?ApiKey=$(sed -ne
+              '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
           failureThreshold: 30
           periodSeconds: 10
-        volumeMounts: 
-        - mountPath: /config 
+        volumeMounts:
+        - mountPath: /config
           name: htpc-home
           subPath: sonarr
-        - mountPath: /tv 
+        - mountPath: /tv
           name: htpc-home
           subPath: media/tv
-        - mountPath: /downloads 
+        - mountPath: /downloads
           name: htpc-home
           subPath: downloads
         - mountPath: /data
           name: htpc-home
+      volumes:
+      - name: arr-data-pvc
+        persistentVolumeClaim:
+          claimName: arr-data-pvc

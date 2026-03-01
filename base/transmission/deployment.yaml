@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,12 +19,15 @@ spec:
       initContainers:
       - name: chown
         image: busybox
-        command: ["sh", "-c", "chown -R 1000:1000 /config"]
+        command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /config
         volumeMounts:
-        - mountPath: /config 
+        - mountPath: /config
           name: htpc-home
           subPath: transmission
-        - mountPath: /downloads 
+        - mountPath: /downloads
           name: htpc-home
           subPath: downloads
         - mountPath: /watch
@@ -33,20 +35,20 @@ spec:
           subPath: watch
         - mountPath: /data
           name: htpc-home
-      containers:    
+      containers:
       - name: transmission
         image: linuxserver/transmission
         env:
         - name: TZ
           value: Pacific/Auckland
         - name: PUID
-          value: "1000"
+          value: '1000'
         - name: PGID
-          value: "1000"
+          value: '1000'
         - name: WHITELIST
-          value: ""
+          value: ''
         - name: HOST_WHITELIST
-          value: ""
+          value: ''
         ports:
         - containerPort: 9091
           name: webui
@@ -58,13 +60,17 @@ spec:
           name: torrent-udp
           protocol: UDP
         resources: {}
-        volumeMounts: 
-        - mountPath: /config 
+        volumeMounts:
+        - mountPath: /config
           name: htpc-home
           subPath: transmission
-        - mountPath: /downloads 
+        - mountPath: /downloads
           name: htpc-home
           subPath: downloads
         - mountPath: /watch
           name: htpc-home
           subPath: watch
+      volumes:
+      - name: arr-data-pvc
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
