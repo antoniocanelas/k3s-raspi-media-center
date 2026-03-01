@@ -14,13 +14,13 @@ spec:
   mountOptions:
     - hard
     - nfsvers=3
-  storageClassName: ""
+  claimName: arr-data-pvc
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: arr-data-pvc
-  namespace: htpc
+  namespace: media
 spec:
   accessModes:
     - ReadWriteMany

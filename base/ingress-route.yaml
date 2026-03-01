@@ -15,7 +15,7 @@ spec:
     services:
     - kind: Service
       name: jellyfin
-      namespace: "htpc"
+      namespace: "media"
       port: 8096
   - kind: Rule
     match: PathPrefix(`/jackett`)
@@ -24,7 +24,7 @@ spec:
     services:
     - kind: Service
       name: jackett
-      namespace: "htpc"
+      namespace: "media"
       port: 9117
   - kind: Rule
     match: PathPrefix(`/sonarr`)
@@ -33,7 +33,7 @@ spec:
     services:
     - kind: Service
       name: sonarr
-      namespace: "htpc"
+      namespace: "media"
       port: 8989
   - kind: Rule
     match: PathPrefix(`/radarr`)
@@ -42,7 +42,7 @@ spec:
     services:
     - kind: Service
       name: radarr
-      namespace: "htpc"
+      namespace: "media"
       port: 7878
   - kind: Rule
     match: PathPrefix(`/bazarr`)
@@ -51,7 +51,7 @@ spec:
     services:
     - kind: Service
       name: bazarr
-      namespace: "htpc"
+      namespace: "media"
       port: 6767
   - kind: Rule
     match: PathPrefix(`/transmission`)
@@ -60,7 +60,7 @@ spec:
     services:
     - kind: Service
       name: transmission
-      namespace: "htpc"
+      namespace: "media"
       port: 9091
   - kind: Rule
     match: PathPrefix(`/prowlarr`)
@@ -69,7 +69,7 @@ spec:
     services:
     - kind: Service
       name: prowlarr
-      namespace: "htpc"
+      namespace: "media"
       port: 9696
   - kind: Rule
     match: PathPrefix(`/readarr`)
@@ -78,7 +78,7 @@ spec:
     services:
     - kind: Service
       name: readarr
-      namespace: "htpc"
+      namespace: "media"
       port: 8787
   - kind: Rule
     match: PathPrefix(`/kavita`)
@@ -87,7 +87,7 @@ spec:
     services:
     - kind: Service
       name: kavita
-      namespace: "htpc"
+      namespace: "media"
       port: 5000
   - kind: Rule
     match: PathPrefix(`/lidarr`)
@@ -96,5 +96,5 @@ spec:
     services:
     - kind: Service
       name: lidarr
-      namespace: "htpc"
+      namespace: "media"
       port: 8686

@@ -1,11 +1,9 @@
-# This is an auto-generated file. DO NOT EDIT
-# Warning: 'vars' is deprecated. Please use 'replacements' instead. [EXPERIMENTAL] Run 'kustomize edit fix' to update your Kustomization automatically.
 apiVersion: v1
 kind: Namespace
 metadata:
   labels:
     app: htpc
-  name: htpc
+  name: media
 ---
 apiVersion: v1
 kind: Service
@@ -13,7 +11,7 @@ metadata:
   labels:
     app: htpc
   name: bazarr
-  namespace: htpc
+  namespace: media
 spec:
   ports:
   - name: webui
@@ -29,7 +27,7 @@ metadata:
   labels:
     app: htpc
   name: jackett
-  namespace: htpc
+  namespace: media
 spec:
   ports:
   - name: webui
@@ -45,7 +43,7 @@ metadata:
   labels:
     app: htpc
   name: jellyfin
-  namespace: htpc
+  namespace: media
 spec:
   ports:
   - name: webui
@@ -61,7 +59,7 @@ metadata:
   labels:
     app: htpc
   name: kavita
-  namespace: htpc
+  namespace: media
 spec:
   ports:
   - name: webui
@@ -77,7 +75,7 @@ metadata:
   labels:
     app: htpc
   name: lidarr
-  namespace: htpc
+  namespace: media
 spec:
   ports:
   - name: webui
@@ -93,7 +91,7 @@ metadata:
   labels:
     app: htpc
   name: prowlarr
-  namespace: htpc
+  namespace: media
 spec:
   ports:
   - name: webui
@@ -109,7 +107,7 @@ metadata:
   labels:
     app: htpc
   name: radarr
-  namespace: htpc
+  namespace: media
 spec:
   ports:
   - name: webui
@@ -125,7 +123,7 @@ metadata:
   labels:
     app: htpc
   name: readarr
-  namespace: htpc
+  namespace: media
 spec:
   ports:
   - name: webui
@@ -141,7 +139,7 @@ metadata:
   labels:
     app: htpc
   name: sonarr
-  namespace: htpc
+  namespace: media
 spec:
   ports:
   - name: webui
@@ -157,7 +155,7 @@ metadata:
   labels:
     app: htpc
   name: transmission
-  namespace: htpc
+  namespace: media
 spec:
   ports:
   - name: webui
@@ -178,6 +176,7 @@ spec:
   - ReadWriteMany
   capacity:
     storage: 400Gi
+  claimName: arr-data-pvc
   mountOptions:
   - hard
   - nfsvers=3
@@ -185,7 +184,6 @@ spec:
     path: /volume1/arr-data
     server: 192.168.0.200
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -193,7 +191,7 @@ metadata:
   labels:
     app: htpc
   name: arr-data-pvc
-  namespace: htpc
+  namespace: media
 spec:
   accessModes:
   - ReadWriteMany
@@ -210,7 +208,7 @@ metadata:
     app: htpc
     run: bazarr
   name: bazarr
-  namespace: htpc
+  namespace: media
 spec:
   replicas: 1
   selector:
@@ -293,7 +291,7 @@ metadata:
     app: htpc
     run: jackett
   name: jackett
-  namespace: htpc
+  namespace: media
 spec:
   replicas: 1
   selector:
@@ -352,7 +350,7 @@ metadata:
     app: htpc
     run: jellyfin
   name: jellyfin
-  namespace: htpc
+  namespace: media
 spec:
   replicas: 1
   selector:
@@ -409,7 +407,7 @@ metadata:
   labels:
     app: htpc
   name: kavita
-  namespace: htpc
+  namespace: media
 spec:
   replicas: 1
   selector:
@@ -502,7 +500,7 @@ metadata:
     app: htpc
     run: lidarr
   name: lidarr
-  namespace: htpc
+  namespace: media
 spec:
   replicas: 1
   selector:
@@ -590,7 +588,7 @@ metadata:
     app: htpc
     run: prowlarr
   name: prowlarr
-  namespace: htpc
+  namespace: media
 spec:
   replicas: 1
   selector:
@@ -682,7 +680,7 @@ metadata:
     app: htpc
     run: radarr
   name: radarr
-  namespace: htpc
+  namespace: media
 spec:
   replicas: 1
   selector:
@@ -779,7 +777,7 @@ metadata:
     app: htpc
     run: readarr
   name: readarr
-  namespace: htpc
+  namespace: media
 spec:
   replicas: 1
   selector:
@@ -891,7 +889,7 @@ metadata:
     app: htpc
     run: sonarr
   name: sonarr
-  namespace: htpc
+  namespace: media
 spec:
   replicas: 1
   selector:
@@ -997,7 +995,7 @@ metadata:
     app: htpc
     run: transmission
   name: transmission
-  namespace: htpc
+  namespace: media
 spec:
   replicas: 1
   selector:
@@ -1075,7 +1073,7 @@ metadata:
   labels:
     app: htpc
   name: htpc
-  namespace: htpc
+  namespace: media
 spec:
   entryPoints:
   - web
@@ -1088,7 +1086,7 @@ spec:
     services:
     - kind: Service
       name: jellyfin
-      namespace: htpc
+      namespace: media
       port: 8096
   - kind: Rule
     match: PathPrefix(`/jackett`)
@@ -1097,7 +1095,7 @@ spec:
     services:
     - kind: Service
       name: jackett
-      namespace: htpc
+      namespace: media
       port: 9117
   - kind: Rule
     match: PathPrefix(`/sonarr`)
@@ -1106,7 +1104,7 @@ spec:
     services:
     - kind: Service
       name: sonarr
-      namespace: htpc
+      namespace: media
       port: 8989
   - kind: Rule
     match: PathPrefix(`/radarr`)
@@ -1115,7 +1113,7 @@ spec:
     services:
     - kind: Service
       name: radarr
-      namespace: htpc
+      namespace: media
       port: 7878
   - kind: Rule
     match: PathPrefix(`/bazarr`)
@@ -1124,7 +1122,7 @@ spec:
     services:
     - kind: Service
       name: bazarr
-      namespace: htpc
+      namespace: media
       port: 6767
   - kind: Rule
     match: PathPrefix(`/transmission`)
@@ -1133,7 +1131,7 @@ spec:
     services:
     - kind: Service
       name: transmission
-      namespace: htpc
+      namespace: media
       port: 9091
   - kind: Rule
     match: PathPrefix(`/prowlarr`)
@@ -1142,7 +1140,7 @@ spec:
     services:
     - kind: Service
       name: prowlarr
-      namespace: htpc
+      namespace: media
       port: 9696
   - kind: Rule
     match: PathPrefix(`/readarr`)
@@ -1151,7 +1149,7 @@ spec:
     services:
     - kind: Service
       name: readarr
-      namespace: htpc
+      namespace: media
       port: 8787
   - kind: Rule
     match: PathPrefix(`/kavita`)
@@ -1160,7 +1158,7 @@ spec:
     services:
     - kind: Service
       name: kavita
-      namespace: htpc
+      namespace: media
       port: 5000
   - kind: Rule
     match: PathPrefix(`/lidarr`)
@@ -1169,5 +1167,5 @@ spec:
     services:
     - kind: Service
       name: lidarr
-      namespace: htpc
+      namespace: media
       port: 8686

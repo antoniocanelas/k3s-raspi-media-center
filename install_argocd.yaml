@@ -11049,7 +11049,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: htpc
+    namespace: media
     server: https://kubernetes.default.svc
   project: default
   revisionHistoryLimit: 10

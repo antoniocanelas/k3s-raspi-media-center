@@ -11,7 +11,7 @@ spec:
     path: overlays/armhf
   destination:
     server: https://kubernetes.default.svc
-    namespace: htpc
+    namespace: media
   syncPolicy:
     automated:
       prune: true
