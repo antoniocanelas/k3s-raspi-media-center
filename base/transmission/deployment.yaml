@@ -61,16 +61,12 @@ spec:
           protocol: UDP
         resources: {}
         volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: transmission
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
-        - mountPath: /watch
-          name: htpc-home
-          subPath: watch
+          - mountPath: /config
+            name: arr-data-pvc
+            subPath: jellyfin
+          - mountPath: /data
+            name: arr-data-pvc
       volumes:
-      - name: arr-data-pvc
-        persistentVolumeClaim:
-          claimName: arr-data-pvc
+        - name: arr-data-pvc
+          persistentVolumeClaim:
+            claimName: arr-data-pvc
