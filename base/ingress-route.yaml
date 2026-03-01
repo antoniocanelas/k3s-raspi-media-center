@@ -15,7 +15,7 @@ spec:
     services:
     - kind: Service
       name: jellyfin
-      namespace: "media"
+      namespace: media
       port: 8096
   - kind: Rule
     match: PathPrefix(`/jackett`)
