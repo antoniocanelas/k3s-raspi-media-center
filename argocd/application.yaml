@@ -1,34 +1,13 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: htpc
-spec:
-  project: default
-  
-  source:
-    repoURL: https://github.com/fabito/htk8s.git
-    targetRevision: master
-    path: overlays/x86
-
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: htpc
-
-  # Sync policy
-  syncPolicy:
-    automated:
-      prune: false
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
   name: argocd
 spec:
   project: default
   
   source:
-    repoURL: https://github.com/fabito/htk8s.git
-    targetRevision: master
+    repoURL: https://github.com/antoniocanelas/k3s-raspi-media-center.git
+    targetRevision: main
     path: argocd
 
   destination:

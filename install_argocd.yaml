@@ -11036,8 +11036,8 @@ spec:
   project: default
   source:
     path: argocd
-    repoURL: https://github.com/fabito/htk8s.git
-    targetRevision: master
+    repoURL: https://github.com/antoniocanelas/k3s-raspi-media-center.git
+    targetRevision: main
   syncPolicy:
     automated:
       prune: false
@@ -11045,25 +11045,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: htpc
-  namespace: argocd
-spec:
-  destination:
-    namespace: htpc
-    server: https://kubernetes.default.svc
-  project: default
-  source:
-    path: overlays/x86
-    repoURL: https://github.com/fabito/htk8s.git
-    targetRevision: master
-  syncPolicy:
-    automated:
-      prune: false
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: htpc-stack
+  name: media-center-stack
   namespace: argocd
 spec:
   destination:
@@ -11073,7 +11055,7 @@ spec:
   revisionHistoryLimit: 10
   source:
     path: overlays/armhf
-    repoURL: https://github.com/yourusername/htk8s
+    repoURL: ssh://git@github.com/antoniocanelas/k3s-raspi-media-center.git
     targetRevision: HEAD
   syncPolicy:
     automated:

@@ -1,12 +1,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: htpc-stack
+  name: media-center-stack
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/antoniocanelas/htk8s
+    repoURL: ssh://git@github.com/antoniocanelas/k3s-raspi-media-center.git
     targetRevision: HEAD
     path: overlays/armhf
   destination:
@@ -19,4 +19,3 @@ spec:
     syncOptions:
     - CreateNamespace=true
   revisionHistoryLimit: 10
-
