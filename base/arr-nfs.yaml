@@ -14,7 +14,6 @@ spec:
   mountOptions:
     - hard
     - nfsvers=3
-  claimName: arr-data-pvc
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

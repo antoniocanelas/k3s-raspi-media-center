@@ -176,7 +176,6 @@ spec:
   - ReadWriteMany
   capacity:
     storage: 400Gi
-  claimName: arr-data-pvc
   mountOptions:
   - hard
   - nfsvers=3
