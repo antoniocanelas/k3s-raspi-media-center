@@ -42,6 +42,8 @@ spec:
         - mountPath: /config 
           name: htpc-home
           subPath: prowlarr
+        - mountPath: /data
+          name: htpc-home
       containers:
       - env:
         - name: TZ

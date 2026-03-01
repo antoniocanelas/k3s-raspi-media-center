@@ -6,10 +6,9 @@ spec:
   template:
     spec:
       volumes: 
-      - hostPath: 
-          path: /opt/htpc 
-          type: DirectoryOrCreate 
-        name: htpc-home
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -19,10 +18,9 @@ spec:
   template:
     spec:
       volumes: 
-      - hostPath: 
-          path: /opt/htpc 
-          type: DirectoryOrCreate 
-        name: htpc-home
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -32,10 +30,9 @@ spec:
   template:
     spec:
       volumes: 
-      - hostPath: 
-          path: /opt/htpc 
-          type: DirectoryOrCreate 
-        name: htpc-home
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -45,10 +42,9 @@ spec:
   template:
     spec:
       volumes: 
-      - hostPath: 
-          path: /opt/htpc 
-          type: DirectoryOrCreate 
-        name: htpc-home
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -58,10 +54,9 @@ spec:
   template:
     spec:
       volumes: 
-      - hostPath: 
-          path: /opt/htpc 
-          type: DirectoryOrCreate 
-        name: htpc-home
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -71,10 +66,9 @@ spec:
   template:
     spec:
       volumes:
-      - hostPath:
-          path: /opt/htpc
-          type: DirectoryOrCreate
-        name: htpc-home
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -84,10 +78,9 @@ spec:
   template:
     spec:
       volumes:
-      - hostPath:
-          path: /opt/htpc
-          type: DirectoryOrCreate
-        name: htpc-home
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -97,10 +90,9 @@ spec:
   template:
     spec:
       volumes:
-      - hostPath:
-          path: /opt/htpc
-          type: DirectoryOrCreate
-        name: htpc-home
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -110,10 +102,9 @@ spec:
   template:
     spec:
       volumes:
-      - hostPath:
-          path: /opt/htpc
-          type: DirectoryOrCreate
-        name: htpc-home
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: arr-data-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -123,7 +114,6 @@ spec:
   template:
     spec:
       volumes:
-      - hostPath:
-          path: /opt/htpc
-          type: DirectoryOrCreate
-        name: htpc-home
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: arr-data-pvc

@@ -19,6 +19,7 @@ resources:
 - jellyfin
 - kavita
 - lidarr
+- arr-nfs.yaml
 
 patchesStrategicMerge:
 - volumes_patch.yaml

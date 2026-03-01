@@ -94,3 +94,5 @@ spec:
         - mountPath: /downloads
           name: htpc-home
           subPath: downloads
+        - mountPath: /data
+          name: htpc-home

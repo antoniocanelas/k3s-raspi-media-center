@@ -31,6 +31,8 @@ spec:
         - mountPath: /watch
           name: htpc-home
           subPath: watch
+        - mountPath: /data
+          name: htpc-home
       containers:    
       - name: transmission
         image: linuxserver/transmission
