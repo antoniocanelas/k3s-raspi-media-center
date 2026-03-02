@@ -43,7 +43,7 @@ spec:
           /config/config.xml;echo end;
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: arr-data-pvc
           subPath: sonarr
       containers:
       - env:

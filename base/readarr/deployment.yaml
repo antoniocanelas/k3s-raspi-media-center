@@ -25,16 +25,16 @@ spec:
         - chown -R 1000:1000 /config /books /comics /audiobooks
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: arr-data-pvc
           subPath: readarr
         - mountPath: /books
-          name: htpc-home
+          name: arr-data-pvc
           subPath: media/books/books
         - mountPath: /audiobooks
-          name: htpc-home
+          name: arr-data-pvc
           subPath: media/books/audiobooks
         - mountPath: /comics
-          name: htpc-home
+          name: arr-data-pvc
           subPath: media/books/comics
       - name: config
         image: busybox
@@ -45,12 +45,19 @@ spec:
           runAsUser: 1000
           runAsGroup: 1000
         args:
-        - "echo 'Customizing config...'\nif [[ ! -f /config/config.xml ]]; then\n\
-          \  echo '<Config><UrlBase>/$(READARR)</UrlBase></Config>'> /config/config.xml\n\
-          fi\necho 'Done customizing.'\n"
+        - |
+          echo 'Configuring Readarr at startup...'
+          if [[ ! -f /config/config.xml ]]; then
+            echo 'Creating default config.xml with UrlBase=/readarr'
+            echo '<Config><UrlBase>/readarr</UrlBase></Config>' > /config/config.xml
+            echo 'Config created successfully'
+          else
+            echo 'Config already exists, skipping creation'
+          fi
+          echo 'Readarr startup config complete'
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: arr-data-pvc
           subPath: readarr
       containers:
       - name: readarr
@@ -83,11 +90,23 @@ spec:
           initialDelaySeconds: 30
           periodSeconds: 10
         volumeMounts:
-          - mountPath: /config
-            name: arr-data-pvc
-            subPath: jellyfin
-          - mountPath: /data
-            name: arr-data-pvc
+        - mountPath: /config
+          name: arr-data-pvc
+          subPath: readarr
+        - mountPath: /books
+          name: arr-data-pvc
+          subPath: media/books/books
+        - mountPath: /audiobooks
+          name: arr-data-pvc
+          subPath: media/books/audiobooks
+        - mountPath: /comics
+          name: arr-data-pvc
+          subPath: media/books/comics
+        - mountPath: /downloads
+          name: arr-data-pvc
+          subPath: downloads
+        - mountPath: /data
+          name: arr-data-pvc
       volumes:
         - name: arr-data-pvc
           persistentVolumeClaim:

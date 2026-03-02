@@ -77,11 +77,17 @@ spec:
           initialDelaySeconds: 30
           periodSeconds: 10
         volumeMounts:
-          - mountPath: /config
-            name: arr-data-pvc
-            subPath: jellyfin
-          - mountPath: /data
-            name: arr-data-pvc
+        - mountPath: /config
+          name: arr-data-pvc
+          subPath: radarr
+        - mountPath: /movies
+          name: arr-data-pvc
+          subPath: media/movies
+        - mountPath: /downloads
+          name: arr-data-pvc
+          subPath: downloads
+        - mountPath: /data
+          name: arr-data-pvc
       volumes:
         - name: arr-data-pvc
           persistentVolumeClaim:
