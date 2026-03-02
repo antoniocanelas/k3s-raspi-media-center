@@ -83,24 +83,12 @@ spec:
           initialDelaySeconds: 30
           periodSeconds: 10
         volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: readarr
-        - mountPath: /books
-          name: htpc-home
-          subPath: media/books/books
-        - mountPath: /audiobooks
-          name: htpc-home
-          subPath: media/books/audiobooks
-        - mountPath: /comics
-          name: htpc-home
-          subPath: media/books/comics
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
-        - mountPath: /data
-          name: htpc-home
+          - mountPath: /config
+            name: arr-data-pvc
+            subPath: jellyfin
+          - mountPath: /data
+            name: arr-data-pvc
       volumes:
-      - name: arr-data-pvc
-        persistentVolumeClaim:
-          claimName: arr-data-pvc
+        - name: arr-data-pvc
+          persistentVolumeClaim:
+            claimName: arr-data-pvc
