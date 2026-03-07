@@ -1,0 +1,73 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: qbittorrent
+  name: qbittorrent
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      run: qbittorrent
+  template:
+    metadata:
+      labels:
+        run: qbittorrent
+    spec:
+      securityContext:
+        fsGroup: 1000
+      initContainers:
+      - name: chown
+        image: busybox
+        command: ["sh", "-c", "chown -R 1000:1000 /config && chown -R 1000:1000 /downloads && chown -R 1000:1000 /watch"]
+        volumeMounts:
+        - mountPath: /config
+          name: htpc-home
+          subPath: config/qbittorrent
+        - mountPath: /downloads
+          name: htpc-home
+          subPath: downloads
+        - mountPath: /watch
+          name: htpc-home
+          subPath: watch
+      containers:
+      - name: qbittorrent
+        image: lscr.io/linuxserver/qbittorrent
+        env:
+        - name: TZ
+          value: Pacific/Auckland
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: WEBUI_PORT
+          value: "8080"
+        ports:
+        - containerPort: 8080
+          name: webui
+          protocol: TCP
+        - containerPort: 6881
+          name: torrent-tcp
+          protocol: TCP
+        - containerPort: 6881
+          name: torrent-udp
+          protocol: UDP
+        volumeMounts:
+        - mountPath: /config
+          name: htpc-home
+          subPath: config/qbittorrent
+        - mountPath: /downloads
+          name: htpc-home
+          subPath: downloads
+        - mountPath: /watch
+          name: htpc-home
+          subPath: watch
+      volumes:
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: htpc-home-pvc
+
+

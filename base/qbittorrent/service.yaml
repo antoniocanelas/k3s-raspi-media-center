@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: qbittorrent
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+    name: webui
+  - port: 6881
+    protocol: TCP
+    targetPort: 6881
+    name: torrent-tcp
+  - port: 6881
+    protocol: UDP
+    targetPort: 6881
+    name: torrent-udp
+  selector:
+    run: qbittorrent
+

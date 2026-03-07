@@ -16,6 +16,7 @@ resources:
 - sonarr
 - prowlarr
 - transmission
+- qbittorrent
 - ingress-route.yaml
 #- jackett
 #- bazarr

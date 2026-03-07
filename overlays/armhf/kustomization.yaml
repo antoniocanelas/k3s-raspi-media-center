@@ -13,6 +13,8 @@ images:
   newTag: arm64v8-latest
 - name: linuxserver/transmission
   newTag: arm64v8-latest
+- name: lscr.io/linuxserver/qbittorrent
+  newTag: latest
 - name: emby/embyserver
   newName: emby/embyserver_arm64
   newTag: latest

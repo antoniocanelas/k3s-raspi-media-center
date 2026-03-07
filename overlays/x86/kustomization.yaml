@@ -11,6 +11,8 @@ images:
   newTag: v1.5.3-ls329
 - name: linuxserver/transmission
   newTag: 4.0.6-r5-ls322
+- name: lscr.io/linuxserver/qbittorrent
+  newTag: 5.1.2-r0-ls414
 - name: emby/embyserver
   newTag: 4.9.4.1
 - name: linuxserver/prowlarr
