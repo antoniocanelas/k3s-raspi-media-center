@@ -28,6 +28,31 @@ kind: Service
 metadata:
   labels:
     app: htpc
+  name: qbittorrent
+  namespace: htpc
+spec:
+  ports:
+  - name: webui
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: torrent-tcp
+    port: 6881
+    protocol: TCP
+    targetPort: 6881
+  - name: torrent-udp
+    port: 6881
+    protocol: UDP
+    targetPort: 6881
+  selector:
+    app: htpc
+    run: qbittorrent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: htpc
   name: radarr
   namespace: htpc
 spec:
@@ -56,23 +81,6 @@ spec:
   selector:
     app: htpc
     run: sonarr
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: htpc
-  name: transmission
-  namespace: htpc
-spec:
-  ports:
-  - name: webui
-    port: 9091
-    protocol: TCP
-    targetPort: 9091
-  selector:
-    app: htpc
-    run: transmission
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -194,6 +202,85 @@ spec:
         - mountPath: /config
           name: htpc-home
           subPath: config/prowlarr
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: htpc-home-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: htpc
+    run: qbittorrent
+  name: qbittorrent
+  namespace: htpc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: htpc
+      run: qbittorrent
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: htpc
+        run: qbittorrent
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Pacific/Auckland
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: WEBUI_PORT
+          value: "8080"
+        image: lscr.io/linuxserver/qbittorrent:5.1.2-r0-ls414
+        name: qbittorrent
+        ports:
+        - containerPort: 8080
+          name: webui
+          protocol: TCP
+        - containerPort: 6881
+          name: torrent-tcp
+          protocol: TCP
+        - containerPort: 6881
+          name: torrent-udp
+          protocol: UDP
+        volumeMounts:
+        - mountPath: /config
+          name: htpc-home
+          subPath: config/qbittorrent
+        - mountPath: /downloads
+          name: htpc-home
+          subPath: downloads
+        - mountPath: /watch
+          name: htpc-home
+          subPath: watch
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /config && chown -R 1000:1000 /downloads && chown -R
+          1000:1000 /watch
+        image: busybox
+        name: chown
+        volumeMounts:
+        - mountPath: /config
+          name: htpc-home
+          subPath: config/qbittorrent
+        - mountPath: /downloads
+          name: htpc-home
+          subPath: downloads
+        - mountPath: /watch
+          name: htpc-home
+          subPath: watch
       securityContext:
         fsGroup: 1000
       volumes:
@@ -419,85 +506,6 @@ spec:
         persistentVolumeClaim:
           claimName: htpc-home-pvc
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: htpc
-    run: transmission
-  name: transmission
-  namespace: htpc
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: htpc
-      run: transmission
-  template:
-    metadata:
-      labels:
-        app: htpc
-        run: transmission
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Pacific/Auckland
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: WHITELIST
-          value: ""
-        - name: HOST_WHITELIST
-          value: ""
-        image: linuxserver/transmission:4.0.6-r5-ls322
-        name: transmission
-        ports:
-        - containerPort: 9091
-          name: webui
-          protocol: TCP
-        - containerPort: 51413
-          name: torrent-tcp
-          protocol: TCP
-        - containerPort: 51413
-          name: torrent-udp
-          protocol: UDP
-        resources: {}
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: config/transmission
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
-        - mountPath: /watch
-          name: htpc-home
-          subPath: watch
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: config/transmission
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
-        - mountPath: /watch
-          name: htpc-home
-          subPath: watch
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - name: htpc-home
-        persistentVolumeClaim:
-          claimName: htpc-home-pvc
----
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -562,6 +570,15 @@ spec:
       name: transmission
       namespace: htpc
       port: 9091
+  - kind: Rule
+    match: PathPrefix(`/qbittorrent`)
+    middlewares: []
+    priority: 0
+    services:
+    - kind: Service
+      name: qbittorrent
+      namespace: htpc
+      port: 8080
   - kind: Rule
     match: PathPrefix(`/prowlarr`)
     middlewares: []

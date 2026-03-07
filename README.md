@@ -106,6 +106,38 @@ Check the [ingress-route.yaml](base/ingress-route.yaml) for more details.
 
 Each module except for Jellyfin is configured to respond on a custom basepath (check the init containers logic for more details).
 
+## qBittorrent with Radarr/Sonarr
+
+If `qbittorrent` is enabled in [`base/kustomization.yaml`](base/kustomization.yaml), use these values in both apps:
+
+| Field | Value |
+|---|---|
+| Download client type | qBittorrent |
+| Host | `qbittorrent` |
+| Port | `8080` |
+| SSL | `false` |
+
+Use category `radarr` in Radarr and category `sonarr` in Sonarr.
+
+Use these qBittorrent paths:
+
+- Incomplete: `/downloads/incomplete`
+- Complete: `/downloads/complete`
+- Optional watch folder: `/watch`
+
+The deployment mounts these PVC subpaths:
+
+- `/config` -> `config/qbittorrent`
+- `/downloads` -> `downloads`
+- `/watch` -> `watch`
+
+Quick verification:
+
+```bash
+kubectl -n htpc get deploy,svc qbittorrent
+kubectl -n htpc logs deploy/qbittorrent --tail=100
+```
+
 ## How it works (WIP)
 
 It uses [LinuxServers](https://www.linuxserver.io/our-images/) images.

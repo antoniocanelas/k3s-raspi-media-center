@@ -15,15 +15,12 @@ resources:
 - radarr
 - sonarr
 - prowlarr
-- transmission
 - qbittorrent
 - ingress-route.yaml
+#- transmission
 #- jackett
 #- bazarr
 #- readarr
 #- jellyfin
 #- kavita
 #- lidarr
-
-patches:
-- path: env_variables_patch.yaml

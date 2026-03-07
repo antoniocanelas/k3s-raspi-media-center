@@ -61,6 +61,15 @@ spec:
       namespace: "htpc"
       port: 9091
   - kind: Rule
+    match: PathPrefix(`/qbittorrent`)
+    middlewares: []
+    priority: 0
+    services:
+    - kind: Service
+      name: qbittorrent
+      namespace: "htpc"
+      port: 8080
+  - kind: Rule
     match: PathPrefix(`/prowlarr`)
     middlewares: []
     priority: 0
