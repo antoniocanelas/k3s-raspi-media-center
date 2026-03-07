@@ -23,7 +23,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: readarr
+          subPath: config/readarr
         - mountPath: /books
           name: htpc-home
           subPath: media/books/books
@@ -43,16 +43,16 @@ spec:
           - |
             echo 'Customizing config...'
             if [[ ! -f /config/config.xml ]]; then
-              echo '<Config><UrlBase>/$(READARR)</UrlBase></Config>'> /config/config.xml
+              echo '<Config><UrlBase>/readarr</UrlBase></Config>'> /config/config.xml
             fi
             echo 'Done customizing.'
         volumeMounts: 
         - mountPath: /config 
           name: htpc-home
-          subPath: readarr
+          subPath: config/readarr
       containers:
       - name: readarr
-        image: lscr.io/linuxserver/readarr
+        image: lscr.io/linuxserver/readarr:nightly-0.4.16.2788-ls395
         env:
         - name: PUID
           value: "1000"
@@ -81,7 +81,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: readarr
+          subPath: config/readarr
         - mountPath: /books
           name: htpc-home
           subPath: media/books/books
@@ -94,3 +94,7 @@ spec:
         - mountPath: /downloads
           name: htpc-home
           subPath: downloads
+      volumes:
+        - name: htpc-home
+          persistentVolumeClaim:
+            claimName: htpc-home-pvc

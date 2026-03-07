@@ -11,91 +11,6 @@ kind: Service
 metadata:
   labels:
     app: htpc
-  name: bazarr
-  namespace: htpc
-spec:
-  ports:
-  - name: webui
-    port: 6767
-    protocol: TCP
-    targetPort: 6767
-  selector:
-    app: htpc
-    run: bazarr
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: htpc
-  name: jackett
-  namespace: htpc
-spec:
-  ports:
-  - name: webui
-    port: 9117
-    protocol: TCP
-    targetPort: 9117
-  selector:
-    app: htpc
-    run: jackett
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: htpc
-  name: jellyfin
-  namespace: htpc
-spec:
-  ports:
-  - name: webui
-    port: 8096
-    protocol: TCP
-    targetPort: 8096
-  selector:
-    app: htpc
-    run: jellyfin
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: htpc
-  name: kavita
-  namespace: htpc
-spec:
-  ports:
-  - name: webui
-    port: 5000
-    protocol: TCP
-    targetPort: 5000
-  selector:
-    app: htpc
-    app.kubernetes.io/name: kavita
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: htpc
-  name: lidarr
-  namespace: htpc
-spec:
-  ports:
-  - name: webui
-    port: 8686
-    protocol: TCP
-    targetPort: 8686
-  selector:
-    app: htpc
-    run: lidarr
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: htpc
   name: prowlarr
   namespace: htpc
 spec:
@@ -124,23 +39,6 @@ spec:
   selector:
     app: htpc
     run: radarr
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: htpc
-  name: readarr
-  namespace: htpc
-spec:
-  ports:
-  - name: webui
-    port: 8787
-    protocol: TCP
-    targetPort: 8787
-  selector:
-    app: htpc
-    run: readarr
 ---
 apiVersion: v1
 kind: Service
@@ -176,396 +74,40 @@ spec:
     app: htpc
     run: transmission
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: PersistentVolume
 metadata:
   labels:
     app: htpc
-    run: bazarr
-  name: bazarr
-  namespace: htpc
+  name: htpc-home
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: htpc
-      run: bazarr
-  template:
-    metadata:
-      labels:
-        app: htpc
-        run: bazarr
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Pacific/Auckland
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        image: linuxserver/bazarr:v1.5.3-ls329
-        name: bazarr
-        ports:
-        - containerPort: 6767
-          name: webui
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: bazarr
-        - mountPath: /movies
-          name: htpc-home
-          subPath: media/movies
-        - mountPath: /tv
-          name: htpc-home
-          subPath: media/tv
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - until wget -qO- sonarr:8989/sonarr &> /dev/null && wget -qO- radarr:7878/radarr
-          &> /dev/null; do echo waiting for sonarr and radarr; sleep 2; done;
-        image: busybox
-        name: wait-for-sonarr-and-radarr
-      - command:
-        - sh
-        - -c
-        - "mkdir -p /htpc/bazarr/config\nexport RADARR_API_KEY=$(cat /htpc/radarr/config.xml
-          | sed -ne \"/ApiKey/{s/.*<ApiKey>\\(.*\\)<\\/ApiKey>.*/\\1/p;q;}\")\nexport
-          SONARR_API_KEY=$(cat /htpc/sonarr/config.xml | sed -ne \"/ApiKey/{s/.*<ApiKey>\\(.*\\)<\\/ApiKey>.*/\\1/p;q;}\")\ncat
-          << EOF > /htpc/bazarr/config/config.ini\n[sonarr]\napikey = ${SONARR_API_KEY}\nfull_update
-          = Daily\nip = sonarr\nonly_monitored = False\nbase_url = /sonarr\nssl =
-          False\nport = 8989\n\n[radarr]\napikey = ${RADARR_API_KEY}\nfull_update
-          = Daily\nip = radarr\nonly_monitored = False\nbase_url = /radarr\nssl =
-          False\nport = 7878\n\n[general]\nmovie_default_hi = False\nmovie_default_language
-          = []\nip = 0.0.0.0\nuse_scenename = True\nuse_postprocessing = False\nenabled_providers
-          = subscene,tvsubtitles\nauto_update = True\nport = 6767\nuse_radarr = True\nbase_url
-          = /bazarr/\npage_size = 25\nminimum_score_movie = 70\nbranch = master\nsingle_language
-          = False\nuse_sonarr = True\nserie_default_hi = False\npath_mappings_movie
-          = [['/movies', '/movies'], ['', ''], ['', ''], ['', ''], ['', '']]\nserie_default_enabled
-          = False\nmovie_default_enabled = False\nserie_default_language = []\npath_mappings
-          = [['/tv', '/tv'], ['', ''], ['', ''], ['', ''], ['', '']]\npostprocessing_cmd
-          = \nminimum_score = 90\ndebug = False\nuse_embedded_subs = True\nadaptive_searching
-          = False\nEOF\n"
-        image: busybox
-        name: config
-        volumeMounts:
-        - mountPath: /htpc
-          name: htpc-home
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - hostPath:
-          path: /opt/htpc
-          type: DirectoryOrCreate
-        name: htpc-home
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 400Gi
+  mountOptions:
+  - hard
+  - nfsvers=3
+  nfs:
+    path: /volume1/arr-data
+    server: 192.168.0.200
+  persistentVolumeReclaimPolicy: Retain
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
   labels:
     app: htpc
-    run: jackett
-  name: jackett
+  name: htpc-home-pvc
   namespace: htpc
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: htpc
-      run: jackett
-  template:
-    metadata:
-      labels:
-        app: htpc
-        run: jackett
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Pacific/Auckland
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        image: linuxserver/jackett:v0.24.532-ls259
-        name: jackett
-        ports:
-        - containerPort: 9117
-          name: webui
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: jackett
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
-      initContainers:
-      - args:
-        - 'echo start; [[ ! -f /config/Jackett/ServerConfig.json ]] && mkdir -p /config/Jackett/
-          &&  echo ''{ "BasePathOverride": "/jackett"}'' > /config/Jackett/ServerConfig.json;
-          echo end;'
-        command:
-        - sh
-        - -c
-        image: busybox
-        name: config
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: jackett
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - hostPath:
-          path: /opt/htpc
-          type: DirectoryOrCreate
-        name: htpc-home
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: htpc
-    run: jellyfin
-  name: jellyfin
-  namespace: htpc
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: htpc
-      run: jellyfin
-  template:
-    metadata:
-      labels:
-        app: htpc
-        run: jellyfin
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Pacific/Auckland
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        image: lscr.io/linuxserver/jellyfin:10.11.5ubu2404-ls14
-        name: jellyfin
-        ports:
-        - containerPort: 8096
-          name: webui
-          protocol: TCP
-        - containerPort: 8920
-          name: webui-ssl
-          protocol: TCP
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: jellyfin
-        - mountPath: /tv
-          name: htpc-home
-          subPath: media/tv
-        - mountPath: /movies
-          name: htpc-home
-          subPath: media/movies
-        - mountPath: /books
-          name: htpc-home
-          subPath: media/books
-        - mountPath: /music
-          name: htpc-home
-          subPath: media/music
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - hostPath:
-          path: /opt/htpc
-          type: DirectoryOrCreate
-        name: htpc-home
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: htpc
-  name: kavita
-  namespace: htpc
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: htpc
-      app.kubernetes.io/name: kavita
-  template:
-    metadata:
-      labels:
-        app: htpc
-        app.kubernetes.io/name: kavita
-    spec:
-      containers:
-      - env:
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: TZ
-          value: Pacific/Auckland
-        image: lscr.io/linuxserver/kavita:v0.8.8.3-ls94
-        name: kavita
-        ports:
-        - containerPort: 5000
-          name: webui
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: kavita
-        - mountPath: /books
-          name: htpc-home
-          subPath: media/books/books
-        - mountPath: /manga
-          name: htpc-home
-          subPath: media/books/manga
-        - mountPath: /comics
-          name: htpc-home
-          subPath: media/books/comics
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config /books /comics /manga
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: kavita
-        - mountPath: /books
-          name: htpc-home
-          subPath: media/books/books
-        - mountPath: /manga
-          name: htpc-home
-          subPath: media/books/manga
-        - mountPath: /comics
-          name: htpc-home
-          subPath: media/books/comics
-      - args:
-        - |
-          echo 'Customizing Kavita config...'
-          if [[ ! -f /config/appsettings.json ]]; then
-            echo '{"BaseUrl": "/kavita"}' > /config/appsettings.json
-            echo 'Kavita appsettings.json created.'
-          else
-            echo 'Kavita appsettings.json already exists.'
-          fi
-          echo 'Done customizing Kavita config.'
-        command:
-        - sh
-        - -c
-        image: busybox
-        name: config
-        securityContext:
-          runAsGroup: 1000
-          runAsUser: 1000
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: kavita
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - hostPath:
-          path: /opt/htpc
-          type: DirectoryOrCreate
-        name: htpc-home
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: htpc
-    run: lidarr
-  name: lidarr
-  namespace: htpc
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: htpc
-      run: lidarr
-  template:
-    metadata:
-      labels:
-        app: htpc
-        run: lidarr
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Pacific/Auckland
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: LIDARR__SERVER__URLBASE
-          value: /lidarr
-        - name: LIDARR__AUTH__METHOD
-          value: external
-        - name: LIDARR__AUTH__REQUIRED
-          value: enabled
-        - name: LIDARR__AUTH__APIKEY
-          value: htk8s-api-key-secure
-        image: lscr.io/linuxserver/lidarr:3.1.0.4875-ls15
-        livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:8686/lidarr/api/v1/health?ApiKey=$LIDARR__AUTH__APIKEY"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        name: lidarr
-        ports:
-        - containerPort: 8686
-          name: webui
-        readinessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:8686/lidarr/api/v1/system/status?ApiKey=$LIDARR__AUTH__APIKEY"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: lidarr
-        - mountPath: /music
-          name: htpc-home
-          subPath: media/music
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config && chown -R 1000:1000 /music
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: lidarr
-        - mountPath: /music
-          name: htpc-home
-          subPath: media/music
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - hostPath:
-          path: /opt/htpc
-          type: DirectoryOrCreate
-        name: htpc-home
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 400Gi
+  storageClassName: ""
+  volumeName: htpc-home
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -621,7 +163,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: prowlarr
+          subPath: config/prowlarr
       initContainers:
       - command:
         - sh
@@ -632,7 +174,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: prowlarr
+          subPath: config/prowlarr
       - args:
         - |
           echo 'Customizing Prowlarr config...'
@@ -651,14 +193,13 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: prowlarr
+          subPath: config/prowlarr
       securityContext:
         fsGroup: 1000
       volumes:
-      - hostPath:
-          path: /opt/htpc
-          type: DirectoryOrCreate
-        name: htpc-home
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: htpc-home-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -696,8 +237,10 @@ spec:
             - -c
             - curl "http://localhost:7878/radarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}'
               </config/config.xml)"
+          failureThreshold: 8
           initialDelaySeconds: 30
-          periodSeconds: 10
+          periodSeconds: 15
+          timeoutSeconds: 5
         name: radarr
         ports:
         - containerPort: 7878
@@ -709,12 +252,14 @@ spec:
             - -c
             - curl "http://localhost:7878/radarr/api/system/status?ApiKey=$(sed -ne
               '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          initialDelaySeconds: 30
-          periodSeconds: 10
+          failureThreshold: 8
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          timeoutSeconds: 5
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: radarr
+          subPath: config/radarr
         - mountPath: /movies
           name: htpc-home
           subPath: media/movies
@@ -731,7 +276,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: radarr
+          subPath: config/radarr
         - mountPath: /movies
           name: htpc-home
           subPath: media/movies
@@ -749,127 +294,13 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: radarr
+          subPath: config/radarr
       securityContext:
         fsGroup: 1000
       volumes:
-      - hostPath:
-          path: /opt/htpc
-          type: DirectoryOrCreate
-        name: htpc-home
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: htpc
-    run: readarr
-  name: readarr
-  namespace: htpc
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: htpc
-      run: readarr
-  template:
-    metadata:
-      labels:
-        app: htpc
-        run: readarr
-    spec:
-      containers:
-      - env:
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: TZ
-          value: Pacific/Auckland
-        image: lscr.io/linuxserver/readarr:nightly-0.4.16.2788-ls395
-        livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:8787/readarr/api/v1/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}'
-              </config/config.xml)"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        name: readarr
-        ports:
-        - containerPort: 8787
-        readinessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:8787/readarr/api/v1/system/status?ApiKey=$(sed
-              -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: readarr
-        - mountPath: /books
-          name: htpc-home
-          subPath: media/books/books
-        - mountPath: /audiobooks
-          name: htpc-home
-          subPath: media/books/audiobooks
-        - mountPath: /comics
-          name: htpc-home
-          subPath: media/books/comics
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config /books /comics /audiobooks
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: readarr
-        - mountPath: /books
-          name: htpc-home
-          subPath: media/books/books
-        - mountPath: /audiobooks
-          name: htpc-home
-          subPath: media/books/audiobooks
-        - mountPath: /comics
-          name: htpc-home
-          subPath: media/books/comics
-      - args:
-        - |
-          echo 'Customizing config...'
-          if [[ ! -f /config/config.xml ]]; then
-            echo '<Config><UrlBase>/readarr</UrlBase></Config>'> /config/config.xml
-          fi
-          echo 'Done customizing.'
-        command:
-        - sh
-        - -c
-        image: busybox
-        name: config
-        securityContext:
-          runAsGroup: 1000
-          runAsUser: 1000
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: readarr
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - hostPath:
-          path: /opt/htpc
-          type: DirectoryOrCreate
-        name: htpc-home
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: htpc-home-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -925,7 +356,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: sonarr
+          subPath: config/sonarr
         - mountPath: /tv
           name: htpc-home
           subPath: media/tv
@@ -942,7 +373,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: sonarr
+          subPath: config/sonarr
         - mountPath: /tv
           name: htpc-home
           subPath: media/tv
@@ -960,14 +391,13 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: sonarr
+          subPath: config/sonarr
       securityContext:
         fsGroup: 1000
       volumes:
-      - hostPath:
-          path: /opt/htpc
-          type: DirectoryOrCreate
-        name: htpc-home
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: htpc-home-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1017,7 +447,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: transmission
+          subPath: config/transmission
         - mountPath: /downloads
           name: htpc-home
           subPath: downloads
@@ -1034,7 +464,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: transmission
+          subPath: config/transmission
         - mountPath: /downloads
           name: htpc-home
           subPath: downloads
@@ -1044,10 +474,9 @@ spec:
       securityContext:
         fsGroup: 1000
       volumes:
-      - hostPath:
-          path: /opt/htpc
-          type: DirectoryOrCreate
-        name: htpc-home
+      - name: htpc-home
+        persistentVolumeClaim:
+          claimName: htpc-home-pvc
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute

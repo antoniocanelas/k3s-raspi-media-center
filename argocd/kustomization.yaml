@@ -1,8 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-bases:
-- github.com/argoproj/argo-cd/manifests/cluster-install?ref=v2.5.5
 
 namespace: argocd
 
@@ -10,6 +8,7 @@ resources:
 - namespace.yaml
 - application.yaml
 - ingress-route.yaml
+- github.com/argoproj/argo-cd/manifests/cluster-install?ref=v2.7.18
 
-patchesStrategicMerge:
-- argo-server_patch.yaml
+patches:
+- path: argo-server_patch.yaml

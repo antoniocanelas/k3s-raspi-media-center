@@ -1,11 +1,30 @@
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: htpc-home
+spec:
+  capacity:
+    storage: 400Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /volume1/arr-data
+    server: 192.168.0.200
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - hard
+    - nfsvers=3
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: local-path-pvc
+  name: htpc-home-pvc
+  namespace: htpc
 spec:
   accessModes:
-    - ReadWriteOnce
-  storageClassName: local-path
+    - ReadWriteMany
   resources:
     requests:
-      storage: 2Gi
+      storage: 400Gi
+  volumeName: htpc-home
+  storageClassName: ""

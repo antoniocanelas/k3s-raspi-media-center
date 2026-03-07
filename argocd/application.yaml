@@ -27,8 +27,8 @@ spec:
   project: default
   
   source:
-    repoURL: https://github.com/fabito/htk8s.git
-    targetRevision: master
+    repoURL: https://github.com/antoniocanelas/k3s-raspi-media-center.git
+    targetRevision: main
     path: argocd
 
   destination:

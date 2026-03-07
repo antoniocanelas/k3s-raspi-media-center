@@ -19,7 +19,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: kavita
+          subPath: config/kavita
         - mountPath: /books
           name: htpc-home
           subPath: media/books/books
@@ -39,7 +39,7 @@ spec:
           - |
             echo 'Customizing Kavita config...'
             if [[ ! -f /config/appsettings.json ]]; then
-              echo '{"BaseUrl": "/$(KAVITA)"}' > /config/appsettings.json
+              echo '{"BaseUrl": "/kavita"}' > /config/appsettings.json
               echo 'Kavita appsettings.json created.'
             else
               echo 'Kavita appsettings.json already exists.'
@@ -48,7 +48,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: kavita
+          subPath: config/kavita
       containers:
       - name: kavita
         image: lscr.io/linuxserver/kavita:latest
@@ -65,7 +65,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: kavita
+          subPath: config/kavita
         - mountPath: /books
           name: htpc-home
           subPath: media/books/books
@@ -77,3 +77,7 @@ spec:
           subPath: media/books/comics
       securityContext:
         fsGroup: 1000 # Should match PGID in configMap
+      volumes:
+        - name: htpc-home
+          persistentVolumeClaim:
+            claimName: htpc-home-pvc

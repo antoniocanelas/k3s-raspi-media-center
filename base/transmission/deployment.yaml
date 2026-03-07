@@ -24,7 +24,7 @@ spec:
         volumeMounts:
         - mountPath: /config 
           name: htpc-home
-          subPath: transmission
+          subPath: config/transmission
         - mountPath: /downloads 
           name: htpc-home
           subPath: downloads
@@ -59,10 +59,14 @@ spec:
         volumeMounts: 
         - mountPath: /config 
           name: htpc-home
-          subPath: transmission
+          subPath: config/transmission
         - mountPath: /downloads 
           name: htpc-home
           subPath: downloads
         - mountPath: /watch
           name: htpc-home
           subPath: watch
+      volumes:
+        - name: htpc-home
+          persistentVolumeClaim:
+            claimName: htpc-home-pvc

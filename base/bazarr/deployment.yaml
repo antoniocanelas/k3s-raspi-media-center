@@ -29,10 +29,10 @@ spec:
         - "sh"
         - "-c"
         - |
-          mkdir -p /htpc/bazarr/config
-          export RADARR_API_KEY=$(cat /htpc/radarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
-          export SONARR_API_KEY=$(cat /htpc/sonarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
-          cat << EOF > /htpc/bazarr/config/config.ini
+          mkdir -p /htpc/config/bazarr/config
+          export RADARR_API_KEY=$(cat /htpc/config/radarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
+          export SONARR_API_KEY=$(cat /htpc/config/sonarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
+          cat << EOF > /htpc/config/bazarr/config/config.ini
           [sonarr]
           apikey = ${SONARR_API_KEY}
           full_update = Daily
@@ -110,10 +110,14 @@ spec:
         volumeMounts: 
         - mountPath: /config 
           name: htpc-home
-          subPath: bazarr
+          subPath: config/bazarr
         - mountPath: /movies 
           name: htpc-home
           subPath: media/movies
         - mountPath: /tv
           name: htpc-home
           subPath: media/tv
+      volumes:
+        - name: htpc-home
+          persistentVolumeClaim:
+            claimName: htpc-home-pvc

@@ -24,7 +24,7 @@ spec:
         volumeMounts:
         - mountPath: /config 
           name: htpc-home
-          subPath: prowlarr
+          subPath: config/prowlarr
       - name: config
         image: busybox
         securityContext:
@@ -35,13 +35,13 @@ spec:
           - |
             echo 'Customizing Prowlarr config...'
             if [[ ! -f /config/config.xml ]]; then
-              echo '<Config><UrlBase>/$(PROWLARR)</UrlBase></Config>'> /config/config.xml
+              echo '<Config><UrlBase>/prowlarr</UrlBase></Config>'> /config/config.xml
             fi
             echo 'Prowlarr config customized.'
         volumeMounts: 
         - mountPath: /config 
           name: htpc-home
-          subPath: prowlarr
+          subPath: config/prowlarr
       containers:
       - env:
         - name: TZ
@@ -74,4 +74,8 @@ spec:
         volumeMounts: 
         - mountPath: /config 
           name: htpc-home
-          subPath: prowlarr
+          subPath: config/prowlarr
+      volumes:
+        - name: htpc-home
+          persistentVolumeClaim:
+            claimName: htpc-home-pvc

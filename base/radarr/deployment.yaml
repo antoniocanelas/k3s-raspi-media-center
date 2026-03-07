@@ -26,7 +26,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: radarr
+          subPath: config/radarr
         - mountPath: /movies
           name: htpc-home
           subPath: media/movies
@@ -37,11 +37,11 @@ spec:
           runAsUser: 1000
           runAsGroup: 1000
         args:
-          - "echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/$(RADARR)</UrlBase></Config>'> /config/config.xml;echo end;"
+          - "echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/radarr</UrlBase></Config>'> /config/config.xml;echo end;"
         volumeMounts: 
         - mountPath: /config 
           name: htpc-home
-          subPath: radarr
+          subPath: config/radarr
       containers:
       - env:
         - name: TZ
@@ -62,22 +62,30 @@ spec:
             - -c
             - curl "http://localhost:7878/radarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
           initialDelaySeconds: 30
-          periodSeconds: 10
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 8
         readinessProbe:
           exec:
             command:
             - /bin/sh
             - -c
             - curl "http://localhost:7878/radarr/api/system/status?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          initialDelaySeconds: 30
-          periodSeconds: 10
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 8
         volumeMounts: 
         - mountPath: /config 
           name: htpc-home
-          subPath: radarr
+          subPath: config/radarr
         - mountPath: /movies 
           name: htpc-home
           subPath: media/movies
         - mountPath: /downloads 
           name: htpc-home
           subPath: downloads
+      volumes:
+        - name: htpc-home
+          persistentVolumeClaim:
+            claimName: htpc-home-pvc

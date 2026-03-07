@@ -26,7 +26,7 @@ spec:
         volumeMounts:
         - mountPath: /config 
           name: htpc-home
-          subPath: sonarr    
+          subPath: config/sonarr
         - mountPath: /tv 
           name: htpc-home
           subPath: media/tv                
@@ -37,11 +37,11 @@ spec:
           runAsUser: 1000
           runAsGroup: 1000
         args:
-          - "echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/$(SONARR)</UrlBase></Config>'> /config/config.xml;echo end;"
+          - "echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/sonarr</UrlBase></Config>'> /config/config.xml;echo end;"
         volumeMounts: 
         - mountPath: /config 
           name: htpc-home
-          subPath: sonarr
+          subPath: config/sonarr
       containers:
       - env:
         - name: TZ
@@ -74,10 +74,14 @@ spec:
         volumeMounts: 
         - mountPath: /config 
           name: htpc-home
-          subPath: sonarr
+          subPath: config/sonarr
         - mountPath: /tv 
           name: htpc-home
           subPath: media/tv
         - mountPath: /downloads 
           name: htpc-home
           subPath: downloads
+      volumes:
+        - name: htpc-home
+          persistentVolumeClaim:
+            claimName: htpc-home-pvc

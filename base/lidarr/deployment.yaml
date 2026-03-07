@@ -26,7 +26,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: htpc-home
-          subPath: lidarr
+          subPath: config/lidarr
         - mountPath: /music
           name: htpc-home
           subPath: media/music
@@ -46,7 +46,7 @@ spec:
           value: enabled
         - name: LIDARR__AUTH__APIKEY
           value: htk8s-api-key-secure
-        image: lscr.io/linuxserver/lidarr
+        image: lscr.io/linuxserver/lidarr:arm64v8-latest
         name: lidarr
         ports:
         - containerPort: 8686
@@ -70,10 +70,14 @@ spec:
         volumeMounts: 
         - mountPath: /config 
           name: htpc-home
-          subPath: lidarr
+          subPath: config/lidarr
         - mountPath: /music 
           name: htpc-home
           subPath: media/music
         - mountPath: /downloads 
           name: htpc-home
           subPath: downloads
+      volumes:
+        - name: htpc-home
+          persistentVolumeClaim:
+            claimName: htpc-home-pvc

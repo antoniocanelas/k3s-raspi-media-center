@@ -37,7 +37,7 @@ spec:
         volumeMounts: 
         - mountPath: /config 
           name: htpc-home
-          subPath: emby
+          subPath: config/emby
         - mountPath: /tv 
           name: htpc-home
           subPath: media/tv  
