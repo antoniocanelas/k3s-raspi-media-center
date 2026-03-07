@@ -215,6 +215,8 @@ spec:
     matchLabels:
       app: htpc
       run: radarr
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -256,6 +258,12 @@ spec:
           initialDelaySeconds: 20
           periodSeconds: 15
           timeoutSeconds: 5
+        startupProbe:
+          failureThreshold: 30
+          periodSeconds: 10
+          tcpSocket:
+            port: 7878
+          timeoutSeconds: 2
         volumeMounts:
         - mountPath: /config
           name: htpc-home
@@ -316,6 +324,8 @@ spec:
     matchLabels:
       app: htpc
       run: sonarr
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -338,8 +348,10 @@ spec:
             - -c
             - curl "http://localhost:8989/sonarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}'
               </config/config.xml)"
+          failureThreshold: 8
           initialDelaySeconds: 30
-          periodSeconds: 10
+          periodSeconds: 15
+          timeoutSeconds: 5
         name: sonarr
         ports:
         - containerPort: 8989
@@ -351,8 +363,16 @@ spec:
             - -c
             - curl "http://localhost:8989/sonarr/api/system/status?ApiKey=$(sed -ne
               '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          initialDelaySeconds: 30
+          failureThreshold: 8
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          timeoutSeconds: 5
+        startupProbe:
+          failureThreshold: 30
           periodSeconds: 10
+          tcpSocket:
+            port: 8989
+          timeoutSeconds: 2
         volumeMounts:
         - mountPath: /config
           name: htpc-home

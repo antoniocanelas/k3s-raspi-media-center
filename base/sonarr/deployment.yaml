@@ -7,6 +7,8 @@ metadata:
   name: sonarr
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       run: sonarr
@@ -55,6 +57,12 @@ spec:
         ports:
         - containerPort: 8989
           name: webui
+        startupProbe:
+          tcpSocket:
+            port: 8989
+          failureThreshold: 30
+          periodSeconds: 10
+          timeoutSeconds: 2
         livenessProbe:
           exec:
             command:
@@ -62,15 +70,19 @@ spec:
             - -c
             - curl "http://localhost:8989/sonarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
           initialDelaySeconds: 30
-          periodSeconds: 10
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 8
         readinessProbe:
           exec:
             command:
             - /bin/sh
             - -c
             - curl "http://localhost:8989/sonarr/api/system/status?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          initialDelaySeconds: 30
-          periodSeconds: 10
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 8
         volumeMounts: 
         - mountPath: /config 
           name: htpc-home
