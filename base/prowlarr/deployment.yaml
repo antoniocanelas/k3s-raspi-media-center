@@ -26,7 +26,7 @@ spec:
         volumeMounts:
         - mountPath: /config 
           name: media-config
-          subPath: config/prowlarr
+          subPath: prowlarr
       - name: config
         image: busybox
         securityContext:
@@ -43,7 +43,7 @@ spec:
         volumeMounts: 
         - mountPath: /config 
           name: media-config
-          subPath: config/prowlarr
+          subPath: prowlarr
       containers:
       - env:
         - name: TZ
@@ -76,7 +76,7 @@ spec:
         volumeMounts: 
         - mountPath: /config 
           name: media-config
-          subPath: config/prowlarr
+          subPath: prowlarr
       volumes:
         - name: media-config
           persistentVolumeClaim:

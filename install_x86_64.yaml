@@ -411,7 +411,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: media-config
-          subPath: config/sonarr
+          subPath: sonarr
         - mountPath: /tv
           name: media
           subPath: media/tv
@@ -429,7 +429,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: media-config
-          subPath: config/sonarr
+          subPath: sonarr
       securityContext:
         fsGroup: 1000
       volumes:
