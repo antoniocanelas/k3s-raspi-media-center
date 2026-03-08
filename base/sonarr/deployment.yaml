@@ -26,12 +26,16 @@ spec:
         image: busybox
         command: ["sh", "-c", "chown -R 1000:1000 /config && chown -R 1000:1000 /tv"]
         volumeMounts:
-        - mountPath: /config 
-          name: htpc-home
-          subPath: config/sonarr
-        - mountPath: /tv
-          name: htpc-home
-          subPath: torrents
+          - mountPath: /config
+            name: htpc-home
+            subPath: config/sonarr
+          - mountPath: /tv
+            name: htpc-home
+            subPath: torrents
+            # TODO remove /downloads
+          - mountPath: /downloads
+            name: htpc-home
+            subPath: downloads
       - name: config
         image: busybox
         command: ["sh", "-c"]
@@ -40,10 +44,17 @@ spec:
           runAsGroup: 1000
         args:
           - "echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/sonarr</UrlBase></Config>'> /config/config.xml;echo end;"
-        volumeMounts: 
-        - mountPath: /config 
-          name: htpc-home
-          subPath: config/sonarr
+        volumeMounts:
+          - mountPath: /config
+            name: htpc-home
+            subPath: config/sonarr
+          - mountPath: /tv
+            name: htpc-home
+            subPath: torrents
+            # TODO remove /downloads
+          - mountPath: /downloads
+            name: htpc-home
+            subPath: downloads
       containers:
       - env:
         - name: TZ
@@ -83,15 +94,15 @@ spec:
           periodSeconds: 15
           timeoutSeconds: 5
           failureThreshold: 8
-        volumeMounts: 
-        - mountPath: /config 
+        volumeMounts:
+        - mountPath: /config
           name: htpc-home
           subPath: config/sonarr
         - mountPath: /tv
           name: htpc-home
           subPath: torrents
           # TODO remove /downloads
-        - mountPath: /downloads 
+        - mountPath: /downloads
           name: htpc-home
           subPath: downloads
       volumes:
