@@ -208,7 +208,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: media-config
-          subPath: config/prowlarr
+          subPath: prowlarr
       initContainers:
       - command:
         - sh
@@ -219,7 +219,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: media-config
-          subPath: config/prowlarr
+          subPath: prowlarr
       - args:
         - |
           echo 'Customizing Prowlarr config...'
@@ -238,7 +238,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: media-config
-          subPath: config/prowlarr
+          subPath: prowlarr
       securityContext:
         fsGroup: 1000
       volumes:
