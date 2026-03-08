@@ -11,11 +11,11 @@ spec:
   - port: 6881
     protocol: TCP
     targetPort: 6881
-    name: torrent-tcp
+    name: qbittorrent-tcp
   - port: 6881
     protocol: UDP
     targetPort: 6881
-    name: torrent-udp
+    name: qbittorrent-udp
   selector:
     run: qbittorrent
 

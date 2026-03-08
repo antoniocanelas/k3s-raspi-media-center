@@ -3,75 +3,16 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    app: htpc
-  name: htpc
+    app: media
+  name: media
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: htpc
-  name: prowlarr
-  namespace: htpc
-spec:
-  ports:
-  - name: webui
-    port: 9696
-    protocol: TCP
-    targetPort: 9696
-  selector:
-    app: htpc
-    run: prowlarr
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: htpc
-  name: qbittorrent
-  namespace: htpc
-spec:
-  ports:
-  - name: webui
-    port: 8080
-    protocol: TCP
-    targetPort: 8080
-  - name: torrent-tcp
-    port: 6881
-    protocol: TCP
-    targetPort: 6881
-  - name: torrent-udp
-    port: 6881
-    protocol: UDP
-    targetPort: 6881
-  selector:
-    app: htpc
-    run: qbittorrent
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: htpc
-  name: radarr
-  namespace: htpc
-spec:
-  ports:
-  - name: webui
-    port: 7878
-    protocol: TCP
-    targetPort: 7878
-  selector:
-    app: htpc
-    run: radarr
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: htpc
+    app: media
   name: sonarr
-  namespace: htpc
+  namespace: media
 spec:
   ports:
   - name: webui
@@ -79,15 +20,15 @@ spec:
     protocol: TCP
     targetPort: 8989
   selector:
-    app: htpc
+    app: media
     run: sonarr
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
-    app: htpc
-  name: htpc-home
+    app: media
+  name: media
 spec:
   accessModes:
   - ReadWriteMany
@@ -95,9 +36,28 @@ spec:
     storage: 400Gi
   mountOptions:
   - hard
-  - nfsvers=3
+  - nfsvers=4.1
   nfs:
-    path: /volume1/arr-data
+    path: /volume1/media
+    server: 192.168.0.200
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app: media
+  name: media-config
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 10Gi
+  mountOptions:
+  - hard
+  - nfsvers=4.1
+  nfs:
+    path: /volume1/raspik8sconf
     server: 192.168.0.200
   persistentVolumeReclaimPolicy: Retain
 ---
@@ -105,9 +65,25 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    app: htpc
-  name: htpc-home-pvc
-  namespace: htpc
+    app: media
+  name: media-config-pvc
+  namespace: media
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: ""
+  volumeName: media-config
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: media
+  name: media-pvc
+  namespace: media
 spec:
   accessModes:
   - ReadWriteMany
@@ -115,308 +91,26 @@ spec:
     requests:
       storage: 400Gi
   storageClassName: ""
-  volumeName: htpc-home
+  volumeName: media
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: htpc
-    run: prowlarr
-  name: prowlarr
-  namespace: htpc
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: htpc
-      run: prowlarr
-  template:
-    metadata:
-      labels:
-        app: htpc
-        run: prowlarr
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Pacific/Auckland
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        image: linuxserver/prowlarr:2.3.0.5236-ls134
-        livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:9696/prowlarr/api/v1/health?ApiKey=$(sed -ne
-              '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        name: prowlarr
-        ports:
-        - containerPort: 9696
-          name: webui
-        readinessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:9696/prowlarr/api/v1/system/status?ApiKey=$(sed
-              -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: config/prowlarr
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: config/prowlarr
-      - args:
-        - |
-          echo 'Customizing Prowlarr config...'
-          if [[ ! -f /config/config.xml ]]; then
-            echo '<Config><UrlBase>/prowlarr</UrlBase></Config>'> /config/config.xml
-          fi
-          echo 'Prowlarr config customized.'
-        command:
-        - sh
-        - -c
-        image: busybox
-        name: config
-        securityContext:
-          runAsGroup: 1000
-          runAsUser: 1000
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: config/prowlarr
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - name: htpc-home
-        persistentVolumeClaim:
-          claimName: htpc-home-pvc
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: htpc
-    run: qbittorrent
-  name: qbittorrent
-  namespace: htpc
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: htpc
-      run: qbittorrent
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: htpc
-        run: qbittorrent
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Pacific/Auckland
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: WEBUI_PORT
-          value: "8080"
-        image: lscr.io/linuxserver/qbittorrent:5.1.2-r0-ls414
-        name: qbittorrent
-        ports:
-        - containerPort: 8080
-          name: webui
-          protocol: TCP
-        - containerPort: 6881
-          name: torrent-tcp
-          protocol: TCP
-        - containerPort: 6881
-          name: torrent-udp
-          protocol: UDP
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: config/qbittorrent
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: torrents
-        - mountPath: /watch
-          name: htpc-home
-          subPath: watch
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config && chown -R 1000:1000 /downloads && chown -R
-          1000:1000 /watch
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: config/qbittorrent
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
-        - mountPath: /watch
-          name: htpc-home
-          subPath: watch
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - name: htpc-home
-        persistentVolumeClaim:
-          claimName: htpc-home-pvc
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: htpc
-    run: radarr
-  name: radarr
-  namespace: htpc
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: htpc
-      run: radarr
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: htpc
-        run: radarr
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Pacific/Auckland
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        image: linuxserver/radarr:6.0.4.10291-ls289
-        livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:7878/radarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}'
-              </config/config.xml)"
-          failureThreshold: 8
-          initialDelaySeconds: 30
-          periodSeconds: 15
-          timeoutSeconds: 5
-        name: radarr
-        ports:
-        - containerPort: 7878
-          name: webui
-        readinessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:7878/radarr/api/system/status?ApiKey=$(sed -ne
-              '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          failureThreshold: 8
-          initialDelaySeconds: 20
-          periodSeconds: 15
-          timeoutSeconds: 5
-        startupProbe:
-          failureThreshold: 30
-          periodSeconds: 10
-          tcpSocket:
-            port: 7878
-          timeoutSeconds: 2
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: config/radarr
-        - mountPath: /movies
-          name: htpc-home
-          subPath: torrents
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config && chown -R 1000:1000 /movies
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: config/radarr
-        - mountPath: /movies
-          name: htpc-home
-          subPath: torrents
-      - args:
-        - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/radarr</UrlBase></Config>'>
-          /config/config.xml;echo end;
-        command:
-        - sh
-        - -c
-        image: busybox
-        name: config
-        securityContext:
-          runAsGroup: 1000
-          runAsUser: 1000
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: config/radarr
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - name: htpc-home
-        persistentVolumeClaim:
-          claimName: htpc-home-pvc
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: htpc
+    app: media
     run: sonarr
   name: sonarr
-  namespace: htpc
+  namespace: media
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: htpc
+      app: media
       run: sonarr
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
-        app: htpc
+        app: media
         run: sonarr
     spec:
       containers:
@@ -462,14 +156,11 @@ spec:
           timeoutSeconds: 2
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: media-config
           subPath: config/sonarr
         - mountPath: /tv
-          name: htpc-home
-          subPath: torrents
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
+          name: media
+          subPath: media/tv
       initContainers:
       - command:
         - sh
@@ -479,11 +170,11 @@ spec:
         name: chown
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: media-config
           subPath: config/sonarr
         - mountPath: /tv
-          name: htpc-home
-          subPath: torrents
+          name: media
+          subPath: media/tv
       - args:
         - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/sonarr</UrlBase></Config>'>
           /config/config.xml;echo end;
@@ -497,61 +188,28 @@ spec:
           runAsUser: 1000
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: media-config
           subPath: config/sonarr
       securityContext:
         fsGroup: 1000
       volumes:
-      - name: htpc-home
+      - name: media-config
         persistentVolumeClaim:
-          claimName: htpc-home-pvc
+          claimName: media-config-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: media-pvc
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   labels:
-    app: htpc
-  name: htpc
-  namespace: htpc
+    app: media
+  name: media
+  namespace: media
 spec:
   entryPoints: []
   routes:
-  - kind: Rule
-    match: PathPrefix(`/jackett`)
-    middlewares: []
-    priority: 0
-    services:
-    - kind: Service
-      name: jackett
-      namespace: htpc
-      port: 9117
-  - kind: Rule
-    match: PathPrefix(`/sonarr`)
-    middlewares: []
-    priority: 0
-    services:
-    - kind: Service
-      name: sonarr
-      namespace: htpc
-      port: 8989
-  - kind: Rule
-    match: PathPrefix(`/radarr`)
-    middlewares: []
-    priority: 0
-    services:
-    - kind: Service
-      name: radarr
-      namespace: htpc
-      port: 7878
-  - kind: Rule
-    match: PathPrefix(`/bazarr`)
-    middlewares: []
-    priority: 0
-    services:
-    - kind: Service
-      name: bazarr
-      namespace: htpc
-      port: 6767
   - kind: Rule
     match: PathPrefix(`/transmission`)
     middlewares: []
@@ -559,19 +217,8 @@ spec:
     services:
     - kind: Service
       name: transmission
-      namespace: htpc
+      namespace: media
       port: 9091
-  - kind: Rule
-    match: PathPrefix(`/qbittorrent`)
-    middlewares:
-    - name: strip-qbittorrent
-    priority: 0
-    services:
-    - kind: Service
-      name: qbittorrent
-      namespace: htpc
-      passHostHeader: true
-      port: 8080
   - kind: Rule
     match: PathPrefix(`/prowlarr`)
     middlewares: []
@@ -579,45 +226,14 @@ spec:
     services:
     - kind: Service
       name: prowlarr
-      namespace: htpc
+      namespace: media
       port: 9696
   - kind: Rule
-    match: PathPrefix(`/readarr`)
+    match: PathPrefix(`/sonarr`)
     middlewares: []
     priority: 0
     services:
     - kind: Service
-      name: readarr
-      namespace: htpc
-      port: 8787
-  - kind: Rule
-    match: PathPrefix(`/kavita`)
-    middlewares: []
-    priority: 0
-    services:
-    - kind: Service
-      name: kavita
-      namespace: htpc
-      port: 5000
-  - kind: Rule
-    match: PathPrefix(`/lidarr`)
-    middlewares: []
-    priority: 0
-    services:
-    - kind: Service
-      name: lidarr
-      namespace: htpc
-      port: 8686
----
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  labels:
-    app: htpc
-  name: strip-qbittorrent
-  namespace: htpc
-spec:
-  stripPrefix:
-    forceSlash: false
-    prefixes:
-    - /qbittorrent
+      name: sonarr
+      namespace: media
+      port: 8989

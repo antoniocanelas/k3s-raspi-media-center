@@ -20,7 +20,21 @@ spec:
       initContainers:
       - name: chown
         image: busybox
-        command: ["sh", "-c", "chown -R 1000:1000 /config"]
+        command: ["sh", "-c"]
+        args:
+          - |
+            set -e
+            mkdir -p /config /downloads/complete /downloads/incomplete /watch
+            chown -R 1000:1000 /config /downloads /watch
+            echo "Done setting permissions."
+            echo "ls config:"
+            ls /config
+            echo "ls downloads:"
+            ls /downloads
+            echo "ls watch:"
+            ls /watch
+            touch /config/queue.json
+            ls /config
         volumeMounts:
         - mountPath: /config 
           name: htpc-home
@@ -60,7 +74,7 @@ spec:
         - mountPath: /config 
           name: htpc-home
           subPath: config/transmission
-        - mountPath: /downloads 
+        - mountPath: /downloads
           name: htpc-home
           subPath: downloads
         - mountPath: /watch

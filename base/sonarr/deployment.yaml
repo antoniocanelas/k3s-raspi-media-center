@@ -7,8 +7,6 @@ metadata:
   name: sonarr
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       run: sonarr
@@ -26,16 +24,12 @@ spec:
         image: busybox
         command: ["sh", "-c", "chown -R 1000:1000 /config && chown -R 1000:1000 /tv"]
         volumeMounts:
-          - mountPath: /config
-            name: htpc-home
-            subPath: config/sonarr
-          - mountPath: /tv
-            name: htpc-home
-            subPath: torrents
-            # TODO remove /downloads
-          - mountPath: /downloads
-            name: htpc-home
-            subPath: downloads
+        - mountPath: /config
+          name: media-config
+          subPath: config/sonarr
+        - mountPath: /tv
+          name: media
+          subPath: media/tv
       - name: config
         image: busybox
         command: ["sh", "-c"]
@@ -45,16 +39,9 @@ spec:
         args:
           - "echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/sonarr</UrlBase></Config>'> /config/config.xml;echo end;"
         volumeMounts:
-          - mountPath: /config
-            name: htpc-home
-            subPath: config/sonarr
-          - mountPath: /tv
-            name: htpc-home
-            subPath: torrents
-            # TODO remove /downloads
-          - mountPath: /downloads
-            name: htpc-home
-            subPath: downloads
+        - mountPath: /config
+          name: media-config
+          subPath: config/sonarr
       containers:
       - env:
         - name: TZ
@@ -96,16 +83,15 @@ spec:
           failureThreshold: 8
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: media-config
           subPath: config/sonarr
         - mountPath: /tv
-          name: htpc-home
-          subPath: torrents
-          # TODO remove /downloads
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
+          name: media
+          subPath: media/tv
       volumes:
-        - name: htpc-home
+        - name: media-config
           persistentVolumeClaim:
-            claimName: htpc-home-pvc
+            claimName: media-config-pvc
+        - name: media
+          persistentVolumeClaim:
+            claimName: media-pvc

@@ -7,8 +7,6 @@ metadata:
   name: radarr
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       run: radarr
@@ -24,15 +22,14 @@ spec:
       initContainers:
       - name: chown
         image: busybox
-        command: ["sh", "-c", "chown -R 1000:1000 /config && chown -R 1000:1000 /movies"]
+        command: ["sh", "-c", "chown -R 1000:1000 /config && chown -R 1000:1000 /movies && chown -R 1000:1000 /downloads"]
         volumeMounts:
           - mountPath: /config
             name: htpc-home
             subPath: config/radarr
           - mountPath: /movies
             name: htpc-home
-            subPath: torrents
-          # TODO remove /downloads
+            subPath: media/movies
           - mountPath: /downloads
             name: htpc-home
             subPath: downloads
@@ -45,16 +42,9 @@ spec:
         args:
           - "echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/radarr</UrlBase></Config>'> /config/config.xml;echo end;"
         volumeMounts:
-          - mountPath: /config
-            name: htpc-home
-            subPath: config/radarr
-          - mountPath: /movies
-            name: htpc-home
-            subPath: torrents
-          # TODO remove /downloads
-          - mountPath: /downloads
-            name: htpc-home
-            subPath: downloads
+        - mountPath: /config
+          name: htpc-home
+          subPath: config/radarr
       containers:
       - env:
         - name: TZ
@@ -100,8 +90,7 @@ spec:
           subPath: config/radarr
         - mountPath: /movies
           name: htpc-home
-          subPath: torrents
-# TODO remove /downloads
+          subPath: media/movies
         - mountPath: /downloads
           name: htpc-home
           subPath: downloads

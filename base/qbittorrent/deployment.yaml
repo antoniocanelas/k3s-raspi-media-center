@@ -50,10 +50,10 @@ spec:
           name: webui
           protocol: TCP
         - containerPort: 6881
-          name: torrent-tcp
+          name: qbittorrent-tcp
           protocol: TCP
         - containerPort: 6881
-          name: torrent-udp
+          name: qbittorrent-udp
           protocol: UDP
         volumeMounts:
         - mountPath: /config
@@ -61,7 +61,7 @@ spec:
           subPath: config/qbittorrent
         - mountPath: /downloads
           name: htpc-home
-          subPath: torrents
+          subPath: downloads
         - mountPath: /watch
           name: htpc-home
           subPath: watch
