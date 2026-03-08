@@ -7,6 +7,8 @@ metadata:
   name: sonarr
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       run: sonarr
@@ -26,7 +28,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: media-config
-          subPath: config/sonarr
+          subPath: sonarr
         - mountPath: /tv
           name: media
           subPath: media/tv
@@ -37,11 +39,11 @@ spec:
           runAsUser: 1000
           runAsGroup: 1000
         args:
-          - "echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/sonarr</UrlBase></Config>'> /config/config.xml;echo end;"
+        - "echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/sonarr</UrlBase></Config>'> /config/config.xml;echo end;"
         volumeMounts:
         - mountPath: /config
           name: media-config
-          subPath: config/sonarr
+          subPath: sonarr
       containers:
       - env:
         - name: TZ
@@ -84,10 +86,13 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: media-config
-          subPath: config/sonarr
+          subPath: sonarr
         - mountPath: /tv
           name: media
           subPath: media/tv
+        - mountPath: /downloads
+          name: media
+          subPath: downloads
       volumes:
         - name: media-config
           persistentVolumeClaim:

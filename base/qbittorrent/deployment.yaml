@@ -25,13 +25,13 @@ spec:
         command: ["sh", "-c", "chown -R 1000:1000 /config && chown -R 1000:1000 /downloads && chown -R 1000:1000 /watch"]
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
-          subPath: config/qbittorrent
+          name: media-config
+          subPath: qbittorrent
         - mountPath: /downloads
-          name: htpc-home
+          name: media
           subPath: downloads
         - mountPath: /watch
-          name: htpc-home
+          name: media
           subPath: watch
       containers:
       - name: qbittorrent
@@ -56,16 +56,19 @@ spec:
           name: qbittorrent-udp
           protocol: UDP
         volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: config/qbittorrent
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
-        - mountPath: /watch
-          name: htpc-home
-          subPath: watch
+          - mountPath: /config
+            name: media-config
+            subPath: qbittorrent
+          - mountPath: /downloads
+            name: media
+            subPath: downloads
+          - mountPath: /watch
+            name: media
+            subPath: watch
       volumes:
-      - name: htpc-home
-        persistentVolumeClaim:
-          claimName: htpc-home-pvc
+        - name: media-config
+          persistentVolumeClaim:
+            claimName: media-config-pvc
+        - name: media
+          persistentVolumeClaim:
+            claimName: media-pvc

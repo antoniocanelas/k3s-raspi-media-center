@@ -7,6 +7,8 @@ metadata:
   name: transmission
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       run: transmission
@@ -20,30 +22,16 @@ spec:
       initContainers:
       - name: chown
         image: busybox
-        command: ["sh", "-c"]
-        args:
-          - |
-            set -e
-            mkdir -p /config /downloads/complete /downloads/incomplete /watch
-            chown -R 1000:1000 /config /downloads /watch
-            echo "Done setting permissions."
-            echo "ls config:"
-            ls /config
-            echo "ls downloads:"
-            ls /downloads
-            echo "ls watch:"
-            ls /watch
-            touch /config/queue.json
-            ls /config
+        command: ["sh", "-c", "chown -R 1000:1000 /config"]
         volumeMounts:
         - mountPath: /config 
-          name: htpc-home
-          subPath: config/transmission
+          name: media-config
+          subPath: transmission
         - mountPath: /downloads 
-          name: htpc-home
+          name: media
           subPath: downloads
         - mountPath: /watch
-          name: htpc-home
+          name: media
           subPath: watch
       containers:    
       - name: transmission
@@ -70,17 +58,20 @@ spec:
           name: torrent-udp
           protocol: UDP
         resources: {}
-        volumeMounts: 
-        - mountPath: /config 
-          name: htpc-home
-          subPath: config/transmission
+        volumeMounts:
+        - mountPath: /config
+          name: media-config
+          subPath: transmission
         - mountPath: /downloads
-          name: htpc-home
+          name: media
           subPath: downloads
         - mountPath: /watch
-          name: htpc-home
+          name: media
           subPath: watch
       volumes:
-        - name: htpc-home
+        - name: media-config
           persistentVolumeClaim:
-            claimName: htpc-home-pvc
+            claimName: media-config-pvc
+        - name: media
+          persistentVolumeClaim:
+            claimName: media-pvc

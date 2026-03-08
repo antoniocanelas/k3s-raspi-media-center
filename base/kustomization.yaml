@@ -13,11 +13,11 @@ resources:
 - namespace.yaml
 - ingress-route.yaml
 - pvc.yaml
-#- transmission
-#- prowlarr
+- transmission
+- qbittorrent
+- prowlarr
 - sonarr
 #- radarr
-#- qbittorrent
 #- jackett
 #- bazarr
 #- readarr

@@ -11,6 +11,48 @@ kind: Service
 metadata:
   labels:
     app: media
+  name: prowlarr
+  namespace: media
+spec:
+  ports:
+  - name: webui
+    port: 9696
+    protocol: TCP
+    targetPort: 9696
+  selector:
+    app: media
+    run: prowlarr
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: media
+  name: qbittorrent
+  namespace: media
+spec:
+  ports:
+  - name: webui
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: qbittorrent-tcp
+    port: 6881
+    protocol: TCP
+    targetPort: 6881
+  - name: qbittorrent-udp
+    port: 6881
+    protocol: UDP
+    targetPort: 6881
+  selector:
+    app: media
+    run: qbittorrent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: media
   name: sonarr
   namespace: media
 spec:
@@ -22,6 +64,23 @@ spec:
   selector:
     app: media
     run: sonarr
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: media
+  name: transmission
+  namespace: media
+spec:
+  ports:
+  - name: webui
+    port: 9091
+    protocol: TCP
+    targetPort: 9091
+  selector:
+    app: media
+    run: transmission
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -98,6 +157,182 @@ kind: Deployment
 metadata:
   labels:
     app: media
+    run: prowlarr
+  name: prowlarr
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media
+      run: prowlarr
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: media
+        run: prowlarr
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Pacific/Auckland
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        image: linuxserver/prowlarr
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - curl "http://localhost:9696/prowlarr/api/v1/health?ApiKey=$(sed -ne
+              '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        name: prowlarr
+        ports:
+        - containerPort: 9696
+          name: webui
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - curl "http://localhost:9696/prowlarr/api/v1/system/status?ApiKey=$(sed
+              -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        volumeMounts:
+        - mountPath: /config
+          name: media-config
+          subPath: config/prowlarr
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /config
+        image: busybox
+        name: chown
+        volumeMounts:
+        - mountPath: /config
+          name: media-config
+          subPath: config/prowlarr
+      - args:
+        - |
+          echo 'Customizing Prowlarr config...'
+          if [[ ! -f /config/config.xml ]]; then
+            echo '<Config><UrlBase>/prowlarr</UrlBase></Config>'> /config/config.xml
+          fi
+          echo 'Prowlarr config customized.'
+        command:
+        - sh
+        - -c
+        image: busybox
+        name: config
+        securityContext:
+          runAsGroup: 1000
+          runAsUser: 1000
+        volumeMounts:
+        - mountPath: /config
+          name: media-config
+          subPath: config/prowlarr
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - name: media-config
+        persistentVolumeClaim:
+          claimName: media-config-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: media
+    run: qbittorrent
+  name: qbittorrent
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media
+      run: qbittorrent
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: media
+        run: qbittorrent
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Pacific/Auckland
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: WEBUI_PORT
+          value: "8080"
+        image: lscr.io/linuxserver/qbittorrent:latest
+        name: qbittorrent
+        ports:
+        - containerPort: 8080
+          name: webui
+          protocol: TCP
+        - containerPort: 6881
+          name: qbittorrent-tcp
+          protocol: TCP
+        - containerPort: 6881
+          name: qbittorrent-udp
+          protocol: UDP
+        volumeMounts:
+        - mountPath: /config
+          name: media-config
+          subPath: qbittorrent
+        - mountPath: /downloads
+          name: media
+          subPath: downloads
+        - mountPath: /watch
+          name: media
+          subPath: watch
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /config && chown -R 1000:1000 /downloads && chown -R
+          1000:1000 /watch
+        image: busybox
+        name: chown
+        volumeMounts:
+        - mountPath: /config
+          name: media-config
+          subPath: qbittorrent
+        - mountPath: /downloads
+          name: media
+          subPath: downloads
+        - mountPath: /watch
+          name: media
+          subPath: watch
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - name: media-config
+        persistentVolumeClaim:
+          claimName: media-config-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: media-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: media
     run: sonarr
   name: sonarr
   namespace: media
@@ -107,6 +342,8 @@ spec:
     matchLabels:
       app: media
       run: sonarr
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -157,10 +394,13 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: media-config
-          subPath: config/sonarr
+          subPath: sonarr
         - mountPath: /tv
           name: media
           subPath: media/tv
+        - mountPath: /downloads
+          name: media
+          subPath: downloads
       initContainers:
       - command:
         - sh
@@ -200,6 +440,90 @@ spec:
         persistentVolumeClaim:
           claimName: media-pvc
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: media
+    run: transmission
+  name: transmission
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media
+      run: transmission
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: media
+        run: transmission
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Pacific/Auckland
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: WHITELIST
+          value: ""
+        - name: HOST_WHITELIST
+          value: ""
+        image: linuxserver/transmission:arm64v8-latest
+        name: transmission
+        ports:
+        - containerPort: 9091
+          name: webui
+          protocol: TCP
+        - containerPort: 51413
+          name: torrent-tcp
+          protocol: TCP
+        - containerPort: 51413
+          name: torrent-udp
+          protocol: UDP
+        resources: {}
+        volumeMounts:
+        - mountPath: /config
+          name: media-config
+          subPath: transmission
+        - mountPath: /downloads
+          name: media
+          subPath: downloads
+        - mountPath: /watch
+          name: media
+          subPath: watch
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /config
+        image: busybox
+        name: chown
+        volumeMounts:
+        - mountPath: /config
+          name: media-config
+          subPath: transmission
+        - mountPath: /downloads
+          name: media
+          subPath: downloads
+        - mountPath: /watch
+          name: media
+          subPath: watch
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - name: media-config
+        persistentVolumeClaim:
+          claimName: media-config-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: media-pvc
+---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -208,7 +532,8 @@ metadata:
   name: media
   namespace: media
 spec:
-  entryPoints: []
+  entryPoints:
+  - web
   routes:
   - kind: Rule
     match: PathPrefix(`/transmission`)
@@ -219,6 +544,16 @@ spec:
       name: transmission
       namespace: media
       port: 9091
+  - kind: Rule
+    match: PathPrefix(`/qbittorrent`)
+    middlewares: []
+    priority: 0
+    services:
+    - kind: Service
+      name: qbittorrent
+      namespace: media
+      passHostHeader: true
+      port: 8080
   - kind: Rule
     match: PathPrefix(`/prowlarr`)
     middlewares: []
@@ -231,7 +566,7 @@ spec:
   - kind: Rule
     match: PathPrefix(`/sonarr`)
     middlewares: []
-    priority: 0
+    priority: 100
     services:
     - kind: Service
       name: sonarr
