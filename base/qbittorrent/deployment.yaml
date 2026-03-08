@@ -61,7 +61,7 @@ spec:
           subPath: config/qbittorrent
         - mountPath: /downloads
           name: htpc-home
-          subPath: downloads
+          subPath: torrents
         - mountPath: /watch
           name: htpc-home
           subPath: watch
@@ -69,5 +69,3 @@ spec:
       - name: htpc-home
         persistentVolumeClaim:
           claimName: htpc-home-pvc
-
-

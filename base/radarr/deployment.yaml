@@ -31,7 +31,7 @@ spec:
           subPath: config/radarr
         - mountPath: /movies
           name: htpc-home
-          subPath: media/movies
+          subPath: torrents
       - name: config
         image: busybox
         command: ["sh", "-c"]
@@ -87,10 +87,11 @@ spec:
         - mountPath: /config 
           name: htpc-home
           subPath: config/radarr
-        - mountPath: /movies 
+        - mountPath: /movies
           name: htpc-home
-          subPath: media/movies
-        - mountPath: /downloads 
+          subPath: torrents
+# TODO remove /downloads
+        - mountPath: /downloads
           name: htpc-home
           subPath: downloads
       volumes:

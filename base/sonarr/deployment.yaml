@@ -29,9 +29,9 @@ spec:
         - mountPath: /config 
           name: htpc-home
           subPath: config/sonarr
-        - mountPath: /tv 
+        - mountPath: /tv
           name: htpc-home
-          subPath: media/tv                
+          subPath: torrents
       - name: config
         image: busybox
         command: ["sh", "-c"]
@@ -87,9 +87,10 @@ spec:
         - mountPath: /config 
           name: htpc-home
           subPath: config/sonarr
-        - mountPath: /tv 
+        - mountPath: /tv
           name: htpc-home
-          subPath: media/tv
+          subPath: torrents
+          # TODO remove /downloads
         - mountPath: /downloads 
           name: htpc-home
           subPath: downloads

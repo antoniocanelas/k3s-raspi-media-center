@@ -259,7 +259,7 @@ spec:
           subPath: config/qbittorrent
         - mountPath: /downloads
           name: htpc-home
-          subPath: downloads
+          subPath: torrents
         - mountPath: /watch
           name: htpc-home
           subPath: watch
@@ -357,7 +357,7 @@ spec:
           subPath: config/radarr
         - mountPath: /movies
           name: htpc-home
-          subPath: media/movies
+          subPath: torrents
         - mountPath: /downloads
           name: htpc-home
           subPath: downloads
@@ -374,7 +374,7 @@ spec:
           subPath: config/radarr
         - mountPath: /movies
           name: htpc-home
-          subPath: media/movies
+          subPath: torrents
       - args:
         - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/radarr</UrlBase></Config>'>
           /config/config.xml;echo end;
@@ -466,7 +466,7 @@ spec:
           subPath: config/sonarr
         - mountPath: /tv
           name: htpc-home
-          subPath: media/tv
+          subPath: torrents
         - mountPath: /downloads
           name: htpc-home
           subPath: downloads
@@ -483,7 +483,7 @@ spec:
           subPath: config/sonarr
         - mountPath: /tv
           name: htpc-home
-          subPath: media/tv
+          subPath: torrents
       - args:
         - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/sonarr</UrlBase></Config>'>
           /config/config.xml;echo end;
@@ -516,15 +516,6 @@ metadata:
 spec:
   entryPoints: []
   routes:
-  - kind: Rule
-    match: PathPrefix(`/`)
-    middlewares: []
-    priority: 0
-    services:
-    - kind: Service
-      name: jellyfin
-      namespace: htpc
-      port: 8096
   - kind: Rule
     match: PathPrefix(`/jackett`)
     middlewares: []
@@ -572,12 +563,14 @@ spec:
       port: 9091
   - kind: Rule
     match: PathPrefix(`/qbittorrent`)
-    middlewares: []
+    middlewares:
+    - name: strip-qbittorrent
     priority: 0
     services:
     - kind: Service
       name: qbittorrent
       namespace: htpc
+      passHostHeader: true
       port: 8080
   - kind: Rule
     match: PathPrefix(`/prowlarr`)
@@ -615,3 +608,16 @@ spec:
       name: lidarr
       namespace: htpc
       port: 8686
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: htpc
+  name: strip-qbittorrent
+  namespace: htpc
+spec:
+  stripPrefix:
+    forceSlash: false
+    prefixes:
+    - /qbittorrent
