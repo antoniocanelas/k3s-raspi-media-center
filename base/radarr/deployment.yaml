@@ -29,9 +29,9 @@ spec:
         - mountPath: /config
           name: media-config
           subPath: sonarr
-        - mountPath: /tv
+        - mountPath: /movies
           name: media
-          subPath: media/tv
+          subPath: media/movies
       - name: config
         image: busybox
         command: ["sh", "-c"]
