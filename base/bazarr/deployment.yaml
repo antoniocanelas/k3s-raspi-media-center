@@ -33,7 +33,6 @@ spec:
           export RADARR_API_KEY=$(cat config/radarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
           export SONARR_API_KEY=$(cat config/sonarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
           
-          cat config/radarr/config.xml
           echo "RADARR_API_KEY: $RADARR_API_KEY"
           echo "SONARR_API_KEY: $SONARR_API_KEY"
           
@@ -372,7 +371,6 @@ spec:
 
           EOF
           
-          cat config/bazarr/config/config.yaml
         volumeMounts:
           - mountPath: /config
             name: media-config
