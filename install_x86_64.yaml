@@ -28,6 +28,23 @@ kind: Service
 metadata:
   labels:
     app: media
+  name: profilarr
+  namespace: media
+spec:
+  ports:
+  - name: webui
+    port: 6868
+    protocol: TCP
+    targetPort: 6868
+  selector:
+    app: media
+    run: profilarr
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: media
   name: prowlarr
   namespace: media
 spec:
@@ -235,7 +252,6 @@ spec:
           export RADARR_API_KEY=$(cat config/radarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
           export SONARR_API_KEY=$(cat config/sonarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
 
-          cat config/radarr/config.xml
           echo "RADARR_API_KEY: $RADARR_API_KEY"
           echo "SONARR_API_KEY: $SONARR_API_KEY"
 
@@ -573,8 +589,6 @@ spec:
             username: ''
 
           EOF
-
-          cat config/bazarr/config/config.yaml
         image: busybox
         name: config
         volumeMounts:
@@ -595,6 +609,67 @@ spec:
       - name: media
         persistentVolumeClaim:
           claimName: media-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: media
+    run: profilarr
+  name: profilarr
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media
+      run: profilarr
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: media
+        run: profilarr
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Europe/Lisbon
+        image: santiagosayshey/profilarr:latest
+        name: profilarr
+        ports:
+        - containerPort: 6868
+          name: webui
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        volumeMounts:
+        - mountPath: /config
+          name: media-config
+          subPath: profilarr
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - mkdir -p /config && chown -R 1000:1000 /config
+        image: busybox
+        name: chown
+        volumeMounts:
+        - mountPath: /config
+          name: media-config
+          subPath: profilarr
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - name: media-config
+        persistentVolumeClaim:
+          claimName: media-config-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1064,6 +1139,15 @@ spec:
       name: prowlarr
       namespace: media
       port: 9696
+  - kind: Rule
+    match: PathPrefix(`/profilarr`)
+    middlewares: []
+    priority: 0
+    services:
+    - kind: Service
+      name: profilarr
+      namespace: media
+      port: 6868
   - kind: Rule
     match: PathPrefix(`/radarr`)
     middlewares: []

@@ -16,6 +16,7 @@ resources:
 #- transmission
 - qbittorrent
 - prowlarr
+- profilarr
 - radarr
 - sonarr
 - bazarr

@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: profilarr
+  name: profilarr
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      run: profilarr
+  template:
+    metadata:
+      labels:
+        run: profilarr
+    spec:
+      securityContext:
+        fsGroup: 1000
+      initContainers:
+      - name: chown
+        image: busybox
+        command: ["sh", "-c", "mkdir -p /config && chown -R 1000:1000 /config"]
+        volumeMounts:
+        - mountPath: /config
+          name: media-config
+          subPath: profilarr
+      containers:
+      - name: profilarr
+        image: santiagosayshey/profilarr
+        env:
+        - name: TZ
+          value: Europe/Lisbon
+        ports:
+        - containerPort: 6868
+          name: webui
+          protocol: TCP
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+        volumeMounts:
+        - mountPath: /config
+          name: media-config
+          subPath: profilarr
+      volumes:
+      - name: media-config
+        persistentVolumeClaim:
+          claimName: media-config-pvc
+

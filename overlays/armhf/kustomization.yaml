@@ -22,5 +22,6 @@ images:
   newTag: arm64v8-latest
 - name: lscr.io/linuxserver/lidarr
   newTag: arm64v8-latest
+
 resources:
 - ../../base

@@ -42,6 +42,15 @@ spec:
         namespace: media
         port: 9696
     - kind: Rule
+      match: PathPrefix(`/profilarr`)
+      middlewares: []
+      priority: 0
+      services:
+      - kind: Service
+        name: profilarr
+        namespace: media
+        port: 6868
+    - kind: Rule
       match: PathPrefix(`/radarr`)
       middlewares: []
       priority: 0
