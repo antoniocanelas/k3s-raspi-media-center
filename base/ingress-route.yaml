@@ -59,6 +59,15 @@ spec:
         name: sonarr
         namespace: media
         port: 8989
+    - kind: Rule
+      match: PathPrefix(`/bazarr`)
+      middlewares: []
+      priority: 0
+      services:
+      - kind: Service
+        name: bazarr
+        namespace: media
+        port: 6767
 #  - kind: Rule
 #    match: PathPrefix(`/`)
 #    middlewares: []
@@ -77,15 +86,6 @@ spec:
 #      name: jackett
 #      namespace: media
 #      port: 9117
-#  - kind: Rule
-#    match: PathPrefix(`/bazarr`)
-#    middlewares: []
-#    priority: 0
-#    services:
-#    - kind: Service
-#      name: bazarr
-#      namespace: media
-#      port: 6767
 #  - kind: Rule
 #    match: PathPrefix(`/readarr`)
 #    middlewares: []

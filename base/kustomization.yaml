@@ -18,8 +18,8 @@ resources:
 - prowlarr
 - radarr
 - sonarr
+- bazarr
 #- jackett
-#- bazarr
 #- readarr
 #- jellyfin
 #- kavita
