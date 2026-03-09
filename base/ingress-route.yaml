@@ -25,15 +25,13 @@ spec:
           namespace: media
           port: 9091
     - kind: Rule
-      match: PathPrefix(`/qbittorrent`)
-      middlewares: []
+      match: Host(`qbittorrent.telheira`)
       priority: 0
       services:
         - kind: Service
           name: qbittorrent
           namespace: media
           port: 8080
-          passHostHeader: true
     - kind: Rule
       match: PathPrefix(`/prowlarr`)
       middlewares: []
