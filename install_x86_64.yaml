@@ -426,7 +426,7 @@ spec:
           name: media
           subPath: media/movies
         - mountPath: /downloads
-          name: media
+          name: downloads
           subPath: downloads
       initContainers:
       - command:
@@ -438,10 +438,13 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: media-config
-          subPath: sonarr
+          subPath: radarr
         - mountPath: /movies
           name: media
           subPath: media/movies
+        - mountPath: /downloads
+          name: downloads
+          subPath: downloads
       - args:
         - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/radarr</UrlBase></Config>'>
           /config/config.xml;echo end;
@@ -545,7 +548,7 @@ spec:
           name: media
           subPath: media/tv
         - mountPath: /downloads
-          name: media
+          name: downloads
           subPath: downloads
       initContainers:
       - command:
@@ -561,6 +564,9 @@ spec:
         - mountPath: /tv
           name: media
           subPath: media/tv
+        - mountPath: /downloads
+          name: downloads
+          subPath: downloads
       - args:
         - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/sonarr</UrlBase></Config>'>
           /config/config.xml;echo end;
