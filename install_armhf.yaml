@@ -53,6 +53,23 @@ kind: Service
 metadata:
   labels:
     app: media
+  name: radarr
+  namespace: media
+spec:
+  ports:
+  - name: webui
+    port: 7878
+    protocol: TCP
+    targetPort: 7878
+  selector:
+    app: media
+    run: radarr
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: media
   name: sonarr
   namespace: media
 spec:
@@ -160,7 +177,7 @@ spec:
       containers:
       - env:
         - name: TZ
-          value: Pacific/Auckland
+          value: Europe/Lisbon
         - name: PUID
           value: "1000"
         - name: PGID
@@ -261,7 +278,7 @@ spec:
       containers:
       - env:
         - name: TZ
-          value: Pacific/Auckland
+          value: Europe/Lisbon
         - name: PUID
           value: "1000"
         - name: PGID
@@ -336,6 +353,125 @@ kind: Deployment
 metadata:
   labels:
     app: media
+    run: radarr
+  name: radarr
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media
+      run: radarr
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: media
+        run: radarr
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Europe/Lisbon
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        image: linuxserver/radarr:arm64v8-latest
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - curl "http://localhost:7878/radarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}'
+              </config/config.xml)"
+          failureThreshold: 8
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+        name: radarr
+        ports:
+        - containerPort: 7878
+          name: webui
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - curl "http://localhost:7878/radarr/api/system/status?ApiKey=$(sed -ne
+              '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+          failureThreshold: 8
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        startupProbe:
+          failureThreshold: 30
+          periodSeconds: 10
+          tcpSocket:
+            port: 7878
+          timeoutSeconds: 2
+        volumeMounts:
+        - mountPath: /config
+          name: media-config
+          subPath: radarr
+        - mountPath: /movies
+          name: media
+          subPath: media/movies
+        - mountPath: /downloads
+          name: media
+          subPath: downloads
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /config && chown -R 1000:1000 /movies
+        image: busybox
+        name: chown
+        volumeMounts:
+        - mountPath: /config
+          name: media-config
+          subPath: sonarr
+        - mountPath: /tv
+          name: media
+          subPath: media/tv
+      - args:
+        - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/radarr</UrlBase></Config>'>
+          /config/config.xml;echo end;
+        command:
+        - sh
+        - -c
+        image: busybox
+        name: config
+        securityContext:
+          runAsGroup: 1000
+          runAsUser: 1000
+        volumeMounts:
+        - mountPath: /config
+          name: media-config
+          subPath: radarr
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - name: media-config
+        persistentVolumeClaim:
+          claimName: media-config-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: media-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: media
     run: sonarr
   name: sonarr
   namespace: media
@@ -356,7 +492,7 @@ spec:
       containers:
       - env:
         - name: TZ
-          value: Pacific/Auckland
+          value: Europe/Lisbon
         - name: PUID
           value: "1000"
         - name: PGID
@@ -478,6 +614,15 @@ spec:
       name: prowlarr
       namespace: media
       port: 9696
+  - kind: Rule
+    match: PathPrefix(`/radarr`)
+    middlewares: []
+    priority: 0
+    services:
+    - kind: Service
+      name: radarr
+      namespace: media
+      port: 7878
   - kind: Rule
     match: PathPrefix(`/sonarr`)
     middlewares: []

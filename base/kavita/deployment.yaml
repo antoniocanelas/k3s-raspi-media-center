@@ -58,7 +58,7 @@ spec:
         - name: PGID
           value: "1000"
         - name: TZ
-          value: Pacific/Auckland
+          value: Europe/Lisbon
         ports:
         - containerPort: 5000
           name: webui

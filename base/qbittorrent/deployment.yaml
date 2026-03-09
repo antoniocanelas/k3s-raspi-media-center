@@ -41,7 +41,7 @@ spec:
         image: lscr.io/linuxserver/qbittorrent
         env:
         - name: TZ
-          value: Pacific/Auckland
+          value: Europe/Lisbon
         - name: PUID
           value: "1000"
         - name: PGID

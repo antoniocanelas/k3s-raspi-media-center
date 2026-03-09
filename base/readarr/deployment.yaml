@@ -59,7 +59,7 @@ spec:
         - name: PGID
           value: "1000"
         - name: TZ
-          value: Pacific/Auckland
+          value: Europe/Lisbon
         ports:
         - containerPort: 8787
         livenessProbe:
