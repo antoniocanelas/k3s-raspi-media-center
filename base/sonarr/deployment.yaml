@@ -33,7 +33,7 @@ spec:
             name: media
             subPath: media/tv
           - mountPath: /downloads
-            name: downloads
+            name: media
             subPath: downloads
       - name: config
         image: busybox
@@ -101,7 +101,7 @@ spec:
           name: media
           subPath: media/tv
         - mountPath: /downloads
-          name: downloads
+          name: media
           subPath: downloads
       volumes:
         - name: media-config
