@@ -28,10 +28,13 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: media-config
-          subPath: sonarr
+          subPath: radarr
         - mountPath: /movies
           name: media
           subPath: media/movies
+        - mountPath: /downloads
+          name: downloads
+          subPath: downloads
       - name: config
         image: busybox
         command: ["sh", "-c"]
@@ -98,7 +101,7 @@ spec:
           name: media
           subPath: media/movies
         - mountPath: /downloads
-          name: media
+          name: downloads
           subPath: downloads
       volumes:
         - name: media-config
