@@ -66,23 +66,6 @@ spec:
     run: sonarr
 ---
 apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: media
-  name: transmission
-  namespace: media
-spec:
-  ports:
-  - name: webui
-    port: 9091
-    protocol: TCP
-    targetPort: 9091
-  selector:
-    app: media
-    run: transmission
----
-apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
@@ -205,6 +188,13 @@ spec:
               -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
           initialDelaySeconds: 30
           periodSeconds: 10
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
         volumeMounts:
         - mountPath: /config
           name: media-config
@@ -290,6 +280,13 @@ spec:
         - containerPort: 6881
           name: qbittorrent-udp
           protocol: UDP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
         volumeMounts:
         - mountPath: /config
           name: media-config
@@ -300,12 +297,15 @@ spec:
         - mountPath: /watch
           name: media
           subPath: watch
+        - mountPath: /media
+          name: media
+          subPath: media
       initContainers:
       - command:
         - sh
         - -c
         - chown -R 1000:1000 /config && chown -R 1000:1000 /downloads && chown -R
-          1000:1000 /watch
+          1000:1000 /media && chown -R 1000:1000 /watch
         image: busybox
         name: chown
         volumeMounts:
@@ -318,6 +318,9 @@ spec:
         - mountPath: /watch
           name: media
           subPath: watch
+        - mountPath: /media
+          name: media
+          subPath: media
       securityContext:
         fsGroup: 1000
       volumes:
@@ -385,6 +388,13 @@ spec:
           initialDelaySeconds: 20
           periodSeconds: 15
           timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
         startupProbe:
           failureThreshold: 30
           periodSeconds: 10
@@ -440,90 +450,6 @@ spec:
         persistentVolumeClaim:
           claimName: media-pvc
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: media
-    run: transmission
-  name: transmission
-  namespace: media
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: media
-      run: transmission
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: media
-        run: transmission
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Pacific/Auckland
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: WHITELIST
-          value: ""
-        - name: HOST_WHITELIST
-          value: ""
-        image: linuxserver/transmission:4.0.6-r5-ls322
-        name: transmission
-        ports:
-        - containerPort: 9091
-          name: webui
-          protocol: TCP
-        - containerPort: 51413
-          name: torrent-tcp
-          protocol: TCP
-        - containerPort: 51413
-          name: torrent-udp
-          protocol: UDP
-        resources: {}
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: transmission
-        - mountPath: /downloads
-          name: media
-          subPath: downloads
-        - mountPath: /watch
-          name: media
-          subPath: watch
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: transmission
-        - mountPath: /downloads
-          name: media
-          subPath: downloads
-        - mountPath: /watch
-          name: media
-          subPath: watch
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - name: media-config
-        persistentVolumeClaim:
-          claimName: media-config-pvc
-      - name: media
-        persistentVolumeClaim:
-          claimName: media-pvc
----
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -535,15 +461,6 @@ spec:
   entryPoints:
   - web
   routes:
-  - kind: Rule
-    match: PathPrefix(`/transmission`)
-    middlewares: []
-    priority: 0
-    services:
-    - kind: Service
-      name: transmission
-      namespace: media
-      port: 9091
   - kind: Rule
     match: Host(`qbittorrent.telheira`)
     priority: 0

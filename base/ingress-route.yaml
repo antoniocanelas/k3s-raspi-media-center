@@ -15,15 +15,15 @@ spec:
 #          name: jellyfin
 #          namespace: media
 #          port: 8096
-    - kind: Rule
-      match: PathPrefix(`/transmission`)
-      middlewares: []
-      priority: 0
-      services:
-        - kind: Service
-          name: transmission
-          namespace: media
-          port: 9091
+#    - kind: Rule
+#      match: PathPrefix(`/transmission`)
+#      middlewares: []
+#      priority: 0
+#      services:
+#        - kind: Service
+#          name: transmission
+#          namespace: media
+#          port: 9091
     - kind: Rule
       match: Host(`qbittorrent.telheira`)
       priority: 0

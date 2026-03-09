@@ -54,6 +54,13 @@ spec:
           value: "1000"
         image: linuxserver/sonarr
         name: sonarr
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
         ports:
         - containerPort: 8989
           name: webui

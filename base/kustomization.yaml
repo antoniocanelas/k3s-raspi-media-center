@@ -13,7 +13,7 @@ resources:
 - namespace.yaml
 - ingress-route.yaml
 - pvc.yaml
-- transmission
+#- transmission
 - qbittorrent
 - prowlarr
 - sonarr
