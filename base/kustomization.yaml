@@ -12,7 +12,8 @@ labels:
 resources:
 - namespace.yaml
 - ingress-route.yaml
-- pvc.yaml
+- nas-storage.yaml
+- ssd-storage.yaml
 #- transmission
 - qbittorrent
 - prowlarr
