@@ -636,7 +636,7 @@ spec:
       - env:
         - name: TZ
           value: Europe/Lisbon
-        image: santiagosayshey/profilarr:latest
+        image: santiagosayshey/profilarr
         name: profilarr
         ports:
         - containerPort: 6868

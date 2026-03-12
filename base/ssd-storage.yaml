@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ssd-config-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 192.168.0.240
+    path: /ssd/config
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ssd-downloads-pv
+spec:
+  capacity:
+    storage: 200Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 192.168.0.240
+    path: /ssd/downloads
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ssd-config-pvc
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeName: ssd-config-pv
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ssd-downloads-pvc
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeName: ssd-downloads-pv
+  resources:
+    requests:
+      storage: 100Gi
