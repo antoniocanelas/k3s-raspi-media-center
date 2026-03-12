@@ -19,23 +19,23 @@ spec:
     spec:
       securityContext:
         fsGroup: 1000
-      initContainers:
-      - name: chown
-        image: busybox
-        command: ["sh", "-c", "chown -R 1000:1000 /config && chown -R 1000:1000 /downloads && chown -R 1000:1000 /media && chown -R 1000:1000 /watch"]
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: qbittorrent
-        - mountPath: /downloads
-          name: media
-          subPath: downloads
-        - mountPath: /watch
-          name: media
-          subPath: watch
-        - mountPath: /media
-          name: media
-          subPath: media
+#      initContainers:
+#      - name: chown
+#        image: busybox
+#        command: ["sh", "-c", "chown -R 1000:1000 /config && chown -R 1000:1000 /downloads && chown -R 1000:1000 /media && chown -R 1000:1000 /watch"]
+#        volumeMounts:
+#        - mountPath: /config
+#          name: media-config
+#          subPath: qbittorrent
+#        - mountPath: /downloads
+#          name: media
+#          subPath: downloads
+#        - mountPath: /watch
+#          name: media
+#          subPath: watch
+#        - mountPath: /media
+#          name: media
+#          subPath: media
       containers:
       - name: qbittorrent
         image: lscr.io/linuxserver/qbittorrent
@@ -66,22 +66,23 @@ spec:
           name: qbittorrent-udp
           protocol: UDP
         volumeMounts:
-          - mountPath: /config
-            name: media-config
+          - name: config
+            mountPath: /config
             subPath: qbittorrent
-          - mountPath: /downloads
-            name: media
-            subPath: downloads
+          - name: downloads
+            mountPath: /downloads
           - mountPath: /watch
-            name: media
-            subPath: watch
-          - mountPath: /media
-            name: media
-            subPath: media
+            name: downloads
+            subPath: downloads/watch
+          - name: media
+            mountPath: /media
       volumes:
-        - name: media-config
+        - name: config
           persistentVolumeClaim:
-            claimName: media-config-pvc
+            claimName: ssd-config-pvc
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: ssd-downloads-pvc
         - name: media
           persistentVolumeClaim:
-            claimName: media-pvc
+            claimName: nas-media-pvc

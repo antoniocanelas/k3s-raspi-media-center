@@ -16,11 +16,11 @@ resources:
 - ssd-storage.yaml
 #- transmission
 - qbittorrent
-- prowlarr
-- profilarr
-- radarr
-- sonarr
-- bazarr
+#- prowlarr
+#- profilarr
+#- radarr
+#- sonarr
+#- bazarr
 #- jackett
 #- readarr
 #- jellyfin

@@ -11,57 +11,6 @@ kind: Service
 metadata:
   labels:
     app: media
-  name: bazarr
-  namespace: media
-spec:
-  ports:
-  - name: webui
-    port: 6767
-    protocol: TCP
-    targetPort: 6767
-  selector:
-    app: media
-    run: bazarr
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: media
-  name: profilarr
-  namespace: media
-spec:
-  ports:
-  - name: webui
-    port: 6868
-    protocol: TCP
-    targetPort: 6868
-  selector:
-    app: media
-    run: profilarr
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: media
-  name: prowlarr
-  namespace: media
-spec:
-  ports:
-  - name: webui
-    port: 9696
-    protocol: TCP
-    targetPort: 9696
-  selector:
-    app: media
-    run: prowlarr
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: media
   name: qbittorrent
   namespace: media
 spec:
@@ -83,53 +32,16 @@ spec:
     run: qbittorrent
 ---
 apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: media
-  name: radarr
-  namespace: media
-spec:
-  ports:
-  - name: webui
-    port: 7878
-    protocol: TCP
-    targetPort: 7878
-  selector:
-    app: media
-    run: radarr
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: media
-  name: sonarr
-  namespace: media
-spec:
-  ports:
-  - name: webui
-    port: 8989
-    protocol: TCP
-    targetPort: 8989
-  selector:
-    app: media
-    run: sonarr
----
-apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
     app: media
-  name: media
+  name: nas-media-pv
 spec:
   accessModes:
   - ReadWriteMany
   capacity:
-    storage: 400Gi
-  mountOptions:
-  - hard
-  - nfsvers=4.1
+    storage: 1Ti
   nfs:
     path: /volume1/media
     server: 192.168.0.200
@@ -140,18 +52,31 @@ kind: PersistentVolume
 metadata:
   labels:
     app: media
-  name: media-config
+  name: ssd-config-pv
 spec:
   accessModes:
   - ReadWriteMany
   capacity:
-    storage: 10Gi
-  mountOptions:
-  - hard
-  - nfsvers=4.1
+    storage: 20Gi
   nfs:
-    path: /volume1/raspik8sconf
-    server: 192.168.0.200
+    path: /ssd/config
+    server: 192.168.0.240
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app: media
+  name: ssd-downloads-pv
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 200Gi
+  nfs:
+    path: /ssd/downloads
+    server: 192.168.0.240
   persistentVolumeReclaimPolicy: Retain
 ---
 apiVersion: v1
@@ -159,7 +84,22 @@ kind: PersistentVolumeClaim
 metadata:
   labels:
     app: media
-  name: media-config-pvc
+  name: nas-media-pvc
+  namespace: media
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Ti
+  volumeName: nas-media-pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: media
+  name: ssd-config-pvc
   namespace: media
 spec:
   accessModes:
@@ -167,610 +107,22 @@ spec:
   resources:
     requests:
       storage: 10Gi
-  storageClassName: ""
-  volumeName: media-config
+  volumeName: ssd-config-pv
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
     app: media
-  name: media-pvc
+  name: ssd-downloads-pvc
   namespace: media
 spec:
   accessModes:
   - ReadWriteMany
   resources:
     requests:
-      storage: 400Gi
-  storageClassName: ""
-  volumeName: media
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: media
-    run: bazarr
-  name: bazarr
-  namespace: media
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: media
-      run: bazarr
-  template:
-    metadata:
-      labels:
-        app: media
-        run: bazarr
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Europe/Lisbon
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        image: linuxserver/bazarr:arm64v8-latest
-        name: bazarr
-        ports:
-        - containerPort: 6767
-          name: webui
-        resources:
-          limits:
-            cpu: 500m
-            memory: 1Gi
-          requests:
-            cpu: 250m
-            memory: 512Mi
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: bazarr
-        - mountPath: /movies
-          name: media
-          subPath: media/movies
-        - mountPath: /tv
-          name: media
-          subPath: media/tv
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - until wget -qO- sonarr:8989/sonarr &> /dev/null && wget -qO- radarr:7878/radarr
-          &> /dev/null; do echo waiting for sonarr and radarr; sleep 2; done;
-        image: busybox
-        name: wait-for-sonarr-and-radarr
-      - command:
-        - sh
-        - -c
-        - |
-          mkdir -p /config/bazarr/config
-          export RADARR_API_KEY=$(cat config/radarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
-          export SONARR_API_KEY=$(cat config/sonarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
-
-          echo "RADARR_API_KEY: $RADARR_API_KEY"
-          echo "SONARR_API_KEY: $SONARR_API_KEY"
-
-          cat << EOF > config/bazarr/config/config.yaml
-
-          ---
-          addic7ed:
-            cookies: ''
-            password: ''
-            user_agent: ''
-            username: ''
-            vip: false
-          analytics:
-            enabled: true
-          anidb:
-            api_client: ''
-            api_client_ver: 1
-          animetosho:
-            anidb_api_client: ''
-            anidb_api_client_ver: 1
-            search_threshold: 6
-          anticaptcha:
-            anti_captcha_key: ''
-          assrt:
-            token: ''
-          auth:
-            apikey: 6cc6027eab41b88fc3cafebfba29dcc4
-            password: 570c0e43355144c7f8d2fa33f66b704b
-            type: form
-            username: admin
-          avistaz:
-            cookies: ''
-            user_agent: ''
-          backup:
-            day: 6
-            folder: /config/backup
-            frequency: Weekly
-            hour: 3
-            retention: 31
-          betaseries:
-            token: ''
-          cinemaz:
-            cookies: ''
-            user_agent: ''
-          cors:
-            enabled: false
-          deathbycaptcha:
-            password: ''
-            username: ''
-          embeddedsubtitles:
-            fallback_lang: en
-            hi_fallback: false
-            included_codecs: []
-            timeout: 600
-            unknown_as_fallback: false
-          general:
-            adaptive_searching: false
-            adaptive_searching_delay: 3w
-            adaptive_searching_delta: 1w
-            anti_captcha_provider: null
-            auto_update: true
-            base_url: /bazarr
-            branch: master
-            chmod: '0640'
-            chmod_enabled: false
-            concurrent_jobs: 4
-            days_to_upgrade_subs: 7
-            debug: false
-            default_und_audio_lang: ''
-            default_und_embedded_subtitles_lang: ''
-            dont_notify_manual_actions: false
-            embedded_subs_show_desired: true
-            embedded_subtitles_parser: ffprobe
-            enable_strm_support: false
-            enabled_integrations: []
-            enabled_providers:
-              - opensubtitlescom
-              - tvsubtitles
-              - yifysubtitles
-              - wizdom
-            external_webhook_password: ''
-            external_webhook_url: ''
-            external_webhook_username: ''
-            flask_secret_key: f8768cac4f2a9b0fa1e263b568d56fa9
-            hi_extension: hi
-            hostname: bazarr-688ddb5c85-rrnl2
-            ignore_ass_subs: false
-            ignore_pgs_subs: false
-            ignore_vobsub_subs: false
-            instance_name: Bazarr
-            ip: '*'
-            language_equals: []
-            minimum_score: 90
-            minimum_score_movie: 70
-            movie_default_enabled: false
-            movie_default_profile: 1
-            movie_tag_enabled: false
-            multithreading: true
-            page_size: 25
-            parse_embedded_audio_track: false
-            path_mappings:
-              - - /tv/
-                - /tv/
-            path_mappings_movie:
-              - - /movies/
-                - /movies/
-            port: 6767
-            postprocessing_cmd: ''
-            postprocessing_threshold: 90
-            postprocessing_threshold_movie: 70
-            remove_profile_tags: []
-            serie_default_enabled: false
-            serie_default_profile: 1
-            serie_tag_enabled: false
-            single_language: false
-            skip_hashing: false
-            subfolder: current
-            subfolder_custom: ''
-            subzero_mods: common
-            theme: auto
-            upgrade_frequency: 12
-            upgrade_manual: true
-            upgrade_subs: true
-            use_embedded_subs: true
-            use_external_webhook: false
-            use_plex: false
-            use_postprocessing: false
-            use_postprocessing_threshold: false
-            use_postprocessing_threshold_movie: false
-            use_radarr: true
-            use_scenename: true
-            use_sonarr: true
-            utf8_encode: true
-            wanted_search_frequency: 6
-            wanted_search_frequency_movie: 6
-          hdbits:
-            passkey: ''
-            username: ''
-          jimaku:
-            api_key: ''
-            enable_ai_subs: false
-            enable_archives_download: false
-            enable_name_search_fallback: true
-          karagarga:
-            f_password: ''
-            f_username: ''
-            password: ''
-            username: ''
-          ktuvit:
-            email: ''
-            hashed_password: ''
-          legendasdivx:
-            password: ''
-            skip_wrong_fps: false
-            username: ''
-          legendasnet:
-            password: ''
-            username: ''
-          log:
-            exclude_filter: ''
-            ignore_case: false
-            include_filter: ''
-            use_regex: false
-          movie_scores:
-            audio_codec: 3
-            edition: 1
-            hash: 119
-            hearing_impaired: 1
-            release_group: 13
-            resolution: 2
-            source: 7
-            streaming_service: 1
-            title: 60
-            video_codec: 2
-            year: 30
-          napiprojekt:
-            only_authors: false
-            only_real_names: false
-          napisy24:
-            password: ''
-            username: ''
-          opensubtitlescom:
-            include_ai_translated: false
-            include_machine_translated: false
-            password: Camelox00.
-            use_hash: true
-            username: acanelas
-          plex:
-            apikey: ''
-            auth_method: apikey
-            client_identifier: ''
-            disable_auto_migration: false
-            email: ''
-            encryption_key: MQwr0ScfdLJS1Q5rdH2TZhjSAcD12ElgIzOJ_5vPD0Q
-            ip: 127.0.0.1
-            migration_attempted: false
-            migration_successful: false
-            migration_timestamp: ''
-            movie_library: []
-            movie_library_ids: []
-            port: 32400
-            series_library: []
-            series_library_ids: []
-            server_local: false
-            server_machine_id: ''
-            server_name: ''
-            server_url: ''
-            set_episode_added: false
-            set_movie_added: false
-            ssl: false
-            token: ''
-            update_movie_library: false
-            update_series_library: false
-            user_id: ''
-            username: ''
-          podnapisi:
-            verify_ssl: true
-          postgresql:
-            database: ''
-            enabled: false
-            host: localhost
-            password: ''
-            port: 5432
-            url: ''
-            username: ''
-          proxy:
-            exclude:
-              - localhost
-              - 127.0.0.1
-            password: ''
-            port: ''
-            type: null
-            url: ''
-            username: ''
-          radarr:
-            apikey: ${RADARR_API_KEY}
-            base_url: /radarr
-            defer_search_signalr: false
-            excluded_tags: []
-            full_update: Daily
-            full_update_day: 6
-            full_update_hour: 4
-            http_timeout: 60
-            ip: 192.168.0.240
-            movies_sync: 60
-            movies_sync_on_live: true
-            only_monitored: false
-            port: 80
-            ssl: false
-            sync_only_monitored_movies: false
-            use_ffprobe_cache: true
-          series_scores:
-            audio_codec: 3
-            episode: 30
-            hash: 359
-            hearing_impaired: 1
-            release_group: 14
-            resolution: 2
-            season: 30
-            series: 180
-            source: 7
-            streaming_service: 1
-            video_codec: 2
-            year: 90
-          sonarr:
-            apikey: ${SONARR_API_KEY}
-            base_url: /sonarr
-            defer_search_signalr: false
-            exclude_season_zero: false
-            excluded_series_types: []
-            excluded_tags: []
-            full_update: Daily
-            full_update_day: 6
-            full_update_hour: 4
-            http_timeout: 60
-            ip: 192.168.0.240
-            only_monitored: false
-            port: 80
-            series_sync: 60
-            series_sync_on_live: true
-            ssl: false
-            sync_only_monitored_episodes: false
-            sync_only_monitored_series: false
-            use_ffprobe_cache: true
-          subdl:
-            api_key: ''
-          subf2m:
-            user_agent: ''
-            verify_ssl: true
-          subsource:
-            apikey: ''
-          subsync:
-            checker:
-              blacklisted_languages: []
-              blacklisted_providers: []
-            debug: false
-            force_audio: false
-            gss: true
-            max_offset_seconds: 60
-            no_fix_framerate: true
-            subsync_movie_threshold: 70
-            subsync_threshold: 90
-            use_subsync: false
-            use_subsync_movie_threshold: false
-            use_subsync_threshold: false
-          subx:
-            api_key: ''
-          titlovi:
-            password: ''
-            username: ''
-          titulky:
-            approved_only: false
-            password: ''
-            skip_wrong_fps: false
-            username: ''
-          translator:
-            default_score: 50
-            gemini_key: ''
-            gemini_model: gemini-2.0-flash
-            lingarr_token: ''
-            lingarr_url: http://lingarr:9876
-            translator_info: true
-            translator_type: google_translate
-          turkcealtyaziorg:
-            cookies: ''
-            user_agent: ''
-          whisperai:
-            endpoint: http://127.0.0.1:9000
-            loglevel: INFO
-            pass_video_name: false
-            response: 5
-            timeout: 3600
-          xsubs:
-            password: ''
-            username: ''
-
-          EOF
-        image: busybox
-        name: config
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-        - mountPath: /movies
-          name: media
-          subPath: media/movies
-        - mountPath: /tv
-          name: media
-          subPath: media/tv
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - name: media-config
-        persistentVolumeClaim:
-          claimName: media-config-pvc
-      - name: media
-        persistentVolumeClaim:
-          claimName: media-pvc
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: media
-    run: profilarr
-  name: profilarr
-  namespace: media
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: media
-      run: profilarr
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: media
-        run: profilarr
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Europe/Lisbon
-        image: santiagosayshey/profilarr
-        name: profilarr
-        ports:
-        - containerPort: 6868
-          name: webui
-          protocol: TCP
-        resources:
-          limits:
-            cpu: 500m
-            memory: 1Gi
-          requests:
-            cpu: 250m
-            memory: 512Mi
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: profilarr
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - mkdir -p /config && chown -R 1000:1000 /config
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: profilarr
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - name: media-config
-        persistentVolumeClaim:
-          claimName: media-config-pvc
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: media
-    run: prowlarr
-  name: prowlarr
-  namespace: media
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: media
-      run: prowlarr
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: media
-        run: prowlarr
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Europe/Lisbon
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        image: linuxserver/prowlarr
-        livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:9696/prowlarr/api/v1/health?ApiKey=$(sed -ne
-              '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        name: prowlarr
-        ports:
-        - containerPort: 9696
-          name: webui
-        readinessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:9696/prowlarr/api/v1/system/status?ApiKey=$(sed
-              -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        resources:
-          limits:
-            cpu: 500m
-            memory: 1Gi
-          requests:
-            cpu: 250m
-            memory: 512Mi
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: prowlarr
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: prowlarr
-      - args:
-        - |
-          echo 'Customizing Prowlarr config...'
-          if [[ ! -f /config/config.xml ]]; then
-            echo '<Config><UrlBase>/prowlarr</UrlBase></Config>'> /config/config.xml
-          fi
-          echo 'Prowlarr config customized.'
-        command:
-        - sh
-        - -c
-        image: busybox
-        name: config
-        securityContext:
-          runAsGroup: 1000
-          runAsUser: 1000
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: prowlarr
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - name: media-config
-        persistentVolumeClaim:
-          claimName: media-config-pvc
+      storage: 100Gi
+  volumeName: ssd-downloads-pv
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -825,291 +177,27 @@ spec:
             memory: 1Gi
         volumeMounts:
         - mountPath: /config
-          name: media-config
+          name: config
           subPath: qbittorrent
         - mountPath: /downloads
-          name: media
-          subPath: downloads
+          name: downloads
         - mountPath: /watch
-          name: media
-          subPath: watch
+          name: downloads
+          subPath: downloads/watch
         - mountPath: /media
           name: media
-          subPath: media
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config && chown -R 1000:1000 /downloads && chown -R
-          1000:1000 /media && chown -R 1000:1000 /watch
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: qbittorrent
-        - mountPath: /downloads
-          name: media
-          subPath: downloads
-        - mountPath: /watch
-          name: media
-          subPath: watch
-        - mountPath: /media
-          name: media
-          subPath: media
       securityContext:
         fsGroup: 1000
       volumes:
-      - name: media-config
+      - name: config
         persistentVolumeClaim:
-          claimName: media-config-pvc
+          claimName: ssd-config-pvc
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: ssd-downloads-pvc
       - name: media
         persistentVolumeClaim:
-          claimName: media-pvc
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: media
-    run: radarr
-  name: radarr
-  namespace: media
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: media
-      run: radarr
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: media
-        run: radarr
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Europe/Lisbon
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        image: linuxserver/radarr:arm64v8-latest
-        livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:7878/radarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}'
-              </config/config.xml)"
-          failureThreshold: 8
-          initialDelaySeconds: 30
-          periodSeconds: 15
-          timeoutSeconds: 5
-        name: radarr
-        ports:
-        - containerPort: 7878
-          name: webui
-        readinessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:7878/radarr/api/system/status?ApiKey=$(sed -ne
-              '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          failureThreshold: 8
-          initialDelaySeconds: 20
-          periodSeconds: 15
-          timeoutSeconds: 5
-        resources:
-          limits:
-            cpu: 1000m
-            memory: 2Gi
-          requests:
-            cpu: 500m
-            memory: 1Gi
-        startupProbe:
-          failureThreshold: 30
-          periodSeconds: 10
-          tcpSocket:
-            port: 7878
-          timeoutSeconds: 2
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: radarr
-        - mountPath: /movies
-          name: media
-          subPath: media/movies
-        - mountPath: /downloads
-          name: media
-          subPath: downloads
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config && chown -R 1000:1000 /movies
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: radarr
-        - mountPath: /movies
-          name: media
-          subPath: media/movies
-        - mountPath: /downloads
-          name: media
-          subPath: downloads
-      - args:
-        - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/radarr</UrlBase></Config>'>
-          /config/config.xml;echo end;
-        command:
-        - sh
-        - -c
-        image: busybox
-        name: config
-        securityContext:
-          runAsGroup: 1000
-          runAsUser: 1000
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: radarr
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - name: media-config
-        persistentVolumeClaim:
-          claimName: media-config-pvc
-      - name: media
-        persistentVolumeClaim:
-          claimName: media-pvc
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: media
-    run: sonarr
-  name: sonarr
-  namespace: media
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: media
-      run: sonarr
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: media
-        run: sonarr
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Europe/Lisbon
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        image: linuxserver/sonarr:arm64v8-latest
-        livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:8989/sonarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}'
-              </config/config.xml)"
-          failureThreshold: 8
-          initialDelaySeconds: 30
-          periodSeconds: 15
-          timeoutSeconds: 5
-        name: sonarr
-        ports:
-        - containerPort: 8989
-          name: webui
-        readinessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:8989/sonarr/api/system/status?ApiKey=$(sed -ne
-              '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          failureThreshold: 8
-          initialDelaySeconds: 20
-          periodSeconds: 15
-          timeoutSeconds: 5
-        resources:
-          limits:
-            cpu: 1000m
-            memory: 2Gi
-          requests:
-            cpu: 500m
-            memory: 1Gi
-        startupProbe:
-          failureThreshold: 30
-          periodSeconds: 10
-          tcpSocket:
-            port: 8989
-          timeoutSeconds: 2
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: sonarr
-        - mountPath: /tv
-          name: media
-          subPath: media/tv
-        - mountPath: /downloads
-          name: media
-          subPath: downloads
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config && chown -R 1000:1000 /tv
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: sonarr
-        - mountPath: /tv
-          name: media
-          subPath: media/tv
-        - mountPath: /downloads
-          name: media
-          subPath: downloads
-      - args:
-        - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/sonarr</UrlBase></Config>'>
-          /config/config.xml;echo end;
-        command:
-        - sh
-        - -c
-        image: busybox
-        name: config
-        securityContext:
-          runAsGroup: 1000
-          runAsUser: 1000
-        volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: sonarr
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - name: media-config
-        persistentVolumeClaim:
-          claimName: media-config-pvc
-      - name: media
-        persistentVolumeClaim:
-          claimName: media-pvc
+          claimName: nas-media-pvc
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
