@@ -3,6 +3,7 @@ kind: PersistentVolume
 metadata:
   name: ssd-config-pv
 spec:
+  storageClassName: ssd-local-path
   capacity:
     storage: 20Gi
   accessModes:
@@ -17,6 +18,7 @@ kind: PersistentVolume
 metadata:
   name: ssd-downloads-pv
 spec:
+  storageClassName: ssd-local-path
   capacity:
     storage: 200Gi
   accessModes:
@@ -32,6 +34,7 @@ metadata:
   name: ssd-config-pvc
   namespace: media
 spec:
+  storageClassName: ssd-local-path
   accessModes:
     - ReadWriteMany
   volumeName: ssd-config-pv
@@ -45,6 +48,7 @@ metadata:
   name: ssd-downloads-pvc
   namespace: media
 spec:
+  storageClassName: ssd-local-path
   accessModes:
     - ReadWriteMany
   volumeName: ssd-downloads-pv

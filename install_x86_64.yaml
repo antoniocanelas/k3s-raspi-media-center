@@ -46,6 +46,7 @@ spec:
     path: /volume1/media
     server: 192.168.0.200
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: nas-local-path
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -62,6 +63,7 @@ spec:
     path: /ssd/config
     server: 192.168.0.240
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: ssd-local-path
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -78,6 +80,7 @@ spec:
     path: /ssd/downloads
     server: 192.168.0.240
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: ssd-local-path
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -92,6 +95,7 @@ spec:
   resources:
     requests:
       storage: 1Ti
+  storageClassName: nas-local-path
   volumeName: nas-media-pv
 ---
 apiVersion: v1
@@ -107,6 +111,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
+  storageClassName: ssd-local-path
   volumeName: ssd-config-pv
 ---
 apiVersion: v1
@@ -122,6 +127,7 @@ spec:
   resources:
     requests:
       storage: 100Gi
+  storageClassName: ssd-local-path
   volumeName: ssd-downloads-pv
 ---
 apiVersion: apps/v1
@@ -181,9 +187,6 @@ spec:
           subPath: qbittorrent
         - mountPath: /downloads
           name: downloads
-        - mountPath: /watch
-          name: downloads
-          subPath: downloads/watch
         - mountPath: /media
           name: media
       securityContext:

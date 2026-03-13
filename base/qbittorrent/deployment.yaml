@@ -71,9 +71,9 @@ spec:
             subPath: qbittorrent
           - name: downloads
             mountPath: /downloads
-          - mountPath: /watch
-            name: downloads
-            subPath: downloads/watch
+#          - mountPath: /watch
+#            name: downloads
+#            subPath: watch
           - name: media
             mountPath: /media
       volumes:

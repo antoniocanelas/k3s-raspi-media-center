@@ -3,6 +3,7 @@ kind: PersistentVolume
 metadata:
   name: nas-media-pv
 spec:
+  storageClassName: nas-local-path
   capacity:
     storage: 1Ti
   accessModes:
@@ -18,6 +19,7 @@ metadata:
   name: nas-media-pvc
   namespace: media
 spec:
+  storageClassName: nas-local-path
   accessModes:
     - ReadWriteMany
   volumeName: nas-media-pv
