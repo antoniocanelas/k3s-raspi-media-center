@@ -18,7 +18,7 @@ resources:
 - qbittorrent
 #- prowlarr
 #- profilarr
-#- radarr
+- radarr
 #- sonarr
 #- bazarr
 #- jackett

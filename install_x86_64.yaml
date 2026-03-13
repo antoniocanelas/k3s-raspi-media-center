@@ -32,6 +32,23 @@ spec:
     run: qbittorrent
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: media
+  name: radarr
+  namespace: media
+spec:
+  ports:
+  - name: webui
+    port: 7878
+    protocol: TCP
+    targetPort: 7878
+  selector:
+    app: media
+    run: radarr
+---
+apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
@@ -189,6 +206,98 @@ spec:
           name: downloads
         - mountPath: /media
           name: media
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: ssd-config-pvc
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: ssd-downloads-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: nas-media-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: media
+    run: radarr
+  name: radarr
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media
+      run: radarr
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: media
+        run: radarr
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Europe/Lisbon
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        image: linuxserver/radarr:6.0.4.10291-ls289
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - curl "http://localhost:7878/radarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}'
+              </config/config.xml)"
+          failureThreshold: 8
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+        name: radarr
+        ports:
+        - containerPort: 7878
+          name: webui
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - curl "http://localhost:7878/radarr/api/system/status?ApiKey=$(sed -ne
+              '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+          failureThreshold: 8
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        startupProbe:
+          failureThreshold: 30
+          periodSeconds: 10
+          tcpSocket:
+            port: 7878
+          timeoutSeconds: 2
+        volumeMounts:
+        - mountPath: /config
+          name: config
+          subPath: radarr
+        - mountPath: /movies
+          name: media
+          subPath: movies
+        - mountPath: /downloads
+          name: downloads
       securityContext:
         fsGroup: 1000
       volumes:
