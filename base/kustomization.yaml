@@ -20,7 +20,7 @@ resources:
 #- profilarr
 - radarr
 - sonarr
-#- bazarr
+- bazarr
 #- jackett
 #- readarr
 #- jellyfin
