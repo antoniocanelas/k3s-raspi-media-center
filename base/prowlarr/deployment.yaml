@@ -20,13 +20,6 @@ spec:
       securityContext:
         fsGroup: 1000    
       initContainers:
-      - name: chown
-        image: busybox
-        command: ["sh", "-c", "chown -R 1000:1000 /config"]
-        volumeMounts:
-        - mountPath: /config 
-          name: media-config
-          subPath: prowlarr
       - name: config
         image: busybox
         securityContext:
@@ -42,7 +35,7 @@ spec:
             echo 'Prowlarr config customized.'
         volumeMounts: 
         - mountPath: /config 
-          name: media-config
+          name: config
           subPath: prowlarr
       containers:
       - env:
@@ -82,9 +75,9 @@ spec:
           periodSeconds: 10
         volumeMounts: 
         - mountPath: /config 
-          name: media-config
+          name: config
           subPath: prowlarr
       volumes:
-        - name: media-config
+        - name: config
           persistentVolumeClaim:
-            claimName: media-config-pvc
+            claimName: ssd-config-pvc

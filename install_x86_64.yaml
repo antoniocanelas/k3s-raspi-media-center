@@ -11,6 +11,23 @@ kind: Service
 metadata:
   labels:
     app: media
+  name: prowlarr
+  namespace: media
+spec:
+  ports:
+  - name: webui
+    port: 9696
+    protocol: TCP
+    targetPort: 9696
+  selector:
+    app: media
+    run: prowlarr
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: media
   name: qbittorrent
   namespace: media
 spec:
@@ -163,6 +180,97 @@ spec:
       storage: 100Gi
   storageClassName: ssd-local-path
   volumeName: ssd-downloads-pv
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: media
+    run: prowlarr
+  name: prowlarr
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media
+      run: prowlarr
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: media
+        run: prowlarr
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Europe/Lisbon
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        image: linuxserver/prowlarr:2.3.0.5236-ls134
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - curl "http://localhost:9696/prowlarr/api/v1/health?ApiKey=$(sed -ne
+              '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        name: prowlarr
+        ports:
+        - containerPort: 9696
+          name: webui
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - curl "http://localhost:9696/prowlarr/api/v1/system/status?ApiKey=$(sed
+              -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        volumeMounts:
+        - mountPath: /config
+          name: config
+          subPath: prowlarr
+      initContainers:
+      - args:
+        - |
+          echo 'Customizing Prowlarr config...'
+          if [[ ! -f /config/config.xml ]]; then
+            echo '<Config><UrlBase>/prowlarr</UrlBase></Config>'> /config/config.xml
+          fi
+          echo 'Prowlarr config customized.'
+        command:
+        - sh
+        - -c
+        image: busybox
+        name: config
+        securityContext:
+          runAsGroup: 1000
+          runAsUser: 1000
+        volumeMounts:
+        - mountPath: /config
+          name: config
+          subPath: prowlarr
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: ssd-config-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment

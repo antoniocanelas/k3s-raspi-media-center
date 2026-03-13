@@ -16,7 +16,7 @@ resources:
 - ssd-storage.yaml
 #- transmission
 - qbittorrent
-#- prowlarr
+- prowlarr
 #- profilarr
 - radarr
 - sonarr
