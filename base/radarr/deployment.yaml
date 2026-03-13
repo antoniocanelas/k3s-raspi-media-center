@@ -18,22 +18,8 @@ spec:
         run: radarr
     spec:
       securityContext:
-        # runAsUser: 1000
-        # runAsGroup: 1000
         fsGroup: 1000
 #      initContainers:
-#      - name: chown
-#        image: busybox
-#        command: ["sh", "-c", "chown -R 1000:1000 /config && chown -R 1000:1000 /movies && chown -R 1000:1000 /downloads"]
-#        volumeMounts:
-#        - mountPath: /config
-#          name: config
-#          subPath: radarr
-#        - mountPath: /movies
-#          name: media
-#          subPath: movies
-#        - mountPath: /downloads
-#          name: downloads
 #      - name: config
 #        image: busybox
 #        command: ["sh", "-c"]
