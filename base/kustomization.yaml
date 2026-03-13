@@ -19,7 +19,7 @@ resources:
 #- prowlarr
 #- profilarr
 - radarr
-#- sonarr
+- sonarr
 #- bazarr
 #- jackett
 #- readarr

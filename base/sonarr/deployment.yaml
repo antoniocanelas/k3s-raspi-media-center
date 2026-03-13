@@ -18,23 +18,8 @@ spec:
         run: sonarr
     spec:
       securityContext:
-        # runAsUser: 1000
-        # runAsGroup: 1000
-        fsGroup: 1000    
+        fsGroup: 1000
       initContainers:
-      - name: chown
-        image: busybox
-        command: ["sh", "-c", "chown -R 1000:1000 /config && chown -R 1000:1000 /tv"]
-        volumeMounts:
-          - mountPath: /config
-            name: media-config
-            subPath: sonarr
-          - mountPath: /tv
-            name: media
-            subPath: media/tv
-          - mountPath: /downloads
-            name: media
-            subPath: downloads
       - name: config
         image: busybox
         command: ["sh", "-c"]
@@ -45,7 +30,7 @@ spec:
         - "echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/sonarr</UrlBase></Config>'> /config/config.xml;echo end;"
         volumeMounts:
         - mountPath: /config
-          name: media-config
+          name: config
           subPath: sonarr
       containers:
       - env:
@@ -94,19 +79,21 @@ spec:
           timeoutSeconds: 5
           failureThreshold: 8
         volumeMounts:
-        - mountPath: /config
-          name: media-config
-          subPath: sonarr
-        - mountPath: /tv
-          name: media
-          subPath: media/tv
-        - mountPath: /downloads
-          name: media
-          subPath: downloads
+          - mountPath: /config
+            name: config
+            subPath: sonarr
+          - mountPath: /tv
+            name: media
+            subPath: tv
+          - mountPath: /downloads
+            name: downloads
       volumes:
-        - name: media-config
+        - name: config
           persistentVolumeClaim:
-            claimName: media-config-pvc
+            claimName: ssd-config-pvc
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: ssd-downloads-pvc
         - name: media
           persistentVolumeClaim:
-            claimName: media-pvc
+            claimName: nas-media-pvc
