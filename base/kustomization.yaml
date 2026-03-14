@@ -23,6 +23,6 @@ resources:
 - bazarr
 #- jackett
 #- readarr
-#- jellyfin
+- jellyfin
 #- kavita
 #- lidarr

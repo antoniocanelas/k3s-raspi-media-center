@@ -36,21 +36,24 @@ spec:
           protocol: TCP
         volumeMounts: 
         - mountPath: /config 
-          name: htpc-home
+          name: config
           subPath: config/jellyfin
         - mountPath: /tv 
-          name: htpc-home
+          name: media
           subPath: media/tv
         - mountPath: /movies 
-          name: htpc-home
+          name: media
           subPath: media/movies
-        - mountPath: /books
-          name: htpc-home
-          subPath: media/books
-        - mountPath: /music
-          name: htpc-home
-          subPath: media/music
+#        - mountPath: /books
+#          name: media
+#          subPath: media/books
+#        - mountPath: /music
+#          name: media
+#          subPath: media/music
       volumes:
-        - name: htpc-home
+        - name: config
           persistentVolumeClaim:
-            claimName: htpc-home-pvc
+            claimName: ssd-config-pvc
+        - name: media
+          persistentVolumeClaim:
+            claimName: nas-media-pvc
