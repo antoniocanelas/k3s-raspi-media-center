@@ -1,7 +1,7 @@
 ssh pi-master-00 '
 sudo mkdir -p \
 /ssd/downloads/incomplete \
-/ssd/downloads/complete \
+/ssd/downloads/completed \
 /ssd/databases/postgres \
 /ssd/databases/grafana \
 /ssd/databases/prometheus \
