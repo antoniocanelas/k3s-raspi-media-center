@@ -28,6 +28,23 @@ kind: Service
 metadata:
   labels:
     app: media
+  name: jellyfin
+  namespace: media
+spec:
+  ports:
+  - name: webui
+    port: 8096
+    protocol: TCP
+    targetPort: 8096
+  selector:
+    app: media
+    run: jellyfin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: media
   name: prowlarr
   namespace: media
 spec:
@@ -633,6 +650,63 @@ spec:
       - name: downloads
         persistentVolumeClaim:
           claimName: ssd-downloads-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: nas-media-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: media
+    run: jellyfin
+  name: jellyfin
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media
+      run: jellyfin
+  template:
+    metadata:
+      labels:
+        app: media
+        run: jellyfin
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Europe/Lisbon
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        image: lscr.io/linuxserver/jellyfin:10.11.5ubu2404-ls14
+        name: jellyfin
+        ports:
+        - containerPort: 8096
+          name: webui
+          protocol: TCP
+        - containerPort: 8920
+          name: webui-ssl
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /config
+          name: config
+          subPath: config/jellyfin
+        - mountPath: /tv
+          name: media
+          subPath: media/tv
+        - mountPath: /movies
+          name: media
+          subPath: media/movies
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: ssd-config-pvc
       - name: media
         persistentVolumeClaim:
           claimName: nas-media-pvc

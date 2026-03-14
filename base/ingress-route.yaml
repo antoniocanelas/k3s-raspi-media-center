@@ -77,15 +77,15 @@ spec:
         name: bazarr
         namespace: media
         port: 6767
-#  - kind: Rule
-#    match: PathPrefix(`/`)
-#    middlewares: []
-#    priority: 1
-#    services:
-#    - kind: Service
-#      name: jellyfin
-#      namespace: media
-#      port: 8096
+    - kind: Rule
+      match: PathPrefix(`/`)
+      middlewares: []
+      priority: 1
+      services:
+      - kind: Service
+        name: jellyfin
+        namespace: media
+        port: 8096
 #  - kind: Rule
 #    match: PathPrefix(`/jackett`)
 #    middlewares: []
