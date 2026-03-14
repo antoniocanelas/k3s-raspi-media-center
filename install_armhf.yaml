@@ -212,6 +212,8 @@ spec:
     matchLabels:
       app: media
       run: bazarr
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -245,11 +247,11 @@ spec:
           periodSeconds: 15
         resources:
           limits:
+            cpu: 1000m
+            memory: 2Gi
+          requests:
             cpu: 500m
             memory: 1Gi
-          requests:
-            cpu: 250m
-            memory: 512Mi
         volumeMounts:
         - mountPath: /config
           name: config
