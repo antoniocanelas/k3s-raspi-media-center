@@ -370,9 +370,9 @@ spec:
             instance_name: Bazarr
             ip: '*'
             language_equals: []
-            minimum_score: 90
-            minimum_score_movie: 70
-            movie_default_enabled: false
+            minimum_score: 70
+            minimum_score_movie: 60
+            movie_default_enabled: true
             movie_default_profile: 1
             movie_tag_enabled: false
             multithreading: true
@@ -521,11 +521,11 @@ spec:
             full_update_day: 6
             full_update_hour: 4
             http_timeout: 60
-            ip: 192.168.0.240
+            ip: radarr
             movies_sync: 60
             movies_sync_on_live: true
             only_monitored: false
-            port: 80
+            port: 7878
             ssl: false
             sync_only_monitored_movies: false
             use_ffprobe_cache: true
@@ -553,9 +553,9 @@ spec:
             full_update_day: 6
             full_update_hour: 4
             http_timeout: 60
-            ip: 192.168.0.240
+            ip: sonarr
             only_monitored: false
-            port: 80
+            port: 8989
             series_sync: 60
             series_sync_on_live: true
             ssl: false
@@ -861,11 +861,11 @@ spec:
           timeoutSeconds: 5
         resources:
           limits:
+            cpu: 2000m
+            memory: 4Gi
+          requests:
             cpu: 1000m
             memory: 2Gi
-          requests:
-            cpu: 500m
-            memory: 1Gi
         startupProbe:
           failureThreshold: 30
           periodSeconds: 10
