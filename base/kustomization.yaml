@@ -11,7 +11,9 @@ labels:
 
 resources:
 - namespace.yaml
-- ingress-route.yaml
+- ingress-route-external.yaml
+- middlewares.yaml
+- external-services.yaml
 - nas-storage.yaml
 - ssd-storage.yaml
 #- transmission
@@ -26,3 +28,32 @@ resources:
 #- jellyfin
 #- kavita
 #- lidarr
+
+patches:
+- target:
+    version: v1
+    kind: Service
+    name: homeassistant-external
+  patch: |-
+    - op: add
+      path: /spec/selector
+      value:
+        external-backend: "true"
+- target:
+    version: v1
+    kind: Service
+    name: jellyfin-external
+  patch: |-
+    - op: add
+      path: /spec/selector
+      value:
+        external-backend: "true"
+- target:
+    version: v1
+    kind: Service
+    name: plex-external
+  patch: |-
+    - op: add
+      path: /spec/selector
+      value:
+        external-backend: "true"

@@ -1,0 +1,94 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: media-external
+spec:
+  entryPoints:
+    - websecure
+  tls:
+    certResolver: letsencrypt
+  routes:
+    - kind: Rule
+      match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/prowlarr`)
+      priority: 200
+      services:
+        - kind: Service
+          name: prowlarr
+          namespace: media
+          port: 9696
+
+    - kind: Rule
+      match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/radarr`)
+      priority: 200
+      services:
+        - kind: Service
+          name: radarr
+          namespace: media
+          port: 7878
+
+    - kind: Rule
+      match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/sonarr`)
+      priority: 200
+      services:
+        - kind: Service
+          name: sonarr
+          namespace: media
+          port: 8989
+
+    - kind: Rule
+      match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/bazarr`)
+      priority: 200
+      middlewares:
+        - name: strip-bazarr
+          namespace: media
+      services:
+        - kind: Service
+          name: bazarr
+          namespace: media
+          port: 6767
+
+    - kind: Rule
+      match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/ha`)
+      priority: 200
+      middlewares:
+        - name: strip-ha
+          namespace: media
+      services:
+        - kind: Service
+          name: homeassistant-external
+          namespace: media
+          port: 8123
+
+    - kind: Rule
+      match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/jellyfin`)
+      priority: 200
+      middlewares:
+        - name: strip-jellyfin
+          namespace: media
+      services:
+        - kind: Service
+          name: jellyfin-external
+          namespace: media
+          port: 8096
+
+    - kind: Rule
+      match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/plex`)
+      priority: 200
+      middlewares:
+        - name: strip-plex
+          namespace: media
+      services:
+        - kind: Service
+          name: plex-external
+          namespace: media
+          port: 32400
+
+    - kind: Rule
+      match: Host(`telheira.tplinkdns.com`)
+      priority: 1
+      services:
+        - kind: Service
+          name: qbittorrent
+          namespace: media
+          port: 8080
+

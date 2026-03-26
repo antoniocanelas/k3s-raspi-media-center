@@ -28,6 +28,54 @@ kind: Service
 metadata:
   labels:
     app: media
+  name: homeassistant-external
+  namespace: media
+spec:
+  ports:
+  - name: http
+    port: 8123
+    targetPort: 8123
+  selector:
+    app: media
+    external-backend: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: media
+  name: jellyfin-external
+  namespace: media
+spec:
+  ports:
+  - name: http
+    port: 8096
+    targetPort: 8096
+  selector:
+    app: media
+    external-backend: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: media
+  name: plex-external
+  namespace: media
+spec:
+  ports:
+  - name: http
+    port: 32400
+    targetPort: 32400
+  selector:
+    app: media
+    external-backend: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: media
   name: prowlarr
   namespace: media
 spec:
@@ -231,7 +279,7 @@ spec:
         image: linuxserver/bazarr:arm64v8-latest
         livenessProbe:
           httpGet:
-            path: /bazarr
+            path: /
             port: webui
           initialDelaySeconds: 200
           periodSeconds: 15
@@ -241,7 +289,7 @@ spec:
           name: webui
         readinessProbe:
           httpGet:
-            path: /bazarr
+            path: /
             port: webui
           initialDelaySeconds: 200
           periodSeconds: 15
@@ -339,7 +387,7 @@ spec:
             adaptive_searching_delta: 1w
             anti_captcha_provider: null
             auto_update: true
-            base_url: /bazarr
+            base_url: /
             branch: master
             chmod: '0640'
             chmod_enabled: false
@@ -1018,67 +1066,242 @@ spec:
         persistentVolumeClaim:
           claimName: nas-media-pvc
 ---
+addressType: IPv4
+apiVersion: discovery.k8s.io/v1
+endpoints:
+- addresses:
+  - 192.168.0.100
+  conditions:
+    ready: true
+kind: EndpointSlice
+metadata:
+  labels:
+    app: media
+    kubernetes.io/service-name: homeassistant-external
+  name: homeassistant-external-1
+  namespace: media
+ports:
+- name: http
+  port: 8123
+  protocol: TCP
+---
+addressType: IPv4
+apiVersion: discovery.k8s.io/v1
+endpoints:
+- addresses:
+  - 192.168.0.200
+  conditions:
+    ready: true
+kind: EndpointSlice
+metadata:
+  labels:
+    app: media
+    kubernetes.io/service-name: jellyfin-external
+  name: jellyfin-external-1
+  namespace: media
+ports:
+- name: http
+  port: 8096
+  protocol: TCP
+---
+addressType: IPv4
+apiVersion: discovery.k8s.io/v1
+endpoints:
+- addresses:
+  - 192.168.0.200
+  conditions:
+    ready: true
+kind: EndpointSlice
+metadata:
+  labels:
+    app: media
+    kubernetes.io/service-name: plex-external
+  name: plex-external-1
+  namespace: media
+ports:
+- name: http
+  port: 32400
+  protocol: TCP
+---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   labels:
     app: media
-  name: media
+  name: media-external
   namespace: media
 spec:
   entryPoints:
-  - web
+  - websecure
   routes:
   - kind: Rule
-    match: Host(`qbittorrent.telheira`)
-    priority: 0
-    services:
-    - kind: Service
-      name: qbittorrent
+    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/prowlarr`)
+    middlewares:
+    - name: strip-prowlarr
       namespace: media
-      port: 8080
-  - kind: Rule
-    match: PathPrefix(`/prowlarr`)
-    middlewares: []
-    priority: 0
+    priority: 200
     services:
     - kind: Service
       name: prowlarr
       namespace: media
       port: 9696
   - kind: Rule
-    match: PathPrefix(`/profilarr`)
-    middlewares: []
-    priority: 0
-    services:
-    - kind: Service
-      name: profilarr
+    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/radarr`)
+    middlewares:
+    - name: strip-radarr
       namespace: media
-      port: 6868
-  - kind: Rule
-    match: PathPrefix(`/radarr`)
-    middlewares: []
-    priority: 0
+    priority: 200
     services:
     - kind: Service
       name: radarr
       namespace: media
       port: 7878
   - kind: Rule
-    match: PathPrefix(`/sonarr`)
-    middlewares: []
-    priority: 100
+    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/sonarr`)
+    middlewares:
+    - name: strip-sonarr
+      namespace: media
+    priority: 200
     services:
     - kind: Service
       name: sonarr
       namespace: media
       port: 8989
   - kind: Rule
-    match: PathPrefix(`/bazarr`)
-    middlewares: []
-    priority: 0
+    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/bazarr`)
+    middlewares:
+    - name: strip-bazarr
+      namespace: media
+    priority: 200
     services:
     - kind: Service
       name: bazarr
       namespace: media
       port: 6767
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/ha`)
+    middlewares:
+    - name: strip-ha
+      namespace: media
+    priority: 200
+    services:
+    - kind: Service
+      name: homeassistant-external
+      namespace: media
+      port: 8123
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/jellyfin`)
+    middlewares:
+    - name: strip-jellyfin
+      namespace: media
+    priority: 200
+    services:
+    - kind: Service
+      name: jellyfin-external
+      namespace: media
+      port: 8096
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/plex`)
+    middlewares:
+    - name: strip-plex
+      namespace: media
+    priority: 200
+    services:
+    - kind: Service
+      name: plex-external
+      namespace: media
+      port: 32400
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`)
+    priority: 1
+    services:
+    - kind: Service
+      name: qbittorrent
+      namespace: media
+      port: 8080
+  tls:
+    certResolver: letsencrypt
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-bazarr
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /bazarr
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-ha
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /ha
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-jellyfin
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /jellyfin
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-plex
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /plex
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-prowlarr
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /prowlarr
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-radarr
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /radarr
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-sonarr
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /sonarr

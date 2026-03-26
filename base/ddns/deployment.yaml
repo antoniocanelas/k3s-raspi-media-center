@@ -1,0 +1,59 @@
+---
+# Cloudflare DDNS updater — keeps your DNS A record pointing to your dynamic public IP.
+# It checks every 5 minutes and updates Cloudflare if the IP has changed.
+#
+# Secret required (create once):
+#   kubectl create secret generic cloudflare-ddns-secret \
+#     --from-literal=api-token=<CF_API_TOKEN_WITH_ZONE_EDIT> \
+#     --from-literal=domains=yourdomain.com \
+#     -n media
+#
+# Cloudflare API token needs: Zone > DNS > Edit  (for your zone)
+#
+# DNS strategy: only update the root A record (yourdomain.com).
+# All subdomains (ha.yourdomain.com, jellyfin.yourdomain.com, ...) should be
+# CNAME records pointing to yourdomain.com in the Cloudflare dashboard.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflare-ddns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflare-ddns
+  template:
+    metadata:
+      labels:
+        app: cloudflare-ddns
+    spec:
+      containers:
+        - name: cloudflare-ddns
+          image: ghcr.io/favonia/cloudflare-ddns:latest
+          imagePullPolicy: Always
+          env:
+            - name: CF_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare-ddns-secret
+                  key: api-token
+            - name: DOMAINS
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare-ddns-secret
+                  key: domains
+            - name: PROXIED
+              value: "false"
+            - name: UPDATE_CRON
+              value: "@every 5m"
+            - name: TZ
+              value: "Europe/Lisbon"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [all]
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+      restartPolicy: Always
+

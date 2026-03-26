@@ -79,14 +79,14 @@ spec:
           timeoutSeconds: 5
           failureThreshold: 8
         volumeMounts:
-          - mountPath: /config
-            name: config
-            subPath: sonarr
-          - mountPath: /tv
-            name: media
-            subPath: tv
-          - mountPath: /downloads
-            name: downloads
+        - mountPath: /config
+          name: config
+          subPath: sonarr
+        - mountPath: /tv
+          name: media
+          subPath: tv
+        - mountPath: /downloads
+          name: downloads
       volumes:
         - name: config
           persistentVolumeClaim:

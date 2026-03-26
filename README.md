@@ -159,3 +159,4 @@ It uses a `hostPath` volume to store configuration and media files. It defaults 
 ├── sonarr
 └── transmission
 ```
+![img.png](img.png)
