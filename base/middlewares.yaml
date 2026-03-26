@@ -55,6 +55,16 @@ spec:
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
+  name: jellyfin-redirect
+spec:
+  redirectRegex:
+    regex: ^https?://([^/]+)/jellyfin$
+    replacement: https://$1/jellyfin/web/
+    permanent: false
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
   name: strip-plex
 spec:
   stripPrefix:

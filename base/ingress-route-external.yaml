@@ -60,6 +60,8 @@ spec:
       match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/jellyfin`)
       priority: 200
       middlewares:
+        - name: jellyfin-redirect
+          namespace: media
         - name: strip-jellyfin
           namespace: media
       services:

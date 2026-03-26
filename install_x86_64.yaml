@@ -1170,9 +1170,6 @@ spec:
       port: 8989
   - kind: Rule
     match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/bazarr`)
-    middlewares:
-    - name: strip-bazarr
-      namespace: media
     priority: 200
     services:
     - kind: Service
@@ -1192,9 +1189,6 @@ spec:
       port: 8123
   - kind: Rule
     match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/jellyfin`)
-    middlewares:
-    - name: strip-jellyfin
-      namespace: media
     priority: 200
     services:
     - kind: Service
