@@ -44,17 +44,6 @@ spec:
           namespace: media
           port: 6767
 
-    - kind: Rule
-      match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/ha`)
-      priority: 200
-      middlewares:
-        - name: strip-ha
-          namespace: media
-      services:
-        - kind: Service
-          name: homeassistant-external
-          namespace: media
-          port: 8123
 
     - kind: Rule
       match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/jellyfin`)
@@ -69,18 +58,6 @@ spec:
           name: jellyfin-external
           namespace: media
           port: 8096
-
-    - kind: Rule
-      match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/plex`)
-      priority: 200
-      middlewares:
-        - name: strip-plex
-          namespace: media
-      services:
-        - kind: Service
-          name: plex-external
-          namespace: media
-          port: 32400
 
     - kind: Rule
       match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/qbittorrent`)

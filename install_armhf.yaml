@@ -1177,35 +1177,18 @@ spec:
       namespace: media
       port: 6767
   - kind: Rule
-    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/ha`)
-    middlewares:
-    - name: strip-ha
-      namespace: media
-    priority: 200
-    services:
-    - kind: Service
-      name: homeassistant-external
-      namespace: media
-      port: 8123
-  - kind: Rule
     match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/jellyfin`)
+    middlewares:
+    - name: jellyfin-redirect
+      namespace: media
+    - name: strip-jellyfin
+      namespace: media
     priority: 200
     services:
     - kind: Service
       name: jellyfin-external
       namespace: media
       port: 8096
-  - kind: Rule
-    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/plex`)
-    middlewares:
-    - name: strip-plex
-      namespace: media
-    priority: 200
-    services:
-    - kind: Service
-      name: plex-external
-      namespace: media
-      port: 32400
   - kind: Rule
     match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/qbittorrent`)
     middlewares:
@@ -1233,6 +1216,19 @@ kind: Middleware
 metadata:
   labels:
     app: media
+  name: jellyfin-redirect
+  namespace: media
+spec:
+  redirectRegex:
+    permanent: false
+    regex: ^https?://([^/]+)/jellyfin$
+    replacement: https://$1/jellyfin/web/
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
   name: strip-bazarr
   namespace: media
 spec:
@@ -1245,36 +1241,12 @@ kind: Middleware
 metadata:
   labels:
     app: media
-  name: strip-ha
-  namespace: media
-spec:
-  stripPrefix:
-    prefixes:
-    - /ha
----
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  labels:
-    app: media
   name: strip-jellyfin
   namespace: media
 spec:
   stripPrefix:
     prefixes:
     - /jellyfin
----
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  labels:
-    app: media
-  name: strip-plex
-  namespace: media
-spec:
-  stripPrefix:
-    prefixes:
-    - /plex
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware

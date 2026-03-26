@@ -93,35 +93,38 @@ You should also be able to reach each component's UI using the links below. Don'
 
 |App|URI
 |---|---
-|radarr|http://localhost/radarr
-|sonarr|http://localhost/sonarr
-|bazarr|http://localhost/bazarr
-|jacket|http://localhost/jackett
-|prowlarr|http://localhost/prowlarr
-|readarr|http://localhost/readarr
-|transmission|http://localhost/transmission
+|radarr|http://localhost/radarr/
+|sonarr|http://localhost/sonarr/
+|bazarr|http://localhost/bazarr/
+|jackett|http://localhost/jackett/
+|prowlarr|http://localhost/prowlarr/
+|readarr|http://localhost/readarr/
+|transmission|http://localhost/transmission/
 |jellyfin|http://localhost/
+|qbittorrent|http://localhost/qbittorrent/
 
 Check the [ingress-route.yaml](base/ingress-route.yaml) for more details.
 
-Each module except for Jellyfin is configured to respond on a custom basepath (check the init containers logic for more details).
+Most media modules are configured to respond on a custom basepath via Traefik middleware. Jellyfin redirects `/jellyfin` to `/jellyfin/web/` automatically. Plex and Home Assistant are exposed directly via port-forward.
 
-### Current external endpoints (path-based)
+### Current external endpoints
 
-If you are using a single public host with path-based routing, these are the endpoints:
+If you are using a single public host, these are the current external endpoints. Most media apps are exposed through path-based routing on `443`, while Plex and Home Assistant use direct port-forwards.
 
 | App | URL |
 |---|---|
-| Sonarr | `https://telheira.tplinkdns.com/sonarr` |
-| Radarr | `https://telheira.tplinkdns.com/radarr` |
-| Prowlarr | `https://telheira.tplinkdns.com/prowlarr` |
-| Bazarr | `https://telheira.tplinkdns.com/bazarr` |
-| qBittorrent | `https://telheira.tplinkdns.com/qbittorrent` |
+| Sonarr | `https://telheira.tplinkdns.com/sonarr/` |
+| Radarr | `https://telheira.tplinkdns.com/radarr/` |
+| Prowlarr | `https://telheira.tplinkdns.com/prowlarr/` |
+| Bazarr | `https://telheira.tplinkdns.com/bazarr/` |
+| qBittorrent | `https://telheira.tplinkdns.com/qbittorrent/` |
 | Jellyfin | `https://telheira.tplinkdns.com/jellyfin` |
-| Plex | `https://telheira.tplinkdns.com/plex` |
-| Home Assistant | `https://telheira.tplinkdns.com/ha` |
+| Plex | `http://telheira.tplinkdns.com:32400/web/` (external) or `http://192.168.0.200:32400/web/` (local) |
+| Home Assistant | `http://telheira.tplinkdns.com:8123/` (external) or `http://192.168.0.100:8123/` (local) |
 
-Adjust the hostname to your own DDNS/domain if different.
+**Plex port-forward setup**: Forward external `32400` TCP on your router to your Plex host (`192.168.0.200:32400`).
+
+**Home Assistant port-forward setup**: Forward external `8123` TCP on your router to your Home Assistant host (`192.168.0.100:8123`).
 
 ## qBittorrent with Radarr/Sonarr
 
