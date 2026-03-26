@@ -1136,9 +1136,6 @@ spec:
   routes:
   - kind: Rule
     match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/prowlarr`)
-    middlewares:
-    - name: strip-prowlarr
-      namespace: media
     priority: 200
     services:
     - kind: Service
@@ -1147,9 +1144,6 @@ spec:
       port: 9696
   - kind: Rule
     match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/radarr`)
-    middlewares:
-    - name: strip-radarr
-      namespace: media
     priority: 200
     services:
     - kind: Service
@@ -1158,9 +1152,6 @@ spec:
       port: 7878
   - kind: Rule
     match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/sonarr`)
-    middlewares:
-    - name: strip-sonarr
-      namespace: media
     priority: 200
     services:
     - kind: Service
