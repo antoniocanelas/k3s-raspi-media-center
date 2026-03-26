@@ -25,3 +25,4 @@ images:
 
 resources:
 - ../../base
+- ../../base/cluster

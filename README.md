@@ -109,22 +109,24 @@ Most media modules are configured to respond on a custom basepath via Traefik mi
 
 ### Current external endpoints
 
-If you are using a single public host, these are the current external endpoints. Most media apps are exposed through path-based routing on `443`, while Plex and Home Assistant use direct port-forwards.
+If you are using a single public host, these are the current external endpoints. Most media apps are exposed through Traefik on `8443`, Plex keeps its direct port-forward, and Home Assistant is intended to stay on the local endpoint below.
 
 | App | URL |
 |---|---|
-| Sonarr | `https://telheira.tplinkdns.com/sonarr/` |
-| Radarr | `https://telheira.tplinkdns.com/radarr/` |
-| Prowlarr | `https://telheira.tplinkdns.com/prowlarr/` |
-| Bazarr | `https://telheira.tplinkdns.com/bazarr/` |
-| qBittorrent | `https://telheira.tplinkdns.com/qbittorrent/` |
-| Jellyfin | `https://telheira.tplinkdns.com/jellyfin` |
+| Sonarr | `https://telheira.tplinkdns.com:8443/sonarr/` |
+| Radarr | `https://telheira.tplinkdns.com:8443/radarr/` |
+| Prowlarr | `https://telheira.tplinkdns.com:8443/prowlarr/` |
+| Bazarr | `https://telheira.tplinkdns.com:8443/bazarr/` |
+| qBittorrent | `https://telheira.tplinkdns.com:8443/qbittorrent/` |
+| Jellyfin | `https://telheira.tplinkdns.com:8443/jellyfin` |
 | Plex | `http://telheira.tplinkdns.com:32400/web/` (external) or `http://192.168.0.200:32400/web/` (local) |
-| Home Assistant | `http://telheira.tplinkdns.com:8123/` (external) or `http://192.168.0.100:8123/` (local) |
+| Home Assistant | `http://192.168.0.100:8123/` |
 
 **Plex port-forward setup**: Forward external `32400` TCP on your router to your Plex host (`192.168.0.200:32400`).
 
-**Home Assistant port-forward setup**: Forward external `8123` TCP on your router to your Home Assistant host (`192.168.0.100:8123`).
+**Traefik HTTPS setup**: Apply [`base/cluster/traefik-tls.yaml`](base/cluster/traefik-tls.yaml) and expose/router-forward external `8443` TCP to the k3s node running Traefik.
+
+**Home Assistant access**: Reach it directly at `http://192.168.0.100:8123/`.
 
 ## qBittorrent with Radarr/Sonarr
 

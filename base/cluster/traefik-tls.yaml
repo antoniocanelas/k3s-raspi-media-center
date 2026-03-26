@@ -19,6 +19,8 @@ spec:
             scheme: https
             permanent: true
       websecure:
+        exposedPort: 8443
         tls:
           enabled: true
+
 
