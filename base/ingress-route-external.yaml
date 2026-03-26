@@ -38,9 +38,6 @@ spec:
     - kind: Rule
       match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/bazarr`)
       priority: 200
-      middlewares:
-        - name: strip-bazarr
-          namespace: media
       services:
         - kind: Service
           name: bazarr
@@ -82,6 +79,18 @@ spec:
           name: plex-external
           namespace: media
           port: 32400
+
+    - kind: Rule
+      match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/qbittorrent`)
+      priority: 200
+      middlewares:
+        - name: strip-qbittorrent
+          namespace: media
+      services:
+        - kind: Service
+          name: qbittorrent
+          namespace: media
+          port: 8080
 
     - kind: Rule
       match: Host(`telheira.tplinkdns.com`)

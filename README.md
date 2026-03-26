@@ -106,6 +106,23 @@ Check the [ingress-route.yaml](base/ingress-route.yaml) for more details.
 
 Each module except for Jellyfin is configured to respond on a custom basepath (check the init containers logic for more details).
 
+### Current external endpoints (path-based)
+
+If you are using a single public host with path-based routing, these are the endpoints:
+
+| App | URL |
+|---|---|
+| Sonarr | `https://telheira.tplinkdns.com/sonarr` |
+| Radarr | `https://telheira.tplinkdns.com/radarr` |
+| Prowlarr | `https://telheira.tplinkdns.com/prowlarr` |
+| Bazarr | `https://telheira.tplinkdns.com/bazarr` |
+| qBittorrent | `https://telheira.tplinkdns.com/qbittorrent` |
+| Jellyfin | `https://telheira.tplinkdns.com/jellyfin` |
+| Plex | `https://telheira.tplinkdns.com/plex` |
+| Home Assistant | `https://telheira.tplinkdns.com/ha` |
+
+Adjust the hostname to your own DDNS/domain if different.
+
 ## qBittorrent with Radarr/Sonarr
 
 If `qbittorrent` is enabled in [`base/kustomization.yaml`](base/kustomization.yaml), use these values in both apps:
