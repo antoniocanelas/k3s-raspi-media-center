@@ -1,0 +1,73 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-prowlarr
+spec:
+  stripPrefix:
+    prefixes:
+      - /prowlarr
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-radarr
+spec:
+  stripPrefix:
+    prefixes:
+      - /radarr
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-sonarr
+spec:
+  stripPrefix:
+    prefixes:
+      - /sonarr
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-bazarr
+spec:
+  stripPrefix:
+    prefixes:
+      - /bazarr
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-ha
+spec:
+  stripPrefix:
+    prefixes:
+      - /ha
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-jellyfin
+spec:
+  stripPrefix:
+    prefixes:
+      - /jellyfin
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-plex
+spec:
+  stripPrefix:
+    prefixes:
+      - /plex
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-qbittorrent
+spec:
+  stripPrefix:
+    prefixes:
+      - /qbittorrent
+
