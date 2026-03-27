@@ -1156,6 +1156,36 @@ spec:
       websecure:
         tls:
           enabled: true
+      homeassistantsecure:
+        port: 8123
+        exposedPort: 8123
+        expose:
+          default: true
+        protocol: TCP
+        tls:
+          enabled: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app: media
+  name: homeassistant-external
+  namespace: media
+spec:
+  entryPoints:
+  - homeassistantsecure
+  routes:
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`)
+    priority: 1
+    services:
+    - kind: Service
+      name: homeassistant-external
+      namespace: media
+      port: 8123
+  tls:
+    certResolver: letsencrypt
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
