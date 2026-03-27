@@ -1164,6 +1164,14 @@ spec:
         protocol: TCP
         tls:
           enabled: true
+      plexsecure:
+        port: 32443
+        exposedPort: 32443
+        expose:
+          default: true
+        protocol: TCP
+        tls:
+          enabled: true
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
@@ -1262,6 +1270,28 @@ spec:
       name: qbittorrent
       namespace: media
       port: 8080
+  tls:
+    certResolver: letsencrypt
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app: media
+  name: plex-external
+  namespace: media
+spec:
+  entryPoints:
+  - plexsecure
+  routes:
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`)
+    priority: 1
+    services:
+    - kind: Service
+      name: plex-external
+      namespace: media
+      port: 32400
   tls:
     certResolver: letsencrypt
 ---

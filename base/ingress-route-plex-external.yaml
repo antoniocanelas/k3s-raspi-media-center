@@ -1,0 +1,20 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: plex-external
+  namespace: media
+spec:
+  entryPoints:
+    - plexsecure
+  tls:
+    certResolver: letsencrypt
+  routes:
+    - kind: Rule
+      match: Host(`telheira.tplinkdns.com`)
+      priority: 1
+      services:
+        - kind: Service
+          name: plex-external
+          namespace: media
+          port: 32400
+

@@ -13,6 +13,7 @@ resources:
 - namespace.yaml
 - ingress-route-external.yaml
 - ingress-route-homeassistant-external.yaml
+- ingress-route-plex-external.yaml
 - middlewares.yaml
 - external-services.yaml
 - nas-storage.yaml

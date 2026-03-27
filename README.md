@@ -109,7 +109,7 @@ Most media modules are configured to respond on a custom basepath via Traefik mi
 
 ### Current external endpoints
 
-If you are using a single public host, these are the current external endpoints. Most media apps are exposed through Traefik on `443`, Home Assistant is exposed through Traefik on `8123`, and Plex keeps its direct port-forward.
+If you are using a single public host, these are the current external endpoints. Most media apps are exposed through Traefik on `443`, Home Assistant is exposed through Traefik on `8123`, and Plex is exposed through Traefik on `32443`.
 
 | App | URL |
 |---|---|
@@ -120,9 +120,11 @@ If you are using a single public host, these are the current external endpoints.
 | qBittorrent | `https://telheira.tplinkdns.com/qbittorrent/` |
 | Jellyfin | `https://telheira.tplinkdns.com/jellyfin` |
 | Home Assistant | `https://telheira.tplinkdns.com:8123/` (external) or `http://192.168.0.100:8123/` (local) |
-| Plex | `http://telheira.tplinkdns.com:32400/web/` (external) or `http://192.168.0.200:32400/web/` (local) |
+| Plex | `https://telheira.tplinkdns.com:32443/web/` (external) or `http://192.168.0.200:32400/web/` (local) |
 
-**Plex port-forward setup**: Forward external `32400` TCP on your router to your Plex host (`192.168.0.200:32400`).
+**Plex HTTPS setup**: Forward external `32443` TCP on your router to the k3s node running Traefik. Plex traffic is then proxied to `192.168.0.200:32400`.
+
+**Plex access note**: Use `https://telheira.tplinkdns.com:32443/...` (HTTPS). `http://telheira.tplinkdns.com:32443/...` returns `404`.
 
 **Traefik HTTPS setup**: Apply [`base/cluster/traefik-tls.yaml`](base/cluster/traefik-tls.yaml) and expose/router-forward external `443` TCP to the k3s node running Traefik.
 
