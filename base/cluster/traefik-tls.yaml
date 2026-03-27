@@ -21,5 +21,13 @@ spec:
       websecure:
         tls:
           enabled: true
+      homeassistantsecure:
+        port: 8123
+        exposedPort: 8123
+        expose:
+          default: true
+        protocol: TCP
+        tls:
+          enabled: true
 
 
