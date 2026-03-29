@@ -955,6 +955,8 @@ spec:
         - mountPath: /config
           name: config
           subPath: radarr
+      nodeSelector:
+        kubernetes.io/hostname: pi-master-00
       securityContext:
         fsGroup: 1000
       volumes:

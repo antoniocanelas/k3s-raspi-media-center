@@ -17,6 +17,8 @@ spec:
       labels:
         run: radarr
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: pi-master-00
       securityContext:
         fsGroup: 1000
       initContainers:

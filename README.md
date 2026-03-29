@@ -121,7 +121,8 @@ If you are using a single public host, these are the current external endpoints.
 | Jellyfin | `https://telheira.tplinkdns.com/jellyfin` |
 | Home Assistant | `https://telheira.tplinkdns.com:8123/` (external) or `http://192.168.0.100:8123/` (local) |
 | Plex | `https://telheira.tplinkdns.com:32443/web/` (external) or `http://192.168.0.200:32400/web/` (local) |
-
+https://telheira.tplinkdns.com:32443/web/index.html#!/
+https://telheira.tplinkdns.com:32443/web/
 **Plex HTTPS setup**: Forward external `32443` TCP on your router to the k3s node running Traefik. Plex traffic is then proxied to `192.168.0.200:32400`.
 
 **Plex access note**: Use `https://telheira.tplinkdns.com:32443/...` (HTTPS). `http://telheira.tplinkdns.com:32443/...` returns `404`.
