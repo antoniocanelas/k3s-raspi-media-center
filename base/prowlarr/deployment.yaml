@@ -27,27 +27,12 @@ spec:
           runAsGroup: 1000
         command: ["sh", "-c"]
         args:
-        - |
-          if [ ! -f /config/config.xml ]; then
-            cat <<'EOF' > /config/config.xml
-            <Config>
-              <UrlBase>/prowlarr</UrlBase>
-              <LogLevel>debug</LogLevel>
-              <BindAddress>*</BindAddress>
-              <Port>9696</Port>
-              <SslPort>6969</SslPort>
-              <EnableSsl>False</EnableSsl>
-              <LaunchBrowser>True</LaunchBrowser>
-              <AuthenticationMethod>Forms</AuthenticationMethod>
-              <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
-              <Branch>master</Branch>
-              <SslCertPath></SslCertPath>
-              <SslCertPassword></SslCertPassword>
-              <InstanceName>Prowlarr</InstanceName>
-              <UpdateMechanism>Docker</UpdateMechanism>
-            </Config>
-            EOF
-          fi
+          - |
+            echo 'Customizing Prowlarr config...'
+            if [[ ! -f /config/config.xml ]]; then
+              echo '<Config><UrlBase>/prowlarr</UrlBase></Config>'> /config/config.xml
+            fi
+            echo 'Prowlarr config customized.'
         volumeMounts: 
         - mountPath: /config 
           name: config
@@ -72,6 +57,15 @@ spec:
         ports:
         - containerPort: 9696
           name: webui
+        startupProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - curl "http://localhost:9696/prowlarr/api/v1/system/status?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 60
         livenessProbe:
           exec:
             command:
@@ -80,6 +74,8 @@ spec:
             - curl "http://localhost:9696/prowlarr/api/v1/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 8
         readinessProbe:
           exec:
             command:
@@ -88,6 +84,8 @@ spec:
             - curl "http://localhost:9696/prowlarr/api/v1/system/status?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 8
         volumeMounts: 
         - mountPath: /config 
           name: config
