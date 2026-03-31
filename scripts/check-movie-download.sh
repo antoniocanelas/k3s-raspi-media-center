@@ -12,7 +12,7 @@
 #   QB_URL          - qBittorrent base URL   (default: http://qbittorrent.telheira)
 #   QB_USER         - qBittorrent username   (default: admin)
 #   QB_PASS         - qBittorrent password   (default: adminadmin)
-#   EXPECTED_PATH   - Expected save path     (default: /downloads/complete)
+#   EXPECTED_PATH   - Expected save path     (default: /downloads/completed/radarr)
 #   K8S_NAMESPACE   - Kubernetes namespace   (default: media)
 
 set -euo pipefail
@@ -33,7 +33,7 @@ RADARR_API_KEY="${RADARR_API_KEY:-}"
 QB_URL="${QB_URL:-http://qbittorrent.telheira}"
 QB_USER="${QB_USER:-admin}"
 QB_PASS="${QB_PASS:-adminadmin}"
-EXPECTED_PATH="${EXPECTED_PATH:-/downloads/complete}"
+EXPECTED_PATH="${EXPECTED_PATH:-/downloads/completed/radarr}"
 K8S_NAMESPACE="${K8S_NAMESPACE:-media}"
 
 # ── Argument check ────────────────────────────────────────────────────────────
@@ -46,7 +46,7 @@ if [[ $# -lt 1 ]]; then
   echo "  QB_URL         qBittorrent base URL  (default: http://qbittorrent.telheira)"
   echo "  QB_USER        qBittorrent username  (default: admin)"
   echo "  QB_PASS        qBittorrent password  (default: adminadmin)"
-  echo "  EXPECTED_PATH  Expected save path    (default: /downloads/complete)"
+  echo "  EXPECTED_PATH  Expected save path    (default: /downloads/completed/radarr)"
   echo "  K8S_NAMESPACE  Kubernetes namespace  (default: media)"
   exit 1
 fi
@@ -235,4 +235,7 @@ echo "$MATCHES" | jq -c '.[]' | while IFS= read -r MOVIE; do
     done
   fi
 done
+
+
+
 

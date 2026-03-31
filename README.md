@@ -148,8 +148,8 @@ Use category `radarr` in Radarr and category `sonarr` in Sonarr.
 
 Use these qBittorrent paths:
 
-- Incomplete: `/downloads/incomplete`
-- Complete: `/downloads/complete`
+- Incomplete: `/downloads/incomplete/radarr` (radarr category), `/downloads/incomplete/sonarr` (sonarr category)
+- Complete: `/downloads/completed/radarr` (radarr category), `/downloads/completed/sonarr` (sonarr category)
 - Optional watch folder: `/watch`
 
 The deployment mounts these PVC subpaths:

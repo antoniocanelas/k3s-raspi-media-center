@@ -30,19 +30,19 @@ spec:
         - |
           mkdir -p /config/qBittorrent
           if [ ! -f /config/qBittorrent/qBittorrent.conf ]; then
-            cat <<'EOF' > /config/qBittorrent/qBittorrent.conf
-            [BitTorrent]
-            Session\DefaultSavePath=/downloads/completed
-            Session\GlobalMaxRatio=0
-            Session\MaxRatioAction=0
-            Session\TempPath=/downloads/incomplete
-            Session\TempPathEnabled=true
-
-            [Preferences]
-            WebUI\AuthSubnetWhitelist=192.168.0.0/24
-            WebUI\Address=*
-            WebUI\Port=8080
-            EOF
+            printf '%s\n' \
+              '[BitTorrent]' \
+              'Session\DefaultSavePath=/downloads/completed' \
+              'Session\GlobalMaxRatio=0' \
+              'Session\MaxRatioAction=0' \
+              'Session\TempPath=/downloads/incomplete' \
+              'Session\TempPathEnabled=true' \
+              '' \
+              '[Preferences]' \
+              'WebUI\AuthSubnetWhitelist=192.168.0.0/24' \
+              'WebUI\Address=*' \
+              'WebUI\Port=8080' \
+              > /config/qBittorrent/qBittorrent.conf
           fi
         volumeMounts:
         - mountPath: /config

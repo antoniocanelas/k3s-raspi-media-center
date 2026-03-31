@@ -29,24 +29,24 @@ spec:
         args:
         - |
           if [ ! -f /config/config.xml ]; then
-            cat <<'EOF' > /config/config.xml
-            <Config>
-              <UrlBase>/sonarr</UrlBase>
-              <LogLevel>debug</LogLevel>
-              <BindAddress>*</BindAddress>
-              <Port>8989</Port>
-              <SslPort>9898</SslPort>
-              <EnableSsl>False</EnableSsl>
-              <LaunchBrowser>True</LaunchBrowser>
-              <AuthenticationMethod>Forms</AuthenticationMethod>
-              <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
-              <Branch>main</Branch>
-              <SslCertPath></SslCertPath>
-              <SslCertPassword></SslCertPassword>
-              <InstanceName>Sonarr</InstanceName>
-              <UpdateMechanism>Docker</UpdateMechanism>
-            </Config>
-            EOF
+            printf '%s\n' \
+              '<Config>' \
+              '  <UrlBase>/sonarr</UrlBase>' \
+              '  <LogLevel>debug</LogLevel>' \
+              '  <BindAddress>*</BindAddress>' \
+              '  <Port>8989</Port>' \
+              '  <SslPort>9898</SslPort>' \
+              '  <EnableSsl>False</EnableSsl>' \
+              '  <LaunchBrowser>True</LaunchBrowser>' \
+              '  <AuthenticationMethod>Forms</AuthenticationMethod>' \
+              '  <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>' \
+              '  <Branch>main</Branch>' \
+              '  <SslCertPath></SslCertPath>' \
+              '  <SslCertPassword></SslCertPassword>' \
+              '  <InstanceName>Sonarr</InstanceName>' \
+              '  <UpdateMechanism>Docker</UpdateMechanism>' \
+              '</Config>' \
+              > /config/config.xml
           fi
         volumeMounts:
         - mountPath: /config

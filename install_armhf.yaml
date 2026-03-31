@@ -735,8 +735,10 @@ spec:
             - -c
             - curl "http://localhost:9696/prowlarr/api/v1/health?ApiKey=$(sed -ne
               '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+          failureThreshold: 8
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
         name: prowlarr
         ports:
         - containerPort: 9696
@@ -748,8 +750,10 @@ spec:
             - -c
             - curl "http://localhost:9696/prowlarr/api/v1/system/status?ApiKey=$(sed
               -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+          failureThreshold: 8
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
         resources:
           limits:
             cpu: 500m
@@ -757,6 +761,16 @@ spec:
           requests:
             cpu: 250m
             memory: 512Mi
+        startupProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - curl "http://localhost:9696/prowlarr/api/v1/system/status?ApiKey=$(sed
+              -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+          failureThreshold: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
         volumeMounts:
         - mountPath: /config
           name: config
@@ -764,26 +778,11 @@ spec:
       initContainers:
       - args:
         - |
-          if [ ! -f /config/config.xml ]; then
-            cat <<'EOF' > /config/config.xml
-            <Config>
-              <UrlBase>/prowlarr</UrlBase>
-              <LogLevel>debug</LogLevel>
-              <BindAddress>*</BindAddress>
-              <Port>9696</Port>
-              <SslPort>6969</SslPort>
-              <EnableSsl>False</EnableSsl>
-              <LaunchBrowser>True</LaunchBrowser>
-              <AuthenticationMethod>Forms</AuthenticationMethod>
-              <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
-              <Branch>master</Branch>
-              <SslCertPath></SslCertPath>
-              <SslCertPassword></SslCertPassword>
-              <InstanceName>Prowlarr</InstanceName>
-              <UpdateMechanism>Docker</UpdateMechanism>
-            </Config>
-            EOF
+          echo 'Customizing Prowlarr config...'
+          if [[ ! -f /config/config.xml ]]; then
+            echo '<Config><UrlBase>/prowlarr</UrlBase></Config>'> /config/config.xml
           fi
+          echo 'Prowlarr config customized.'
         command:
         - sh
         - -c
@@ -867,19 +866,19 @@ spec:
         - |
           mkdir -p /config/qBittorrent
           if [ ! -f /config/qBittorrent/qBittorrent.conf ]; then
-            cat <<'EOF' > /config/qBittorrent/qBittorrent.conf
-            [BitTorrent]
-            Session\DefaultSavePath=/downloads/completed
-            Session\GlobalMaxRatio=0
-            Session\MaxRatioAction=0
-            Session\TempPath=/downloads/incomplete
-            Session\TempPathEnabled=true
-
-            [Preferences]
-            WebUI\AuthSubnetWhitelist=192.168.0.0/24
-            WebUI\Address=*
-            WebUI\Port=8080
-            EOF
+            printf '%s\n' \
+              '[BitTorrent]' \
+              'Session\DefaultSavePath=/downloads/completed' \
+              'Session\GlobalMaxRatio=0' \
+              'Session\MaxRatioAction=0' \
+              'Session\TempPath=/downloads/incomplete' \
+              'Session\TempPathEnabled=true' \
+              '' \
+              '[Preferences]' \
+              'WebUI\AuthSubnetWhitelist=192.168.0.0/24' \
+              'WebUI\Address=*' \
+              'WebUI\Port=8080' \
+              > /config/qBittorrent/qBittorrent.conf
           fi
         command:
         - sh
@@ -989,24 +988,24 @@ spec:
       - args:
         - |
           if [ ! -f /config/config.xml ]; then
-            cat <<'EOF' > /config/config.xml
-            <Config>
-              <UrlBase>/radarr</UrlBase>
-              <LogLevel>debug</LogLevel>
-              <BindAddress>*</BindAddress>
-              <Port>7878</Port>
-              <SslPort>9898</SslPort>
-              <EnableSsl>False</EnableSsl>
-              <LaunchBrowser>True</LaunchBrowser>
-              <AuthenticationMethod>Forms</AuthenticationMethod>
-              <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
-              <Branch>master</Branch>
-              <SslCertPath></SslCertPath>
-              <SslCertPassword></SslCertPassword>
-              <InstanceName>Radarr</InstanceName>
-              <UpdateMechanism>Docker</UpdateMechanism>
-            </Config>
-            EOF
+            printf '%s\n' \
+              '<Config>' \
+              '  <UrlBase>/radarr</UrlBase>' \
+              '  <LogLevel>debug</LogLevel>' \
+              '  <BindAddress>*</BindAddress>' \
+              '  <Port>7878</Port>' \
+              '  <SslPort>9898</SslPort>' \
+              '  <EnableSsl>False</EnableSsl>' \
+              '  <LaunchBrowser>True</LaunchBrowser>' \
+              '  <AuthenticationMethod>Forms</AuthenticationMethod>' \
+              '  <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>' \
+              '  <Branch>master</Branch>' \
+              '  <SslCertPath></SslCertPath>' \
+              '  <SslCertPassword></SslCertPassword>' \
+              '  <InstanceName>Radarr</InstanceName>' \
+              '  <UpdateMechanism>Docker</UpdateMechanism>' \
+              '</Config>' \
+              > /config/config.xml
           fi
         command:
         - sh
@@ -1118,24 +1117,24 @@ spec:
       - args:
         - |
           if [ ! -f /config/config.xml ]; then
-            cat <<'EOF' > /config/config.xml
-            <Config>
-              <UrlBase>/sonarr</UrlBase>
-              <LogLevel>debug</LogLevel>
-              <BindAddress>*</BindAddress>
-              <Port>8989</Port>
-              <SslPort>9898</SslPort>
-              <EnableSsl>False</EnableSsl>
-              <LaunchBrowser>True</LaunchBrowser>
-              <AuthenticationMethod>Forms</AuthenticationMethod>
-              <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
-              <Branch>main</Branch>
-              <SslCertPath></SslCertPath>
-              <SslCertPassword></SslCertPassword>
-              <InstanceName>Sonarr</InstanceName>
-              <UpdateMechanism>Docker</UpdateMechanism>
-            </Config>
-            EOF
+            printf '%s\n' \
+              '<Config>' \
+              '  <UrlBase>/sonarr</UrlBase>' \
+              '  <LogLevel>debug</LogLevel>' \
+              '  <BindAddress>*</BindAddress>' \
+              '  <Port>8989</Port>' \
+              '  <SslPort>9898</SslPort>' \
+              '  <EnableSsl>False</EnableSsl>' \
+              '  <LaunchBrowser>True</LaunchBrowser>' \
+              '  <AuthenticationMethod>Forms</AuthenticationMethod>' \
+              '  <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>' \
+              '  <Branch>main</Branch>' \
+              '  <SslCertPath></SslCertPath>' \
+              '  <SslCertPassword></SslCertPassword>' \
+              '  <InstanceName>Sonarr</InstanceName>' \
+              '  <UpdateMechanism>Docker</UpdateMechanism>' \
+              '</Config>' \
+              > /config/config.xml
           fi
         command:
         - sh

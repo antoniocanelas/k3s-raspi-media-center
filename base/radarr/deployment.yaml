@@ -31,24 +31,24 @@ spec:
         args:
         - |
           if [ ! -f /config/config.xml ]; then
-            cat <<'EOF' > /config/config.xml
-            <Config>
-              <UrlBase>/radarr</UrlBase>
-              <LogLevel>debug</LogLevel>
-              <BindAddress>*</BindAddress>
-              <Port>7878</Port>
-              <SslPort>9898</SslPort>
-              <EnableSsl>False</EnableSsl>
-              <LaunchBrowser>True</LaunchBrowser>
-              <AuthenticationMethod>Forms</AuthenticationMethod>
-              <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
-              <Branch>master</Branch>
-              <SslCertPath></SslCertPath>
-              <SslCertPassword></SslCertPassword>
-              <InstanceName>Radarr</InstanceName>
-              <UpdateMechanism>Docker</UpdateMechanism>
-            </Config>
-            EOF
+            printf '%s\n' \
+              '<Config>' \
+              '  <UrlBase>/radarr</UrlBase>' \
+              '  <LogLevel>debug</LogLevel>' \
+              '  <BindAddress>*</BindAddress>' \
+              '  <Port>7878</Port>' \
+              '  <SslPort>9898</SslPort>' \
+              '  <EnableSsl>False</EnableSsl>' \
+              '  <LaunchBrowser>True</LaunchBrowser>' \
+              '  <AuthenticationMethod>Forms</AuthenticationMethod>' \
+              '  <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>' \
+              '  <Branch>master</Branch>' \
+              '  <SslCertPath></SslCertPath>' \
+              '  <SslCertPassword></SslCertPassword>' \
+              '  <InstanceName>Radarr</InstanceName>' \
+              '  <UpdateMechanism>Docker</UpdateMechanism>' \
+              '</Config>' \
+              > /config/config.xml
           fi
         volumeMounts:
         - mountPath: /config

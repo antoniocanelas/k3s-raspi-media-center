@@ -29,3 +29,8 @@ This project uses `kustomize` to manage Kubernetes manifests. The core manifests
 
 -   **Never edit the `install_*.yaml` files directly.** These files are auto-generated, and your changes will be overwritten the next time the `update-manifests.sh` script is run.
 -   Always run `./update-manifests.sh` after making changes to the `base` or `overlays` directories.
+
+### Environment Access
+
+-   The k3s master node can be reached with `ssh pi-master-00`.
+-   The Synology NAS can be reached with `ssh synology`.

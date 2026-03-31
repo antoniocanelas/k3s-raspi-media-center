@@ -25,6 +25,8 @@ images:
   newTag: v0.8.8.3-ls94
 - name: lscr.io/linuxserver/lidarr
   newTag: 3.1.0.4875-ls15
+- name: santiagosayshey/profilarr
+  newTag: v1.1.4
 resources:
 - ../../base
 - ../../base/cluster
