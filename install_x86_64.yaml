@@ -764,11 +764,26 @@ spec:
       initContainers:
       - args:
         - |
-          echo 'Customizing Prowlarr config...'
-          if [[ ! -f /config/config.xml ]]; then
-            echo '<Config><UrlBase>/prowlarr</UrlBase></Config>'> /config/config.xml
+          if [ ! -f /config/config.xml ]; then
+            cat <<'EOF' > /config/config.xml
+            <Config>
+              <UrlBase>/prowlarr</UrlBase>
+              <LogLevel>debug</LogLevel>
+              <BindAddress>*</BindAddress>
+              <Port>9696</Port>
+              <SslPort>6969</SslPort>
+              <EnableSsl>False</EnableSsl>
+              <LaunchBrowser>True</LaunchBrowser>
+              <AuthenticationMethod>Forms</AuthenticationMethod>
+              <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
+              <Branch>master</Branch>
+              <SslCertPath></SslCertPath>
+              <SslCertPassword></SslCertPassword>
+              <InstanceName>Prowlarr</InstanceName>
+              <UpdateMechanism>Docker</UpdateMechanism>
+            </Config>
+            EOF
           fi
-          echo 'Prowlarr config customized.'
         command:
         - sh
         - -c
@@ -972,8 +987,27 @@ spec:
           name: downloads
       initContainers:
       - args:
-        - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/radarr</UrlBase></Config>'>
-          /config/config.xml;echo end;
+        - |
+          if [ ! -f /config/config.xml ]; then
+            cat <<'EOF' > /config/config.xml
+            <Config>
+              <UrlBase>/radarr</UrlBase>
+              <LogLevel>debug</LogLevel>
+              <BindAddress>*</BindAddress>
+              <Port>7878</Port>
+              <SslPort>9898</SslPort>
+              <EnableSsl>False</EnableSsl>
+              <LaunchBrowser>True</LaunchBrowser>
+              <AuthenticationMethod>Forms</AuthenticationMethod>
+              <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
+              <Branch>master</Branch>
+              <SslCertPath></SslCertPath>
+              <SslCertPassword></SslCertPassword>
+              <InstanceName>Radarr</InstanceName>
+              <UpdateMechanism>Docker</UpdateMechanism>
+            </Config>
+            EOF
+          fi
         command:
         - sh
         - -c
@@ -1082,8 +1116,27 @@ spec:
           name: downloads
       initContainers:
       - args:
-        - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/sonarr</UrlBase></Config>'>
-          /config/config.xml;echo end;
+        - |
+          if [ ! -f /config/config.xml ]; then
+            cat <<'EOF' > /config/config.xml
+            <Config>
+              <UrlBase>/sonarr</UrlBase>
+              <LogLevel>debug</LogLevel>
+              <BindAddress>*</BindAddress>
+              <Port>8989</Port>
+              <SslPort>9898</SslPort>
+              <EnableSsl>False</EnableSsl>
+              <LaunchBrowser>True</LaunchBrowser>
+              <AuthenticationMethod>Forms</AuthenticationMethod>
+              <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
+              <Branch>main</Branch>
+              <SslCertPath></SslCertPath>
+              <SslCertPassword></SslCertPassword>
+              <InstanceName>Sonarr</InstanceName>
+              <UpdateMechanism>Docker</UpdateMechanism>
+            </Config>
+            EOF
+          fi
         command:
         - sh
         - -c

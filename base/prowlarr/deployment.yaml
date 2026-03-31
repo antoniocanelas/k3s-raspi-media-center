@@ -27,12 +27,27 @@ spec:
           runAsGroup: 1000
         command: ["sh", "-c"]
         args:
-          - |
-            echo 'Customizing Prowlarr config...'
-            if [[ ! -f /config/config.xml ]]; then
-              echo '<Config><UrlBase>/prowlarr</UrlBase></Config>'> /config/config.xml
-            fi
-            echo 'Prowlarr config customized.'
+        - |
+          if [ ! -f /config/config.xml ]; then
+            cat <<'EOF' > /config/config.xml
+            <Config>
+              <UrlBase>/prowlarr</UrlBase>
+              <LogLevel>debug</LogLevel>
+              <BindAddress>*</BindAddress>
+              <Port>9696</Port>
+              <SslPort>6969</SslPort>
+              <EnableSsl>False</EnableSsl>
+              <LaunchBrowser>True</LaunchBrowser>
+              <AuthenticationMethod>Forms</AuthenticationMethod>
+              <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
+              <Branch>master</Branch>
+              <SslCertPath></SslCertPath>
+              <SslCertPassword></SslCertPassword>
+              <InstanceName>Prowlarr</InstanceName>
+              <UpdateMechanism>Docker</UpdateMechanism>
+            </Config>
+            EOF
+          fi
         volumeMounts: 
         - mountPath: /config 
           name: config

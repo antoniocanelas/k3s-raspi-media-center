@@ -29,7 +29,27 @@ spec:
           runAsUser: 1000
           runAsGroup: 1000
         args:
-        - "echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/radarr</UrlBase></Config>'> /config/config.xml;echo end;"
+        - |
+          if [ ! -f /config/config.xml ]; then
+            cat <<'EOF' > /config/config.xml
+            <Config>
+              <UrlBase>/radarr</UrlBase>
+              <LogLevel>debug</LogLevel>
+              <BindAddress>*</BindAddress>
+              <Port>7878</Port>
+              <SslPort>9898</SslPort>
+              <EnableSsl>False</EnableSsl>
+              <LaunchBrowser>True</LaunchBrowser>
+              <AuthenticationMethod>Forms</AuthenticationMethod>
+              <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
+              <Branch>master</Branch>
+              <SslCertPath></SslCertPath>
+              <SslCertPassword></SslCertPassword>
+              <InstanceName>Radarr</InstanceName>
+              <UpdateMechanism>Docker</UpdateMechanism>
+            </Config>
+            EOF
+          fi
         volumeMounts:
         - mountPath: /config
           name: config
