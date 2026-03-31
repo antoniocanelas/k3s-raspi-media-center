@@ -19,6 +19,35 @@ spec:
     spec:
       securityContext:
         fsGroup: 1000
+      initContainers:
+      - name: config
+        image: busybox
+        command: ["sh", "-c"]
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+        args:
+        - |
+          mkdir -p /config/qBittorrent
+          if [ ! -f /config/qBittorrent/qBittorrent.conf ]; then
+            cat <<'EOF' > /config/qBittorrent/qBittorrent.conf
+            [BitTorrent]
+            Session\DefaultSavePath=/downloads/completed
+            Session\GlobalMaxRatio=0
+            Session\MaxRatioAction=0
+            Session\TempPath=/downloads/incomplete
+            Session\TempPathEnabled=true
+
+            [Preferences]
+            WebUI\AuthSubnetWhitelist=192.168.0.0/24
+            WebUI\Address=*
+            WebUI\Port=8080
+            EOF
+          fi
+        volumeMounts:
+        - mountPath: /config
+          name: config
+          subPath: qbittorrent
 #      initContainers:
 #      - name: chown
 #        image: busybox

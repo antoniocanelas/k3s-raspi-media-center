@@ -847,6 +847,37 @@ spec:
           name: downloads
         - mountPath: /media
           name: media
+      initContainers:
+      - args:
+        - |
+          mkdir -p /config/qBittorrent
+          if [ ! -f /config/qBittorrent/qBittorrent.conf ]; then
+            cat <<'EOF' > /config/qBittorrent/qBittorrent.conf
+            [BitTorrent]
+            Session\DefaultSavePath=/downloads/completed
+            Session\GlobalMaxRatio=0
+            Session\MaxRatioAction=0
+            Session\TempPath=/downloads/incomplete
+            Session\TempPathEnabled=true
+
+            [Preferences]
+            WebUI\AuthSubnetWhitelist=192.168.0.0/24
+            WebUI\Address=*
+            WebUI\Port=8080
+            EOF
+          fi
+        command:
+        - sh
+        - -c
+        image: busybox
+        name: config
+        securityContext:
+          runAsGroup: 1000
+          runAsUser: 1000
+        volumeMounts:
+        - mountPath: /config
+          name: config
+          subPath: qbittorrent
       securityContext:
         fsGroup: 1000
       volumes:
