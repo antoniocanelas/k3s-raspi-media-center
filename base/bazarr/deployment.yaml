@@ -59,8 +59,8 @@ spec:
           assrt:
             token: ''
           auth:
-            apikey: 6cc6027eab41b88fc3cafebfba29dcc4
-            password: 570c0e43355144c7f8d2fa33f66b704b
+            apikey: ''
+            password: ''
             type: form
             username: admin
           avistaz:
@@ -116,9 +116,9 @@ spec:
             external_webhook_password: ''
             external_webhook_url: ''
             external_webhook_username: ''
-            flask_secret_key: f8768cac4f2a9b0fa1e263b568d56fa9
+            flask_secret_key: ''
             hi_extension: hi
-            hostname: bazarr-688ddb5c85-rrnl2
+            hostname: ''
             ignore_ass_subs: false
             ignore_pgs_subs: false
             ignore_vobsub_subs: false
@@ -217,16 +217,16 @@ spec:
           opensubtitlescom:
             include_ai_translated: false
             include_machine_translated: false
-            password: Camelox00.
+            password: ''
             use_hash: true
-            username: acanelas
+            username: ''
           plex:
             apikey: ''
             auth_method: apikey
             client_identifier: ''
             disable_auto_migration: false
             email: ''
-            encryption_key: MQwr0ScfdLJS1Q5rdH2TZhjSAcD12ElgIzOJ_5vPD0Q
+            encryption_key: ''
             ip: 127.0.0.1
             migration_attempted: false
             migration_successful: false
