@@ -8,11 +8,11 @@ images:
 - name: linuxserver/radarr
   newTag: 6.0.4.10291-ls289
 - name: linuxserver/bazarr
-  newTag: v1.5.3-ls329
+  newTag: v1.5.6-ls342
 - name: linuxserver/transmission
   newTag: 4.0.6-r5-ls322
 - name: lscr.io/linuxserver/qbittorrent
-  newTag: 5.1.2-r0-ls414
+  newTag: 5.1.4
 - name: emby/embyserver
   newTag: 4.9.4.1
 - name: linuxserver/prowlarr
