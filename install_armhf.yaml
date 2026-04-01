@@ -7,6 +7,48 @@ metadata:
   name: media
 ---
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: media
+  name: tailscale
+  namespace: media
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app: media
+  name: tailscale
+  namespace: media
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - get
+  - update
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app: media
+  name: tailscale
+  namespace: media
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: tailscale
+subjects:
+- kind: ServiceAccount
+  name: tailscale
+  namespace: media
+---
+apiVersion: v1
 kind: Service
 metadata:
   labels:
@@ -727,7 +769,7 @@ spec:
           value: "1000"
         - name: PGID
           value: "1000"
-        image: linuxserver/prowlarr
+        image: linuxserver/prowlarr:arm64v8-latest
         livenessProbe:
           exec:
             command:
@@ -835,6 +877,14 @@ spec:
         - name: WEBUI_PORT
           value: "8080"
         image: lscr.io/linuxserver/qbittorrent:latest
+        livenessProbe:
+          failureThreshold: 8
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
         name: qbittorrent
         ports:
         - containerPort: 8080
@@ -846,6 +896,14 @@ spec:
         - containerPort: 6881
           name: qbittorrent-udp
           protocol: UDP
+        readinessProbe:
+          failureThreshold: 8
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          timeoutSeconds: 5
         resources:
           limits:
             cpu: 1000m
@@ -853,6 +911,12 @@ spec:
           requests:
             cpu: 500m
             memory: 1Gi
+        startupProbe:
+          failureThreshold: 30
+          periodSeconds: 10
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 2
         volumeMounts:
         - mountPath: /config
           name: config
@@ -1160,6 +1224,82 @@ spec:
       - name: media
         persistentVolumeClaim:
           claimName: nas-media-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: media
+    run: tailscale
+  name: tailscale
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media
+      run: tailscale
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: media
+        run: tailscale
+    spec:
+      containers:
+      - env:
+        - name: TS_AUTHKEY
+          valueFrom:
+            secretKeyRef:
+              key: authkey
+              name: tailscale-auth
+        - name: TS_STATE_DIR
+          value: /var/lib/tailscale
+        - name: TS_USERSPACE
+          value: "false"
+        - name: TS_ROUTES
+          value: 192.168.0.0/24
+        - name: TS_EXTRA_ARGS
+          value: --hostname=pi-master-00
+        image: ghcr.io/tailscale/tailscale:latest
+        imagePullPolicy: Always
+        name: tailscale
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
+        volumeMounts:
+        - mountPath: /var/lib/tailscale
+          name: config
+          subPath: tailscale
+        - mountPath: /dev/net/tun
+          name: tun
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      initContainers:
+      - command:
+        - /bin/sh
+        - -c
+        - |
+          sysctl -w net.ipv4.ip_forward=1
+          sysctl -w net.ipv6.conf.all.forwarding=1
+        image: busybox
+        name: sysctls
+        securityContext:
+          privileged: true
+      nodeSelector:
+        kubernetes.io/hostname: pi-master-00
+      serviceAccountName: tailscale
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: ssd-config-pvc
+      - hostPath:
+          path: /dev/net/tun
+          type: CharDevice
+        name: tun
 ---
 addressType: IPv4
 apiVersion: discovery.k8s.io/v1

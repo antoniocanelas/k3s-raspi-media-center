@@ -25,6 +25,7 @@ resources:
 - radarr
 - sonarr
 - bazarr
+- tailscale
 #- jackett
 #- readarr
 #- jellyfin
