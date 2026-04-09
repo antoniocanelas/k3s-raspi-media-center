@@ -1,0 +1,836 @@
+Position,IMDb_ID,Title,Year,IMDb_Rating,Directors,Genres,URL
+819,tt0092337,Dekalog,1989,8.9,,Drama,https://www.imdb.com/title/tt0092337/
+762,tt0090015,Shoah,1985,8.7,Claude Lanzmann,"Documentary, History, War",https://www.imdb.com/title/tt0090015/
+305,tt0048434,Night and Fog,1956,8.6,Alain Resnais,"Documentary, Short, History, War",https://www.imdb.com/title/tt0048434/
+370,tt0054407,Le trou,1960,8.5,Jacques Becker,"Crime, Drama, Thriller",https://www.imdb.com/title/tt0054407/
+1227,tt9617456,For Sama,2019,8.5,"Waad Al-Kateab, Edward Watts","Documentary, Biography, War",https://www.imdb.com/title/tt9617456/
+435,tt0058625,Woman in the Dunes,1964,8.4,Hiroshi Teshigahara,"Drama, Thriller",https://www.imdb.com/title/tt0058625/
+1216,tt8267604,Capernaum,2018,8.4,Nadine Labaki,Drama,https://www.imdb.com/title/tt8267604/
+1250,tt15239678,Dune: Part Two,2024,8.4,Denis Villeneuve,"Action, Adventure, Drama, Sci-Fi",https://www.imdb.com/title/tt15239678/
+63,tt0022100,M,1931,8.3,Fritz Lang,"Crime, Mystery, Thriller",https://www.imdb.com/title/tt0022100/
+181,tt0036775,Double Indemnity,1944,8.3,Billy Wilder,"Crime, Drama, Film-Noir, Mystery, Thriller",https://www.imdb.com/title/tt0036775/
+256,tt0045152,Singin' in the Rain,1952,8.3,"Stanley Donen, Gene Kelly","Comedy, Musical, Romance",https://www.imdb.com/title/tt0045152/
+258,tt0044741,Ikiru,1952,8.3,Akira Kurosawa,Drama,https://www.imdb.com/title/tt0044741/
+290,tt0047445,Sansho the Bailiff,1954,8.3,Kenji Mizoguchi,Drama,https://www.imdb.com/title/tt0047445/
+338,tt0050634,The Cranes Are Flying,1957,8.3,Mikhail Kalatozov,"Drama, Romance, War",https://www.imdb.com/title/tt0050634/
+355,tt0053125,North by Northwest,1959,8.3,Alfred Hitchcock,"Adventure, Drama, Mystery, Thriller",https://www.imdb.com/title/tt0053125/
+406,tt0056322,The Given Word,1962,8.3,Anselmo Duarte,Drama,https://www.imdb.com/title/tt0056322/
+506,tt0062622,2001: A Space Odyssey,1968,8.3,Stanley Kubrick,"Adventure, Sci-Fi",https://www.imdb.com/title/tt0062622/
+752,tt0091251,Come and See,1985,8.3,Elem Klimov,"Drama, Thriller, War",https://www.imdb.com/title/tt0091251/
+913,tt0110057,Hoop Dreams,1994,8.3,Steve James,"Documentary, Drama, Sport",https://www.imdb.com/title/tt0110057/
+938,tt0435761,Toy Story 3,2010,8.3,Lee Unkrich,"Animation, Adventure, Comedy, Family, Fantasy",https://www.imdb.com/title/tt0435761/
+968,tt0119698,Princess Mononoke,1997,8.3,Hayao Miyazaki,"Animation, Adventure, Fantasy",https://www.imdb.com/title/tt0119698/
+39,tt0018192,Napoleon,1927,8.2,Abel Gance,"Biography, Drama, History, War",https://www.imdb.com/title/tt0018192/
+67,tt0023042,I Am a Fugitive from a Chain Gang,1932,8.2,Mervyn LeRoy,"Crime, Drama, Film-Noir",https://www.imdb.com/title/tt0023042/
+133,tt0031381,Gone with the Wind,1939,8.2,Victor Fleming,"Drama, Romance, War",https://www.imdb.com/title/tt0031381/
+150,tt0033467,Citizen Kane,1941,8.2,Orson Welles,"Drama, Mystery",https://www.imdb.com/title/tt0033467/
+212,tt0040522,Bicycle Thieves,1948,8.2,Vittorio De Sica,Drama,https://www.imdb.com/title/tt0040522/
+241,tt0042804,The Young and the Damned,1950,8.2,Luis Buñuel,"Crime, Drama",https://www.imdb.com/title/tt0042804/
+298,tt0048452,Ordet,1955,8.2,Carl Theodor Dreyer,Drama,https://www.imdb.com/title/tt0048452/
+339,tt0048956,Aparajito,1956,8.2,Satyajit Ray,Drama,https://www.imdb.com/title/tt0048956/
+371,tt0054248,Rocco and His Brothers,1960,8.2,Luchino Visconti,"Crime, Drama, Sport",https://www.imdb.com/title/tt0054248/
+385,tt0056119,La Jetée,1962,8.2,Chris Marker,"Short, Drama, Romance, Sci-Fi",https://www.imdb.com/title/tt0056119/
+405,tt0056592,To Kill a Mockingbird,1962,8.2,Robert Mulligan,"Crime, Drama",https://www.imdb.com/title/tt0056592/
+427,tt0057115,The Great Escape,1963,8.2,John Sturges,"Adventure, Drama, Thriller, War",https://www.imdb.com/title/tt0057115/
+449,tt0059527,The Shop on Main Street,1965,8.2,"Ján Kadár, Elmar Klos","Drama, War",https://www.imdb.com/title/tt0059527/
+578,tt0070735,The Sting,1973,8.2,George Roy Hill,"Comedy, Crime, Drama",https://www.imdb.com/title/tt0070735/
+602,tt0071411,Dersu Uzala,1975,8.2,Akira Kurosawa,"Adventure, Biography, Drama",https://www.imdb.com/title/tt0071411/
+639,tt0075404,The Ascent,1977,8.2,Larisa Shepitko,"Drama, War",https://www.imdb.com/title/tt0075404/
+715,tt0084787,The Thing,1982,8.2,John Carpenter,"Horror, Mystery, Sci-Fi",https://www.imdb.com/title/tt0084787/
+731,tt0085809,Koyaanisqatsi,1982,8.2,Godfrey Reggio,"Documentary, Music",https://www.imdb.com/title/tt0085809/
+755,tt0089881,Ran,1985,8.2,Akira Kurosawa,"Action, Drama, War",https://www.imdb.com/title/tt0089881/
+849,tt0100234,Close-Up,1990,8.2,Abbas Kiarostami,"Biography, Crime, Drama",https://www.imdb.com/title/tt0100234/
+863,tt0101985,A Brighter Summer Day,1991,8.2,Edward Yang,"Crime, Drama, Romance",https://www.imdb.com/title/tt0101985/
+922,tt0108906,The Kingdom,1994,8.2,,"Comedy, Drama, Fantasy, Horror, Mystery",https://www.imdb.com/title/tt0108906/
+1158,tt2375605,The Act of Killing,2012,8.2,"Joshua Oppenheimer, Anonymous, Christine Cynn","Documentary, Biography, Crime, History, War",https://www.imdb.com/title/tt2375605/
+1180,tt3521134,The Look of Silence,2014,8.2,Joshua Oppenheimer,"Documentary, Biography, History",https://www.imdb.com/title/tt3521134/
+1199,tt5895028,13th,2016,8.2,Ava DuVernay,"Documentary, Crime, History",https://www.imdb.com/title/tt5895028/
+1256,tt15398776,Oppenheimer,2023,8.2,Christopher Nolan,"Biography, Drama, History",https://www.imdb.com/title/tt15398776/
+1,tt0000417,A Trip to the Moon,1902,8.1,Georges Méliès,"Short, Adventure, Comedy, Fantasy, Sci-Fi",https://www.imdb.com/title/tt0000417/
+22,tt0015324,Sherlock Jr.,1924,8.1,Buster Keaton,"Action, Comedy, Romance",https://www.imdb.com/title/tt0015324/
+29,tt0015864,The Gold Rush,1925,8.1,Charles Chaplin,"Adventure, Comedy, Drama, Romance, Western",https://www.imdb.com/title/tt0015864/
+34,tt0018455,Sunrise,1927,8.1,F.W. Murnau,"Drama, Romance",https://www.imdb.com/title/tt0018455/
+53,tt0020629,All Quiet on the Western Front,1930,8.1,Lewis Milestone,"Drama, War",https://www.imdb.com/title/tt0020629/
+89,tt0025316,It Happened One Night,1934,8.1,Frank Capra,"Comedy, Romance",https://www.imdb.com/title/tt0025316/
+112,tt0029192,Make Way for Tomorrow,1937,8.1,Leo McCarey,"Drama, Romance",https://www.imdb.com/title/tt0029192/
+129,tt0031679,Mr. Smith Goes to Washington,1939,8.1,Frank Capra,"Comedy, Drama",https://www.imdb.com/title/tt0031679/
+143,tt0032976,Rebecca,1940,8.1,Alfred Hitchcock,"Drama, Mystery, Romance, Thriller",https://www.imdb.com/title/tt0032976/
+145,tt0032551,The Grapes of Wrath,1940,8.1,John Ford,Drama,https://www.imdb.com/title/tt0032551/
+194,tt0036868,The Best Years of Our Lives,1946,8.1,William Wyler,"Drama, Romance, War",https://www.imdb.com/title/tt0036868/
+222,tt0040725,The Red Shoes,1948,8.1,"Michael Powell, Emeric Pressburger","Drama, Music, Romance",https://www.imdb.com/title/tt0040725/
+227,tt0042041,White Heat,1949,8.1,Raoul Walsh,"Action, Crime, Drama, Film-Noir, Thriller",https://www.imdb.com/title/tt0042041/
+229,tt0041452,The Heiress,1949,8.1,William Wyler,"Drama, Romance",https://www.imdb.com/title/tt0041452/
+243,tt0043338,Ace in the Hole,1951,8.1,Billy Wilder,"Drama, Film-Noir",https://www.imdb.com/title/tt0043338/
+259,tt0045274,Umberto D.,1952,8.1,Vittorio De Sica,Drama,https://www.imdb.com/title/tt0045274/
+269,tt0046268,The Wages of Fear,1953,8.1,Henri-Georges Clouzot,"Adventure, Drama, Thriller",https://www.imdb.com/title/tt0046268/
+272,tt0046438,Tokyo Story,1953,8.1,Yasujirô Ozu,Drama,https://www.imdb.com/title/tt0046438/
+274,tt0046478,Ugetsu,1953,8.1,Kenji Mizoguchi,"Drama, Fantasy, War",https://www.imdb.com/title/tt0046478/
+283,tt0046911,Diabolique,1955,8.1,Henri-Georges Clouzot,"Crime, Drama, Horror, Mystery, Thriller",https://www.imdb.com/title/tt0046911/
+322,tt0049902,A Man Escaped,1956,8.1,Robert Bresson,"Drama, Thriller, War",https://www.imdb.com/title/tt0049902/
+337,tt0050783,Nights of Cabiria,1957,8.1,Federico Fellini,Drama,https://www.imdb.com/title/tt0050783/
+361,tt0052618,Ben-Hur,1959,8.1,William Wyler,"Adventure, Drama",https://www.imdb.com/title/tt0052618/
+402,tt0056217,The Man Who Shot Liberty Valance,1962,8.1,John Ford,"Drama, Western",https://www.imdb.com/title/tt0056217/
+454,tt0058946,The Battle of Algiers,1966,8.1,Gillo Pontecorvo,"Drama, War",https://www.imdb.com/title/tt0058946/
+455,tt0059742,The Sound of Music,1965,8.1,Robert Wise,"Biography, Drama, Family, Musical, Romance",https://www.imdb.com/title/tt0059742/
+511,tt0065234,Z,1969,8.1,Costa-Gavras,"Crime, Drama, Thriller",https://www.imdb.com/title/tt0065234/
+538,tt0066580,Woodstock,1970,8.1,Michael Wadleigh,"Documentary, History, Music",https://www.imdb.com/title/tt0066580/
+544,tt0066904,The Sorrow and the Pity,1969,8.1,Marcel Ophüls,"Documentary, History, War",https://www.imdb.com/title/tt0066904/
+628,tt0073195,Jaws,1975,8.1,Steven Spielberg,"Adventure, Horror, Thriller",https://www.imdb.com/title/tt0073195/
+633,tt0074958,Network,1976,8.1,Sidney Lumet,Drama,https://www.imdb.com/title/tt0074958/
+636,tt0075148,Rocky,1976,8.1,John G. Avildsen,"Drama, Sport",https://www.imdb.com/title/tt0075148/
+874,tt0101640,Raise the Red Lantern,1991,8.1,Yimou Zhang,"Drama, Romance",https://www.imdb.com/title/tt0101640/
+875,tt0102015,Hearts of Darkness: A Filmmaker's Apocalypse,1991,8.1,"Fax Bahr, George Hickenlooper, Eleanor Coppola",Documentary,https://www.imdb.com/title/tt0102015/
+896,tt0106332,Farewell My Concubine,1993,8.1,Kaige Chen,"Drama, Music, Romance",https://www.imdb.com/title/tt0106332/
+1207,tt5027774,"Three Billboards Outside Ebbing, Missouri",2017,8.1,Martin McDonagh,"Comedy, Crime, Drama",https://www.imdb.com/title/tt5027774/
+6,tt0010323,The Cabinet of Dr. Caligari,1920,8.0,Robert Wiene,"Horror, Mystery, Thriller",https://www.imdb.com/title/tt0010323/
+11,tt0012364,The Phantom Carriage,1921,8.0,Victor Sjöström,"Drama, Fantasy, Horror",https://www.imdb.com/title/tt0012364/
+20,tt0015064,The Last Laugh,1924,8.0,F.W. Murnau,Drama,https://www.imdb.com/title/tt0015064/
+24,tt0015881,Greed,1924,8.0,Erich von Stroheim,"Drama, Thriller, Western",https://www.imdb.com/title/tt0015881/
+41,tt0018806,The Crowd,1928,8.0,King Vidor,"Drama, Romance",https://www.imdb.com/title/tt0018806/
+168,tt0036244,The Ox-Bow Incident,1943,8.0,William A. Wellman,"Drama, Western",https://www.imdb.com/title/tt0036244/
+169,tt0036112,The Life and Death of Colonel Blimp,1943,8.0,"Michael Powell, Emeric Pressburger","Drama, Romance, War",https://www.imdb.com/title/tt0036112/
+191,tt0037558,Brief Encounter,1945,8.0,David Lean,"Drama, Romance",https://www.imdb.com/title/tt0037558/
+202,tt0038733,A Matter of Life and Death,1946,8.0,"Michael Powell, Emeric Pressburger","Drama, Fantasy, Romance, War",https://www.imdb.com/title/tt0038733/
+231,tt0041546,Kind Hearts and Coronets,1949,8.0,Robert Hamer,"Comedy, Crime",https://www.imdb.com/title/tt0041546/
+254,tt0043686,Forbidden Games,1952,8.0,René Clément,"Drama, War",https://www.imdb.com/title/tt0043686/
+278,tt0046250,Roman Holiday,1953,8.0,William Wyler,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0046250/
+282,tt0047528,La Strada,1954,8.0,Federico Fellini,Drama,https://www.imdb.com/title/tt0047528/
+310,tt0048424,The Night of the Hunter,1955,8.0,Charles Laughton,"Crime, Drama, Thriller",https://www.imdb.com/title/tt0048424/
+319,tt0049012,The Burmese Harp,1956,8.0,Kon Ichikawa,"Drama, Music, War",https://www.imdb.com/title/tt0049012/
+329,tt0050613,Throne of Blood,1957,8.0,Akira Kurosawa,Drama,https://www.imdb.com/title/tt0050613/
+341,tt0051036,Sweet Smell of Success,1957,8.0,Alexander Mackendrick,"Drama, Film-Noir",https://www.imdb.com/title/tt0051036/
+362,tt0052561,Anatomy of a Murder,1959,8.0,Otto Preminger,"Drama, Mystery",https://www.imdb.com/title/tt0052561/
+369,tt0053779,La Dolce Vita,1960,8.0,Federico Fellini,"Comedy, Drama",https://www.imdb.com/title/tt0053779/
+400,tt0056444,An Autumn Afternoon,1962,8.0,Yasujirô Ozu,Drama,https://www.imdb.com/title/tt0056444/
+409,tt0056732,The Exterminating Angel,1962,8.0,Luis Buñuel,"Drama, Fantasy",https://www.imdb.com/title/tt0056732/
+412,tt0056687,What Ever Happened to Baby Jane?,1962,8.0,Robert Aldrich,"Drama, Horror, Thriller",https://www.imdb.com/title/tt0056687/
+413,tt0056801,8½,1963,8.0,Federico Fellini,Drama,https://www.imdb.com/title/tt0056801/
+431,tt0057358,Winter Light,1963,8.0,Ingmar Bergman,Drama,https://www.imdb.com/title/tt0057358/
+466,tt0061184,Who's Afraid of Virginia Woolf?,1966,8.0,Mike Nichols,Drama,https://www.imdb.com/title/tt0061184/
+481,tt0061722,The Graduate,1967,8.0,Mike Nichols,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0061722/
+485,tt0062229,Le Samouraï,1967,8.0,Jean-Pierre Melville,"Crime, Drama, Thriller",https://www.imdb.com/title/tt0062229/
+499,tt0063442,Planet of the Apes,1968,8.0,Franklin J. Schaffner,"Adventure, Sci-Fi",https://www.imdb.com/title/tt0063442/
+500,tt0063522,Rosemary's Baby,1968,8.0,Roman Polanski,"Drama, Horror",https://www.imdb.com/title/tt0063522/
+509,tt0063611,Shame,1968,8.0,Ingmar Bergman,Drama,https://www.imdb.com/title/tt0063611/
+516,tt0064115,Butch Cassidy and the Sundance Kid,1969,8.0,George Roy Hill,"Adventure, Biography, Crime, Drama, Western",https://www.imdb.com/title/tt0064115/
+557,tt0067328,The Last Picture Show,1971,8.0,Peter Bogdanovich,"Drama, Romance",https://www.imdb.com/title/tt0067328/
+589,tt0070460,Day for Night,1973,8.0,François Truffaut,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0070460/
+607,tt0072417,A Woman Under the Influence,1974,8.0,John Cassavetes,"Drama, Romance",https://www.imdb.com/title/tt0072417/
+608,tt0072431,Young Frankenstein,1974,8.0,Mel Brooks,Comedy,https://www.imdb.com/title/tt0072431/
+612,tt0071141,Fear Eats the Soul,1974,8.0,Rainer Werner Fassbinder,"Drama, Romance",https://www.imdb.com/title/tt0071141/
+618,tt0072860,Deewaar,1975,8.0,Yash Chopra,"Action, Crime, Drama, Thriller",https://www.imdb.com/title/tt0072860/
+669,tt0079944,Stalker,1979,8.0,Andrei Tarkovsky,"Drama, Sci-Fi",https://www.imdb.com/title/tt0079944/
+670,tt0079470,Monty Python's Life of Brian,1979,8.0,Terry Jones,Comedy,https://www.imdb.com/title/tt0079470/
+714,tt0083987,Gandhi,1982,8.0,Richard Attenborough,"Biography, Drama, History",https://www.imdb.com/title/tt0083987/
+785,tt0092593,Au Revoir Les Enfants,1987,8.0,Louis Malle,"Drama, War",https://www.imdb.com/title/tt0092593/
+791,tt0093779,The Princess Bride,1987,8.0,Rob Reiner,"Adventure, Comedy, Family, Fantasy, Romance",https://www.imdb.com/title/tt0093779/
+811,tt0094625,Akira,1988,8.0,Katsuhiro Ôtomo,"Animation, Action, Drama, Fantasy, Sci-Fi",https://www.imdb.com/title/tt0094625/
+1172,tt4044364,Citizenfour,2014,8.0,Laura Poitras,"Documentary, Biography",https://www.imdb.com/title/tt4044364/
+1210,tt1856101,Blade Runner 2049,2017,8.0,Denis Villeneuve,"Action, Drama, Mystery, Sci-Fi, Thriller",https://www.imdb.com/title/tt1856101/
+1226,tt8613070,Portrait of a Lady on Fire,2019,8.0,Céline Sciamma,"Drama, Romance",https://www.imdb.com/title/tt8613070/
+1242,tt2948372,Soul,2020,8.0,"Pete Docter, Kemp Powers","Animation, Adventure, Comedy, Drama, Family, Fantasy, Music",https://www.imdb.com/title/tt2948372/
+1246,tt8633462,"Quo Vadis, Aida?",2020,8.0,Jasmila Zbanic,"Drama, History, War",https://www.imdb.com/title/tt8633462/
+1248,tt7378922,"Summer of Soul (...Or, When the Revolution Could Not Be Televised)",2021,8.0,"Questlove, Hal Tulchin","Documentary, History, Music",https://www.imdb.com/title/tt7378922/
+1249,tt1160419,Dune: Part One,2021,8.0,Denis Villeneuve,"Action, Adventure, Drama, Sci-Fi",https://www.imdb.com/title/tt1160419/
+23,tt1764657,The Great White Silence,1924,7.9,Herbert G. Ponting,Documentary,https://www.imdb.com/title/tt1764657/
+30,tt0015624,The Big Parade,1925,7.9,"King Vidor, George W. Hill","Drama, Romance, War",https://www.imdb.com/title/tt0015624/
+71,tt0023622,Trouble in Paradise,1932,7.9,Ernst Lubitsch,"Comedy, Crime, Romance",https://www.imdb.com/title/tt0023622/
+82,tt0024216,King Kong,1933,7.9,"Merian C. Cooper, Ernest B. Schoedsack","Adventure, Horror",https://www.imdb.com/title/tt0024216/
+92,tt0025878,The Thin Man,1934,7.9,W.S. Van Dyke,"Comedy, Crime, Mystery, Romance",https://www.imdb.com/title/tt0025878/
+104,tt0028010,My Man Godfrey,1936,7.9,Gregory La Cava,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0028010/
+117,tt0028691,Captains Courageous,1937,7.9,Victor Fleming,"Adventure, Drama, Family",https://www.imdb.com/title/tt0028691/
+121,tt0029843,The Adventures of Robin Hood,1938,7.9,"Michael Curtiz, William Keighley","Action, Adventure, Romance",https://www.imdb.com/title/tt0029843/
+122,tt0029870,Angels with Dirty Faces,1938,7.9,Michael Curtiz,"Crime, Drama, Film-Noir, Thriller",https://www.imdb.com/title/tt0029870/
+138,tt0031885,The Rules of the Game,1939,7.9,Jean Renoir,"Comedy, Drama",https://www.imdb.com/title/tt0031885/
+156,tt0034240,Sullivan's Travels,1941,7.9,Preston Sturges,"Adventure, Comedy, Drama, Romance",https://www.imdb.com/title/tt0034240/
+157,tt0033870,The Maltese Falcon,1941,7.9,John Huston,"Crime, Drama, Film-Noir, Mystery, Romance",https://www.imdb.com/title/tt0033870/
+176,tt0037008,Laura,1944,7.9,"Otto Preminger, Rouben Mamoulian","Drama, Film-Noir, Mystery",https://www.imdb.com/title/tt0037008/
+185,tt0037913,Mildred Pierce,1945,7.9,Michael Curtiz,"Crime, Drama, Film-Noir, Mystery, Romance",https://www.imdb.com/title/tt0037913/
+188,tt0037884,The Lost Weekend,1945,7.9,Billy Wilder,"Drama, Film-Noir",https://www.imdb.com/title/tt0037884/
+197,tt0038348,Beauty and the Beast,1946,7.9,"Jean Cocteau, René Clément","Drama, Fantasy, Romance",https://www.imdb.com/title/tt0038348/
+205,tt0038787,Notorious,1946,7.9,Alfred Hitchcock,"Drama, Film-Noir, Mystery, Romance, Thriller",https://www.imdb.com/title/tt0038787/
+208,tt0039689,Out of the Past,1947,7.9,Jacques Tourneur,"Crime, Drama, Film-Noir, Romance, Thriller",https://www.imdb.com/title/tt0039689/
+221,tt0040746,Rope,1948,7.9,Alfred Hitchcock,"Crime, Drama, Mystery, Thriller",https://www.imdb.com/title/tt0040746/
+242,tt0042593,In a Lonely Place,1950,7.9,Nicholas Ray,"Drama, Film-Noir, Mystery, Romance, Thriller",https://www.imdb.com/title/tt0042593/
+279,tt0045555,The Big Heat,1953,7.9,Fritz Lang,"Crime, Drama, Film-Noir, Thriller",https://www.imdb.com/title/tt0045555/
+317,tt0049833,The Ten Commandments,1956,7.9,Cecil B. DeMille,"Adventure, Drama, Family, History",https://www.imdb.com/title/tt0049833/
+365,tt0053221,Rio Bravo,1959,7.9,Howard Hawks,Western,https://www.imdb.com/title/tt0053221/
+366,tt0053390,Floating Weeds,1959,7.9,Yasujirô Ozu,Drama,https://www.imdb.com/title/tt0053390/
+374,tt0054331,Spartacus,1960,7.9,Stanley Kubrick,"Adventure, Biography, Drama, History, War",https://www.imdb.com/title/tt0054331/
+391,tt0054997,The Hustler,1961,7.9,Robert Rossen,"Drama, Sport",https://www.imdb.com/title/tt0054997/
+393,tt0055499,Through a Glass Darkly,1961,7.9,Ingmar Bergman,Drama,https://www.imdb.com/title/tt0055499/
+411,tt0056218,The Manchurian Candidate,1962,7.9,John Frankenheimer,"Drama, Thriller",https://www.imdb.com/title/tt0056218/
+420,tt0057091,The Leopard,1963,7.9,Luchino Visconti,"Drama, History",https://www.imdb.com/title/tt0057091/
+450,tt0059113,Doctor Zhivago,1965,7.9,David Lean,"Drama, Romance, War",https://www.imdb.com/title/tt0059113/
+451,tt0059894,The War Game,1966,7.9,Peter Watkins,"Drama, War",https://www.imdb.com/title/tt0059894/
+489,tt0061811,In the Heat of the Night,1967,7.9,Norman Jewison,"Drama, Mystery, Thriller",https://www.imdb.com/title/tt0061811/
+519,tt0064541,Kes,1969,7.9,Ken Loach,"Drama, Family",https://www.imdb.com/title/tt0064541/
+522,tt0065214,The Wild Bunch,1969,7.9,Sam Peckinpah,"Action, Adventure, Drama, Western",https://www.imdb.com/title/tt0065214/
+525,tt0065571,The Conformist,1970,7.9,Bernardo Bertolucci,Drama,https://www.imdb.com/title/tt0065571/
+567,tt0069467,Cries & Whispers,1972,7.9,Ingmar Bergman,Drama,https://www.imdb.com/title/tt0069467/
+576,tt0069281,Sleuth,1972,7.9,Joseph L. Mankiewicz,"Mystery, Thriller",https://www.imdb.com/title/tt0069281/
+605,tt0072443,Mirror,1975,7.9,Andrei Tarkovsky,"Biography, Drama",https://www.imdb.com/title/tt0072443/
+625,tt0074360,Cría Cuervos,1976,7.9,Carlos Saura,Drama,https://www.imdb.com/title/tt0074360/
+630,tt0074119,All the President's Men,1976,7.9,Alan J. Pakula,"Drama, History, Thriller",https://www.imdb.com/title/tt0074119/
+674,tt0078841,Being There,1979,7.9,Hal Ashby,"Comedy, Drama",https://www.imdb.com/title/tt0078841/
+709,tt0084934,Yol,1982,7.9,Serif Gören,Drama,https://www.imdb.com/title/tt0084934/
+713,tt0083946,Fitzcarraldo,1982,7.9,Werner Herzog,"Adventure, Drama, Music",https://www.imdb.com/title/tt0083946/
+720,tt0085334,A Christmas Story,1983,7.9,Bob Clark,"Comedy, Family",https://www.imdb.com/title/tt0085334/
+742,tt0088258,This Is Spinal Tap,1984,7.9,Rob Reiner,"Comedy, Music",https://www.imdb.com/title/tt0088258/
+753,tt0089603,Mishima: A Life in Four Chapters,1985,7.9,Paul Schrader,"Biography, Drama",https://www.imdb.com/title/tt0089603/
+783,tt0092048,Tampopo,1985,7.9,Jûzô Itami,Comedy,https://www.imdb.com/title/tt0092048/
+810,tt0096257,The Thin Blue Line,1988,7.9,Errol Morris,"Documentary, Crime",https://www.imdb.com/title/tt0096257/
+826,tt0096288,Landscape in the Mist,1988,7.9,Theodoros Angelopoulos,Drama,https://www.imdb.com/title/tt0096288/
+840,tt0097216,Do the Right Thing,1989,7.9,Spike Lee,"Comedy, Drama",https://www.imdb.com/title/tt0097216/
+937,tt0120363,Toy Story 2,1999,7.9,"John Lasseter, Ash Brannon, Lee Unkrich","Animation, Adventure, Comedy, Family, Fantasy",https://www.imdb.com/title/tt0120363/
+1042,tt0310793,Bowling for Columbine,2002,7.9,Michael Moore,"Documentary, Crime, Drama",https://www.imdb.com/title/tt0310793/
+13,tt0013086,"Dr. Mabuse, the Gambler",1922,7.8,Fritz Lang,"Crime, Mystery, Thriller",https://www.imdb.com/title/tt0013086/
+15,tt0013442,Nosferatu,1922,7.8,F.W. Murnau,"Fantasy, Horror",https://www.imdb.com/title/tt0013442/
+31,tt0016332,Seven Chances,1925,7.8,Buster Keaton,"Comedy, Romance",https://www.imdb.com/title/tt0016332/
+32,tt0015532,The Adventures of Prince Achmed,1926,7.8,"Lotte Reiniger, Carl Koch","Animation, Adventure, Drama, Family, Fantasy, Music, Romance",https://www.imdb.com/title/tt0015532/
+45,tt0019421,"Steamboat Bill, Jr.",1928,7.8,"Charles Reisner, Buster Keaton","Action, Comedy, Drama, Family, Romance",https://www.imdb.com/title/tt0019421/
+73,tt0022913,Freaks,1932,7.8,Tod Browning,"Drama, Horror",https://www.imdb.com/title/tt0022913/
+96,tt0026778,A Night at the Opera,1935,7.8,"Sam Wood, Edmund Goulding","Comedy, Music, Musical",https://www.imdb.com/title/tt0026778/
+97,tt0026138,Bride of Frankenstein,1935,7.8,James Whale,"Drama, Horror, Sci-Fi",https://www.imdb.com/title/tt0026138/
+103,tt0027996,Mr. Deeds Goes to Town,1936,7.8,Frank Capra,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0027996/
+124,tt0029947,Bringing Up Baby,1938,7.8,Howard Hawks,Comedy,https://www.imdb.com/title/tt0029947/
+130,tt0031971,Stagecoach,1939,7.8,John Ford,"Adventure, Drama, Western",https://www.imdb.com/title/tt0031971/
+136,tt0031725,Ninotchka,1939,7.8,Ernst Lubitsch,"Comedy, Romance",https://www.imdb.com/title/tt0031725/
+139,tt0032156,The Story of the Last Chrysanthemum,1939,7.8,Kenji Mizoguchi,"Drama, Romance",https://www.imdb.com/title/tt0032156/
+141,tt0032599,His Girl Friday,1940,7.8,Howard Hawks,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0032599/
+144,tt0032904,The Philadelphia Story,1940,7.8,George Cukor,"Comedy, Romance",https://www.imdb.com/title/tt0032904/
+160,tt0035140,"Now, Voyager",1942,7.8,Irving Rapper,"Drama, Romance",https://www.imdb.com/title/tt0035140/
+170,tt0036154,Meshes of the Afternoon,1943,7.8,"Maya Deren, Alexander Hammid","Short, Fantasy, Mystery",https://www.imdb.com/title/tt0036154/
+173,tt0036342,Shadow of a Doubt,1943,7.8,Alfred Hitchcock,"Drama, Film-Noir, Mystery, Thriller",https://www.imdb.com/title/tt0036342/
+178,tt0037382,To Have and Have Not,1944,7.8,Howard Hawks,"Adventure, Comedy, Drama, Film-Noir, Romance, Thriller, War",https://www.imdb.com/title/tt0037382/
+179,tt0036855,Gaslight,1944,7.8,George Cukor,"Crime, Drama, Mystery, Romance, Thriller",https://www.imdb.com/title/tt0036855/
+203,tt0038574,Great Expectations,1946,7.8,David Lean,"Adventure, Drama, Mystery, Romance",https://www.imdb.com/title/tt0038574/
+209,tt0039631,Monsieur Verdoux,1947,7.8,Charles Chaplin,"Comedy, Crime, Drama",https://www.imdb.com/title/tt0039631/
+211,tt0039420,The Ghost and Mrs. Muir,1947,7.8,Joseph L. Mankiewicz,"Comedy, Drama, Fantasy, Mystery, Romance, Thriller",https://www.imdb.com/title/tt0039420/
+213,tt0040536,Letter from an Unknown Woman,1948,7.8,Max Ophüls,"Drama, Romance",https://www.imdb.com/title/tt0040536/
+234,tt0041719,Orpheus,1950,7.8,Jean Cocteau,"Drama, Fantasy, Romance",https://www.imdb.com/title/tt0041719/
+235,tt0042208,The Asphalt Jungle,1950,7.8,John Huston,"Crime, Drama, Film-Noir, Thriller",https://www.imdb.com/title/tt0042208/
+342,tt0050188,Mother India,1957,7.8,Mehboob Khan,"Action, Comedy, Drama, Family, Musical",https://www.imdb.com/title/tt0050188/
+350,tt0051792,The Music Room,1958,7.8,Satyajit Ray,"Drama, Music",https://www.imdb.com/title/tt0051792/
+358,tt0052893,Hiroshima Mon Amour,1959,7.8,Alain Resnais,"Drama, Romance",https://www.imdb.com/title/tt0052893/
+377,tt0054073,The Cloud-Capped Star,1960,7.8,Ritwik Ghatak,Drama,https://www.imdb.com/title/tt0054073/
+397,tt0055852,Cleo from 5 to 7,1962,7.8,Agnès Varda,"Comedy, Drama, Music",https://www.imdb.com/title/tt0055852/
+399,tt0056663,Vivre sa vie,1962,7.8,Jean-Luc Godard,Drama,https://www.imdb.com/title/tt0056663/
+418,tt0336693,The House Is Black,1963,7.8,Forugh Farrokhzad,"Documentary, Short",https://www.imdb.com/title/tt0336693/
+419,tt0057163,Hud,1963,7.8,Martin Ritt,"Drama, Western",https://www.imdb.com/title/tt0057163/
+436,tt0058642,Shadows of Forgotten Ancestors,1965,7.8,Sergei Parajanov,"Drama, Romance",https://www.imdb.com/title/tt0058642/
+444,tt0058450,The Umbrellas of Cherbourg,1964,7.8,Jacques Demy,"Drama, Musical, Romance",https://www.imdb.com/title/tt0058450/
+446,tt0058331,Mary Poppins,1964,7.8,Robert Stevenson,"Comedy, Family, Fantasy, Musical",https://www.imdb.com/title/tt0058331/
+447,tt0058430,Onibaba,1964,7.8,Kaneto Shindô,"Drama, Horror, Thriller",https://www.imdb.com/title/tt0058430/
+452,tt0059817,Tokyo Olympiad,1965,7.8,Kon Ichikawa,"Documentary, Sport",https://www.imdb.com/title/tt0059817/
+479,tt0062136,Playtime,1967,7.8,Jacques Tati,Comedy,https://www.imdb.com/title/tt0062136/
+490,tt0063278,Marketa Lazarová,1967,7.8,František Vláčil,"Drama, History, Romance",https://www.imdb.com/title/tt0063278/
+496,tt0064356,The Cow,1969,7.8,Dariush Mehrjui,Drama,https://www.imdb.com/title/tt0064356/
+507,tt0063350,Night of the Living Dead,1968,7.8,George A. Romero,"Horror, Thriller",https://www.imdb.com/title/tt0063350/
+515,tt0064665,Midnight Cowboy,1969,7.8,John Schlesinger,Drama,https://www.imdb.com/title/tt0064665/
+523,tt0064612,My Night at Maud's,1969,7.8,Éric Rohmer,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0064612/
+539,tt0065780,Gimme Shelter,1970,7.8,"Albert Maysles, David Maysles, Charlotte Zwerin","Documentary, Music, Thriller",https://www.imdb.com/title/tt0065780/
+545,tt0067992,Willy Wonka & the Chocolate Factory,1971,7.8,Mel Stuart,"Adventure, Comedy, Family, Fantasy, Musical",https://www.imdb.com/title/tt0067992/
+551,tt0067185,Harold and Maude,1971,7.8,Hal Ashby,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0067185/
+564,tt0068182,"Aguirre, the Wrath of God",1972,7.8,Werner Herzog,"Action, Adventure, Biography, Drama, History",https://www.imdb.com/title/tt0068182/
+565,tt0068327,Cabaret,1972,7.8,Bob Fosse,"Drama, Music, Musical, Romance",https://www.imdb.com/title/tt0068327/
+599,tt0071129,Amarcord,1973,7.8,Federico Fellini,"Comedy, Drama",https://www.imdb.com/title/tt0071129/
+616,tt0073800,The Travelling Players,1975,7.8,Theodoros Angelopoulos,"Drama, History, Music, War",https://www.imdb.com/title/tt0073800/
+621,tt0073363,Manila in the Claws of Light,1975,7.8,Lino Brocka,"Drama, Mystery",https://www.imdb.com/title/tt0073363/
+631,tt0075029,The Outlaw Josey Wales,1976,7.8,Clint Eastwood,"Drama, Western",https://www.imdb.com/title/tt0075029/
+658,tt0077138,The Tree of Wooden Clogs,1978,7.8,Ermanno Olmi,"Drama, History",https://www.imdb.com/title/tt0077138/
+661,tt0077402,Dawn of the Dead,1978,7.8,George A. Romero,"Horror, Thriller",https://www.imdb.com/title/tt0077402/
+675,tt0079522,Manhattan,1979,7.8,Woody Allen,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0079522/
+722,tt0086197,The Right Stuff,1983,7.8,Philip Kaufman,"Adventure, Biography, Drama, History",https://www.imdb.com/title/tt0086197/
+726,tt0084390,The Ballad of Narayama,1983,7.8,Shôhei Imamura,"Drama, Family, Mystery",https://www.imdb.com/title/tt0084390/
+751,tt0088847,The Breakfast Club,1985,7.8,John Hughes,"Comedy, Drama",https://www.imdb.com/title/tt0088847/
+795,tt0092603,Babette's Feast,1987,7.8,Gabriel Axel,Drama,https://www.imdb.com/title/tt0092603/
+799,tt0094226,The Untouchables,1987,7.8,Brian De Palma,"Crime, Drama, Thriller",https://www.imdb.com/title/tt0094226/
+831,tt0097123,Crimes and Misdemeanors,1989,7.8,Woody Allen,"Comedy, Drama",https://www.imdb.com/title/tt0097123/
+834,tt0097441,Glory,1989,7.8,Edward Zwick,"Biography, Drama, History, War",https://www.imdb.com/title/tt0097441/
+844,tt0096908,A City of Sadness,1989,7.8,Hsiao-Hsien Hou,"Drama, History",https://www.imdb.com/title/tt0096908/
+1198,tt5168192,"I, Daniel Blake",2016,7.8,Ken Loach,Drama,https://www.imdb.com/title/tt5168192/
+1211,tt5052448,Get Out,2017,7.8,Jordan Peele,"Horror, Mystery, Thriller",https://www.imdb.com/title/tt5052448/
+1234,tt3281548,Little Women,2019,7.8,Greta Gerwig,"Drama, Romance",https://www.imdb.com/title/tt3281548/
+18,tt0014341,Our Hospitality,1923,7.7,"John G. Blystone, Buster Keaton","Comedy, Romance, Thriller",https://www.imdb.com/title/tt0014341/
+25,tt0015400,The Thief of Bagdad,1924,7.7,Raoul Walsh,"Adventure, Family, Fantasy, Romance",https://www.imdb.com/title/tt0015400/
+36,tt0018528,The Unknown,1927,7.7,Tod Browning,"Drama, Horror, Romance, Thriller",https://www.imdb.com/title/tt0018528/
+49,tt0018737,Pandora's Box,1929,7.7,Georg Wilhelm Pabst,"Crime, Drama, Romance",https://www.imdb.com/title/tt0018737/
+61,tt0021884,Frankenstein,1931,7.7,James Whale,"Drama, Horror, Sci-Fi, Thriller",https://www.imdb.com/title/tt0021884/
+72,tt0023427,Scarface,1932,7.7,"Howard Hawks, Richard Rosson","Action, Crime, Drama, Film-Noir, Thriller",https://www.imdb.com/title/tt0023427/
+79,tt0023969,Duck Soup,1933,7.7,Leo McCarey,"Comedy, Musical",https://www.imdb.com/title/tt0023969/
+81,tt0024069,Gold Diggers of 1933,1933,7.7,Mervyn LeRoy,"Comedy, Drama, Musical",https://www.imdb.com/title/tt0024069/
+88,tt0195256,The Goddess,1934,7.7,Yonggang Wu,Drama,https://www.imdb.com/title/tt0195256/
+98,tt0026174,Captain Blood,1935,7.7,Michael Curtiz,"Action, Adventure, History, Romance",https://www.imdb.com/title/tt0026174/
+99,tt0027125,Top Hat,1935,7.7,Mark Sandrich,"Comedy, Musical, Romance",https://www.imdb.com/title/tt0027125/
+108,tt0027532,Dodsworth,1936,7.7,William Wyler,"Drama, Romance",https://www.imdb.com/title/tt0027532/
+125,tt0030522,Olympia Part One: Festival of the Nations,1938,7.7,Leni Riefenstahl,"Documentary, Sport",https://www.imdb.com/title/tt0030522/
+127,tt0030341,The Lady Vanishes,1938,7.7,Alfred Hitchcock,"Crime, Drama, Mystery, Thriller",https://www.imdb.com/title/tt0030341/
+142,tt0032455,Fantasia,1940,7.7,"James Algar, Samuel Armstrong, Ford Beebe Jr., Norman Ferguson, David Hand, Jim Handley, T. Hee, Wilfred Jackson, Hamilton Luske, Bill Roberts, Paul Satterfield, Ben Sharpsteen","Animation, Family, Fantasy, Music, Musical",https://www.imdb.com/title/tt0032455/
+146,tt0032811,The Mortal Storm,1940,7.7,Frank Borzage,Drama,https://www.imdb.com/title/tt0032811/
+151,tt0034167,Sergeant York,1941,7.7,Howard Hawks,"Biography, Drama, History, Romance, War",https://www.imdb.com/title/tt0034167/
+152,tt0033804,The Lady Eve,1941,7.7,Preston Sturges,"Comedy, Romance",https://www.imdb.com/title/tt0033804/
+184,tt0051790,"Ivan the Terrible, Part II: The Boyars' Plot",1946,7.7,Sergei Eisenstein,"Biography, Drama, History",https://www.imdb.com/title/tt0051790/
+198,tt0038669,The Killers,1946,7.7,Robert Siodmak,"Crime, Drama, Film-Noir, Mystery",https://www.imdb.com/title/tt0038669/
+204,tt0038762,My Darling Clementine,1946,7.7,"John Ford, Lloyd Bacon","Drama, Romance, Western",https://www.imdb.com/title/tt0038762/
+206,tt0039192,Black Narcissus,1947,7.7,"Michael Powell, Emeric Pressburger",Drama,https://www.imdb.com/title/tt0039192/
+217,tt0040724,Red River,1948,7.7,"Howard Hawks, Arthur Rosson","Drama, Western",https://www.imdb.com/title/tt0040724/
+248,tt0043265,The African Queen,1951,7.7,John Huston,"Adventure, Drama, Romance, War",https://www.imdb.com/title/tt0043265/
+249,tt0043924,A Place in the Sun,1951,7.7,George Stevens,"Drama, Romance",https://www.imdb.com/title/tt0043924/
+251,tt0042619,Diary of a Country Priest,1951,7.7,Robert Bresson,Drama,https://www.imdb.com/title/tt0042619/
+252,tt0043456,The Day the Earth Stood Still,1951,7.7,Robert Wise,"Drama, Sci-Fi",https://www.imdb.com/title/tt0043456/
+253,tt0045061,The Quiet Man,1952,7.7,John Ford,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0045061/
+257,tt0044391,The Bad and the Beautiful,1952,7.7,Vincente Minnelli,"Drama, Romance",https://www.imdb.com/title/tt0044391/
+324,tt0049366,Invasion of the Body Snatchers,1956,7.7,Don Siegel,"Drama, Horror, Sci-Fi",https://www.imdb.com/title/tt0049366/
+348,tt0052080,Ashes and Diamonds,1958,7.7,Andrzej Wajda,"Drama, Romance, War",https://www.imdb.com/title/tt0052080/
+372,tt0053619,L'Avventura,1960,7.7,Michelangelo Antonioni,"Drama, Mystery, Romance",https://www.imdb.com/title/tt0053619/
+383,tt0055471,Splendor in the Grass,1961,7.7,Elia Kazan,"Drama, Romance",https://www.imdb.com/title/tt0055471/
+407,tt0056736,L'Eclisse,1962,7.7,Michelangelo Antonioni,"Drama, Romance",https://www.imdb.com/title/tt0056736/
+416,tt0057490,The Servant,1963,7.7,Joseph Losey,Drama,https://www.imdb.com/title/tt0057490/
+433,tt0058385,My Fair Lady,1964,7.7,George Cukor,"Drama, Family, Musical, Romance",https://www.imdb.com/title/tt0058385/
+461,tt0059643,The Saragossa Manuscript,1965,7.7,Wojciech Has,"Adventure, Drama, Fantasy, History, Horror, Mystery",https://www.imdb.com/title/tt0059643/
+483,tt0062873,The Young Girls of Rochefort,1967,7.7,Jacques Demy,"Comedy, Drama, Musical, Romance",https://www.imdb.com/title/tt0062873/
+493,tt0061418,Bonnie and Clyde,1967,7.7,Arthur Penn,"Action, Biography, Crime, Drama",https://www.imdb.com/title/tt0061418/
+546,tt0066993,The Devils,1971,7.7,Ken Russell,"Biography, Drama, History",https://www.imdb.com/title/tt0066993/
+552,tt0067116,The French Connection,1971,7.7,William Friedkin,"Action, Crime, Drama, Thriller",https://www.imdb.com/title/tt0067116/
+568,tt0068361,The Discreet Charm of the Bourgeoisie,1972,7.7,Luis Buñuel,"Comedy, Drama, Fantasy",https://www.imdb.com/title/tt0068361/
+579,tt0070359,The Mother and the Whore,1973,7.7,Jean Eustache,"Drama, Romance",https://www.imdb.com/title/tt0070359/
+581,tt0069762,Badlands,1973,7.7,Terrence Malick,"Action, Crime, Drama",https://www.imdb.com/title/tt0069762/
+587,tt0070666,Serpico,1973,7.7,Sidney Lumet,"Biography, Crime, Drama, Thriller",https://www.imdb.com/title/tt0070666/
+593,tt0072962,F for Fake,1973,7.7,"Orson Welles, Gary Graver, Oja Kodar, François Reichenbach",Documentary,https://www.imdb.com/title/tt0072962/
+596,tt0070040,The Spirit of the Beehive,1973,7.7,Víctor Erice,"Drama, Fantasy",https://www.imdb.com/title/tt0070040/
+610,tt0071230,Blazing Saddles,1974,7.7,Mel Brooks,"Comedy, Western",https://www.imdb.com/title/tt0071230/
+643,tt0075276,Stroszek,1977,7.7,Werner Herzog,"Comedy, Drama",https://www.imdb.com/title/tt0075276/
+650,tt0075902,Man of Marble,1977,7.7,Andrzej Wajda,Drama,https://www.imdb.com/title/tt0075902/
+657,tt0077651,Halloween,1978,7.7,John Carpenter,"Horror, Thriller",https://www.imdb.com/title/tt0077651/
+667,tt0079095,The Marriage of Maria Braun,1979,7.7,Rainer Werner Fassbinder,"Drama, Romance",https://www.imdb.com/title/tt0079095/
+672,tt0078902,Breaking Away,1979,7.7,Peter Yates,"Comedy, Drama, Sport",https://www.imdb.com/title/tt0078902/
+679,tt0079010,Christ Stopped at Eboli,1979,7.7,Francesco Rosi,Drama,https://www.imdb.com/title/tt0079010/
+684,tt0081283,Ordinary People,1980,7.7,Robert Redford,Drama,https://www.imdb.com/title/tt0081283/
+693,tt0080339,Airplane!,1980,7.7,"Jim Abrahams, David Zucker, Jerry Zucker",Comedy,https://www.imdb.com/title/tt0080339/
+724,tt0084628,Sans Soleil,1983,7.7,Chris Marker,"Documentary, Drama",https://www.imdb.com/title/tt0084628/
+728,tt0085482,El Norte,1983,7.7,Gregory Nava,"Adventure, Drama",https://www.imdb.com/title/tt0085482/
+765,tt0089276,The Official Story,1985,7.7,Luis Puenzo,"Drama, History",https://www.imdb.com/title/tt0089276/
+830,tt0098635,When Harry Met Sally...,1989,7.7,Rob Reiner,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0098635/
+837,tt0097202,The Killer,1989,7.7,John Woo,"Action, Crime, Drama, Thriller",https://www.imdb.com/title/tt0097202/
+915,tt0109445,Clerks,1994,7.7,Kevin Smith,Comedy,https://www.imdb.com/title/tt0109445/
+918,tt0111845,Through the Olive Trees,1994,7.7,Abbas Kiarostami,Drama,https://www.imdb.com/title/tt0111845/
+958,tt0119250,Fireworks,1997,7.7,Takeshi Kitano,"Crime, Drama, Romance, Thriller",https://www.imdb.com/title/tt0119250/
+1181,tt2488496,Star Wars: Episode VII - The Force Awakens,2015,7.7,J.J. Abrams,"Action, Adventure, Sci-Fi",https://www.imdb.com/title/tt2488496/
+1257,tt14230458,Poor Things,2023,7.7,Yorgos Lanthimos,"Comedy, Drama, Romance, Sci-Fi",https://www.imdb.com/title/tt14230458/
+5,tt0006864,Intolerance,1916,7.6,D.W. Griffith,"Drama, History",https://www.imdb.com/title/tt0006864/
+14,tt0013427,Nanook of the North,1922,7.6,Robert J. Flaherty,Documentary,https://www.imdb.com/title/tt0013427/
+16,tt0013257,Häxan,1922,7.6,Benjamin Christensen,"Documentary, Fantasy, Horror",https://www.imdb.com/title/tt0013257/
+21,tt0015361,Strike,1925,7.6,Sergei Eisenstein,Drama,https://www.imdb.com/title/tt0015361/
+40,tt0018051,The Kid Brother,1927,7.6,"Ted Wilde, Harold Lloyd, Lewis Milestone, J.A. Howe","Comedy, Drama, Family, Romance, Western",https://www.imdb.com/title/tt0018051/
+52,tt0020697,The Blue Angel,1930,7.6,Josef von Sternberg,"Drama, Music, Romance",https://www.imdb.com/title/tt0020697/
+62,tt0022286,The Public Enemy,1931,7.6,William A. Wellman,"Crime, Drama",https://www.imdb.com/title/tt0022286/
+94,tt0026752,Mutiny on the Bounty,1935,7.6,Frank Lloyd,"Adventure, Biography, Drama, History, Romance",https://www.imdb.com/title/tt0026752/
+95,tt0026029,The 39 Steps,1935,7.6,Alfred Hitchcock,"Crime, Mystery, Thriller",https://www.imdb.com/title/tt0026029/
+111,tt0029453,Pépé le Moko,1937,7.6,Julien Duvivier,"Crime, Drama, Romance",https://www.imdb.com/title/tt0029453/
+116,tt0029583,Snow White and the Seven Dwarfs,1937,7.6,"William Cottrell, David Hand, Wilfred Jackson, Larry Morey, Perce Pearce, Ben Sharpsteen","Animation, Adventure, Family, Fantasy, Musical, Romance",https://www.imdb.com/title/tt0029583/
+118,tt0028597,The Awful Truth,1937,7.6,Leo McCarey,"Comedy, Romance",https://www.imdb.com/title/tt0028597/
+126,tt0030523,Olympia Part Two: Festival of Beauty,1938,7.6,Leni Riefenstahl,"Documentary, Sport",https://www.imdb.com/title/tt0030523/
+131,tt0031762,Only Angels Have Wings,1939,7.6,Howard Hawks,"Adventure, Drama, Romance",https://www.imdb.com/title/tt0031762/
+132,tt0031225,Destry Rides Again,1939,7.6,George Marshall,"Comedy, Western",https://www.imdb.com/title/tt0031225/
+134,tt0031514,Daybreak,1939,7.6,Marcel Carné,"Crime, Drama, Romance, Thriller",https://www.imdb.com/title/tt0031514/
+162,tt0035015,The Magnificent Ambersons,1942,7.6,"Orson Welles, Fred Fleck, Robert Wise","Drama, Romance",https://www.imdb.com/title/tt0035015/
+163,tt0035575,Yankee Doodle Dandy,1942,7.6,Michael Curtiz,"Biography, Drama, Family, Music, Musical",https://www.imdb.com/title/tt0035575/
+164,tt0035093,Mrs. Miniver,1942,7.6,William Wyler,"Drama, Romance, War",https://www.imdb.com/title/tt0035093/
+183,tt0037824,"Ivan the Terrible, Part I",1944,7.6,Sergei Eisenstein,"Biography, Drama, History",https://www.imdb.com/title/tt0037824/
+195,tt0038823,Paisan,1946,7.6,Roberto Rossellini,"Drama, War",https://www.imdb.com/title/tt0038823/
+201,tt0038559,Gilda,1946,7.6,Charles Vidor,"Drama, Film-Noir, Romance, Thriller",https://www.imdb.com/title/tt0038559/
+210,tt0039677,Odd Man Out,1947,7.6,Carol Reed,"Crime, Drama, Film-Noir, Thriller",https://www.imdb.com/title/tt0039677/
+225,tt0042530,Gun Crazy,1950,7.6,Joseph H. Lewis,"Crime, Drama, Film-Noir, Romance, Thriller",https://www.imdb.com/title/tt0042530/
+238,tt0043137,Winchester '73,1950,7.6,Anthony Mann,"Action, Drama, Western",https://www.imdb.com/title/tt0043137/
+265,tt0046187,Pickup on South Street,1953,7.6,Samuel Fuller,"Crime, Drama, Film-Noir, Mystery, Thriller",https://www.imdb.com/title/tt0046187/
+273,tt0045793,From Here to Eternity,1953,7.6,Fred Zinnemann,"Drama, Romance, War",https://www.imdb.com/title/tt0045793/
+276,tt0046303,Shane,1953,7.6,George Stevens,"Drama, Western",https://www.imdb.com/title/tt0046303/
+292,tt0047136,Johnny Guitar,1954,7.6,Nicholas Ray,"Drama, Western",https://www.imdb.com/title/tt0047136/
+299,tt0048356,Marty,1955,7.6,Delbert Mann,"Drama, Romance",https://www.imdb.com/title/tt0048356/
+301,tt0048545,Rebel Without a Cause,1955,7.6,Nicholas Ray,Drama,https://www.imdb.com/title/tt0048545/
+304,tt0047849,Bad Day at Black Rock,1955,7.6,John Sturges,"Crime, Drama, Mystery, Thriller, Western",https://www.imdb.com/title/tt0047849/
+311,tt0048281,The Ladykillers,1955,7.6,Alexander Mackendrick,"Comedy, Crime",https://www.imdb.com/title/tt0048281/
+315,tt0047811,All That Heaven Allows,1955,7.6,Douglas Sirk,"Drama, Romance",https://www.imdb.com/title/tt0047811/
+325,tt0049261,Giant,1956,7.6,George Stevens,"Drama, Western",https://www.imdb.com/title/tt0049261/
+335,tt0050539,The Incredible Shrinking Man,1957,7.6,Jack Arnold,"Horror, Sci-Fi",https://www.imdb.com/title/tt0050539/
+367,tt0053459,Eyes Without a Face,1960,7.6,Georges Franju,"Drama, Horror",https://www.imdb.com/title/tt0053459/
+373,tt0053472,Breathless,1960,7.6,Jean-Luc Godard,"Crime, Drama",https://www.imdb.com/title/tt0053472/
+380,tt0054167,Peeping Tom,1960,7.6,Michael Powell,"Drama, Horror, Thriller",https://www.imdb.com/title/tt0054167/
+390,tt0055614,West Side Story,1961,7.6,"Jerome Robbins, Robert Wise","Crime, Drama, Musical, Romance",https://www.imdb.com/title/tt0055614/
+448,tt0058715,The Gospel According to St. Matthew,1964,7.6,Pier Paolo Pasolini,"Biography, Drama, History",https://www.imdb.com/title/tt0058715/
+458,tt0059012,Chimes at Midnight,1965,7.6,Orson Welles,"Comedy, Drama, History, War",https://www.imdb.com/title/tt0059012/
+470,tt0060955,Seconds,1966,7.6,John Frankenheimer,"Sci-Fi, Thriller",https://www.imdb.com/title/tt0060955/
+487,tt0060802,Closely Watched Trains,1966,7.6,Jirí Menzel,"Comedy, Drama, Romance, War",https://www.imdb.com/title/tt0060802/
+492,tt0061852,The Jungle Book,1967,7.6,Wolfgang Reitherman,"Animation, Adventure, Comedy, Family, Musical",https://www.imdb.com/title/tt0061852/
+503,tt0063291,Memories of Underdevelopment,1968,7.6,Tomás Gutiérrez Alea,Drama,https://www.imdb.com/title/tt0063291/
+531,tt0066498,The Ear,1970,7.6,Karel Kachyna,"Drama, Thriller",https://www.imdb.com/title/tt0066498/
+543,tt0067411,McCabe & Mrs. Miller,1971,7.6,Robert Altman,"Drama, Western",https://www.imdb.com/title/tt0067411/
+549,tt0067959,Walkabout,1971,7.6,Nicolas Roeg,"Adventure, Drama",https://www.imdb.com/title/tt0067959/
+563,tt0068473,Deliverance,1972,7.6,John Boorman,"Adventure, Drama, Thriller",https://www.imdb.com/title/tt0068473/
+586,tt0070034,Enter the Dragon,1973,7.6,Robert Clouse,"Action, Crime, Thriller",https://www.imdb.com/title/tt0070034/
+598,tt0070544,Fantastic Planet,1973,7.6,René Laloux,"Animation, Sci-Fi",https://www.imdb.com/title/tt0070544/
+623,tt0073440,Nashville,1975,7.6,Robert Altman,"Comedy, Drama, Music",https://www.imdb.com/title/tt0073440/
+638,tt0074084,1900,1976,7.6,Bernardo Bertolucci,"Drama, History",https://www.imdb.com/title/tt0074084/
+640,tt0075860,Close Encounters of the Third Kind,1977,7.6,Steven Spielberg,"Drama, Sci-Fi",https://www.imdb.com/title/tt0075860/
+654,tt0076734,Soldier of Orange,1977,7.6,Paul Verhoeven,"Drama, Romance, Thriller, War",https://www.imdb.com/title/tt0076734/
+664,tt0078243,The 36th Chamber of Shaolin,1978,7.6,Chia-Liang Liu,"Action, Adventure, Drama",https://www.imdb.com/title/tt0078243/
+678,tt0079588,The Muppet Movie,1979,7.6,James Frawley,"Adventure, Comedy, Family, Musical",https://www.imdb.com/title/tt0079588/
+760,tt0089853,The Purple Rose of Cairo,1985,7.6,Woody Allen,"Comedy, Fantasy, Romance",https://www.imdb.com/title/tt0089853/
+761,tt0089960,Vagabond,1985,7.6,Agnès Varda,Drama,https://www.imdb.com/title/tt0089960/
+779,tt0091064,The Fly,1986,7.6,David Cronenberg,"Drama, Horror, Sci-Fi",https://www.imdb.com/title/tt0091064/
+805,tt0095341,Hôtel Terminus,1988,7.6,Marcel Ophüls,"Documentary, Biography, History, War",https://www.imdb.com/title/tt0095341/
+814,tt0095705,The Naked Gun: From the Files of Police Squad!,1988,7.6,David Zucker,"Comedy, Crime",https://www.imdb.com/title/tt0095705/
+824,tt0093870,RoboCop,1987,7.6,Paul Verhoeven,"Action, Crime, Sci-Fi, Thriller",https://www.imdb.com/title/tt0093870/
+872,tt0101765,The Double Life of Véronique,1991,7.6,Krzysztof Kieslowski,"Drama, Fantasy, Music, Mystery, Romance",https://www.imdb.com/title/tt0101765/
+893,tt0108122,Short Cuts,1993,7.6,Robert Altman,"Comedy, Drama",https://www.imdb.com/title/tt0108122/
+899,tt0107156,The Wedding Banquet,1993,7.6,Ang Lee,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0107156/
+929,tt0112445,The White Balloon,1995,7.6,Jafar Panahi,"Drama, Family",https://www.imdb.com/title/tt0112445/
+940,tt1979376,Toy Story 4,2019,7.6,Josh Cooley,"Animation, Adventure, Comedy, Family, Fantasy",https://www.imdb.com/title/tt1979376/
+1065,tt0416991,Moolaadé,2003,7.6,Ousmane Sembene,Drama,https://www.imdb.com/title/tt0416991/
+1136,tt1556190,Nostalgia for the Light,2010,7.6,Patricio Guzmán,Documentary,https://www.imdb.com/title/tt1556190/
+1173,tt2802154,Leviathan,2014,7.6,Andrey Zvyagintsev,"Crime, Drama",https://www.imdb.com/title/tt2802154/
+1190,tt4226388,Victoria,2015,7.6,Sebastian Schipper,"Crime, Drama, Romance, Thriller",https://www.imdb.com/title/tt4226388/
+1219,tt6155172,Roma,2018,7.6,Alfonso Cuarón,Drama,https://www.imdb.com/title/tt6155172/
+1251,tt19770238,Aftersun,2022,7.6,Charlotte Wells,Drama,https://www.imdb.com/title/tt19770238/
+1252,tt17009710,Anatomy of a Fall,2023,7.6,Justine Triet,"Crime, Drama, Mystery, Thriller",https://www.imdb.com/title/tt17009710/
+1260,tt21192142,All of Us Strangers,2023,7.6,Andrew Haigh,"Drama, Romance",https://www.imdb.com/title/tt21192142/
+19,tt0014417,The Wheel,1923,7.5,Abel Gance,Drama,https://www.imdb.com/title/tt0014417/
+27,tt0016220,The Phantom of the Opera,1925,7.5,"Rupert Julian, Lon Chaney, Ernst Laemmle, Edward Sedgwick","Horror, Music",https://www.imdb.com/title/tt0016220/
+42,tt0018839,The Docks of New York,1928,7.5,Josef von Sternberg,"Crime, Drama, Film-Noir, Romance",https://www.imdb.com/title/tt0018839/
+65,tt0021739,The Bitch,1931,7.5,Jean Renoir,"Crime, Drama, Romance",https://www.imdb.com/title/tt0021739/
+69,tt0023158,Love Me Tonight,1932,7.5,Rouben Mamoulian,"Comedy, Musical, Romance",https://www.imdb.com/title/tt0023158/
+76,tt0024028,Footlight Parade,1933,7.5,Lloyd Bacon,"Comedy, Musical, Romance",https://www.imdb.com/title/tt0024028/
+84,tt0024601,Sons of the Desert,1933,7.5,William A. Seiter,"Comedy, Family",https://www.imdb.com/title/tt0024601/
+85,tt0024481,Queen Christina,1933,7.5,Rouben Mamoulian,"Biography, Drama, History, Romance",https://www.imdb.com/title/tt0024481/
+105,tt0028201,The Story of a Cheat,1936,7.5,Sacha Guitry,Comedy,https://www.imdb.com/title/tt0028201/
+109,tt0028445,A Day in the Country,1946,7.5,Jean Renoir,"Short, Comedy, Drama, Romance",https://www.imdb.com/title/tt0028445/
+123,tt0030127,The Baker's Wife,1938,7.5,Marcel Pagnol,"Comedy, Drama",https://www.imdb.com/title/tt0030127/
+128,tt0032145,Wuthering Heights,1939,7.5,William Wyler,"Drama, Romance",https://www.imdb.com/title/tt0032145/
+148,tt0032910,Pinocchio,1940,7.5,"Norman Ferguson, T. Hee, Wilfred Jackson, Jack Kinney, Hamilton Luske, Bill Roberts, Ben Sharpsteen","Animation, Adventure, Comedy, Family, Fantasy, Musical",https://www.imdb.com/title/tt0032910/
+154,tt0033717,High Sierra,1941,7.5,Raoul Walsh,"Action, Adventure, Drama, Film-Noir, Thriller",https://www.imdb.com/title/tt0033717/
+174,tt0035160,Obsession,1943,7.5,Luchino Visconti,"Crime, Drama, Romance",https://www.imdb.com/title/tt0035160/
+177,tt0037059,Meet Me in St. Louis,1944,7.5,Vincente Minnelli,"Comedy, Drama, Family, Musical, Romance",https://www.imdb.com/title/tt0037059/
+182,tt0037101,"Murder, My Sweet",1944,7.5,Edward Dmytryk,"Crime, Drama, Film-Noir, Mystery, Thriller",https://www.imdb.com/title/tt0037101/
+193,tt0038109,Spellbound,1945,7.5,Alfred Hitchcock,"Drama, Film-Noir, Mystery, Romance, Thriller",https://www.imdb.com/title/tt0038109/
+219,tt0040806,The Snake Pit,1948,7.5,Anatole Litvak,"Drama, Mystery",https://www.imdb.com/title/tt0040806/
+220,tt0040525,The Lady from Shanghai,1947,7.5,Orson Welles,"Crime, Drama, Film-Noir, Mystery, Thriller",https://www.imdb.com/title/tt0040525/
+250,tt0044829,The Lavender Hill Mob,1951,7.5,Charles Crichton,"Comedy, Crime",https://www.imdb.com/title/tt0044829/
+264,tt0046345,Summer with Monika,1953,7.5,Ingmar Bergman,"Drama, Romance",https://www.imdb.com/title/tt0046345/
+284,tt0047522,A Star Is Born,1954,7.5,George Cukor,"Drama, Musical, Romance",https://www.imdb.com/title/tt0047522/
+308,tt0048261,Kiss Me Deadly,1955,7.5,Robert Aldrich,"Crime, Drama, Film-Noir, Mystery, Thriller",https://www.imdb.com/title/tt0048261/
+314,tt0047892,Bob le Flambeur,1956,7.5,Jean-Pierre Melville,"Crime, Drama, Thriller",https://www.imdb.com/title/tt0047892/
+320,tt0049223,Forbidden Planet,1956,7.5,Fred M. Wilcox,"Adventure, Sci-Fi",https://www.imdb.com/title/tt0049223/
+345,tt0051525,The Defiant Ones,1958,7.5,Stanley Kramer,"Crime, Drama",https://www.imdb.com/title/tt0051525/
+349,tt0051390,Cairo Station,1958,7.5,Youssef Chahine,"Crime, Drama",https://www.imdb.com/title/tt0051390/
+357,tt0053168,Pickpocket,1959,7.5,Robert Bresson,"Crime, Drama",https://www.imdb.com/title/tt0053168/
+368,tt0054269,Saturday Night and Sunday Morning,1960,7.5,Karel Reisz,"Drama, Romance",https://www.imdb.com/title/tt0054269/
+386,tt0054698,Breakfast at Tiffany's,1961,7.5,Blake Edwards,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0054698/
+421,tt0057654,Barren Lives,1963,7.5,Nelson Pereira dos Santos,Drama,https://www.imdb.com/title/tt0057654/
+443,tt0058182,A Hard Day's Night,1964,7.5,Richard Lester,"Comedy, Musical",https://www.imdb.com/title/tt0058182/
+462,tt0059646,Repulsion,1965,7.5,Roman Polanski,"Drama, Horror, Thriller",https://www.imdb.com/title/tt0059646/
+480,tt0061537,The Red and the White,1967,7.5,Miklós Jancsó,"Drama, War",https://www.imdb.com/title/tt0061537/
+504,tt0064429,High School,1968,7.5,Frederick Wiseman,Documentary,https://www.imdb.com/title/tt0064429/
+510,tt0063462,The Producers,1967,7.5,Mel Brooks,"Comedy, Music",https://www.imdb.com/title/tt0063462/
+514,tt0063555,The Color of Pomegranates,1969,7.5,Sergei Parajanov,"Biography, Drama, History, Music",https://www.imdb.com/title/tt0063555/
+517,tt0064451,A Touch of Zen,1971,7.5,King Hu,"Action, Adventure, Drama, Thriller",https://www.imdb.com/title/tt0064451/
+532,tt0065988,Little Big Man,1970,7.5,Arthur Penn,"Adventure, Comedy, Drama, Western",https://www.imdb.com/title/tt0065988/
+559,tt0067778,Murmur of the Heart,1971,7.5,Louis Malle,"Comedy, Drama",https://www.imdb.com/title/tt0067778/
+562,tt0067541,Wake in Fright,1971,7.5,Ted Kotcheff,"Drama, Thriller",https://www.imdb.com/title/tt0067541/
+584,tt0070334,The Long Goodbye,1973,7.5,Robert Altman,"Comedy, Crime, Drama, Mystery, Thriller",https://www.imdb.com/title/tt0070334/
+585,tt0070917,The Wicker Man,1973,7.5,Robin Hardy,"Horror, Mystery, Thriller",https://www.imdb.com/title/tt0070917/
+615,tt0073198,"Jeanne Dielman, 23, quai du Commerce, 1080 Bruxelles",1975,7.5,Chantal Akerman,Drama,https://www.imdb.com/title/tt0073198/
+622,tt0072976,Fox and His Friends,1975,7.5,Rainer Werner Fassbinder,"Crime, Drama, Romance",https://www.imdb.com/title/tt0072976/
+694,tt0082010,An American Werewolf in London,1981,7.5,John Landis,"Comedy, Horror",https://www.imdb.com/title/tt0082010/
+750,tt0090185,A Time to Live and a Time to Die,1985,7.5,Hsiao-Hsien Hou,"Biography, Drama",https://www.imdb.com/title/tt0090185/
+790,tt0094336,Withnail and I,1987,7.5,Bruce Robinson,"Comedy, Drama",https://www.imdb.com/title/tt0094336/
+812,tt0095159,A Fish Called Wanda,1988,7.5,"Charles Crichton, John Cleese","Comedy, Crime",https://www.imdb.com/title/tt0095159/
+822,tt0094947,Dangerous Liaisons,1988,7.5,Stephen Frears,"Drama, Romance",https://www.imdb.com/title/tt0094947/
+827,tt0096336,Story of Women,1988,7.5,Claude Chabrol,"Drama, History, Romance",https://www.imdb.com/title/tt0096336/
+833,tt0097351,Field of Dreams,1989,7.5,Phil Alden Robinson,"Drama, Family, Fantasy, Sport",https://www.imdb.com/title/tt0097351/
+835,tt0097108,"The Cook, the Thief, His Wife & Her Lover",1989,7.5,Peter Greenaway,"Crime, Drama",https://www.imdb.com/title/tt0097108/
+842,tt0098213,Roger & Me,1989,7.5,Michael Moore,Documentary,https://www.imdb.com/title/tt0098213/
+855,tt0100802,Total Recall,1990,7.5,Paul Verhoeven,"Action, Adventure, Sci-Fi",https://www.imdb.com/title/tt0100802/
+861,tt0101428,La belle noiseuse,1991,7.5,Jacques Rivette,Drama,https://www.imdb.com/title/tt0101428/
+879,tt0105151,The Player,1992,7.5,Robert Altman,"Comedy, Crime, Drama, Thriller",https://www.imdb.com/title/tt0105151/
+890,tt0107358,The Blue Kite,1993,7.5,Zhuangzhuang Tian,"Drama, History",https://www.imdb.com/title/tt0107358/
+912,tt0109045,"The Adventures of Priscilla, Queen of the Desert",1994,7.5,Stephan Elliott,"Comedy, Music",https://www.imdb.com/title/tt0109045/
+1159,tt1854513,Snow White,2012,7.5,Pablo Berger,"Drama, Fantasy",https://www.imdb.com/title/tt1854513/
+1160,tt2258858,Wadjda,2012,7.5,Haifaa Al-Mansour,"Comedy, Drama",https://www.imdb.com/title/tt2258858/
+1203,tt5215486,Dawson City: Frozen Time,2016,7.5,Bill Morrison,"Documentary, History",https://www.imdb.com/title/tt5215486/
+1214,tt1485796,The Greatest Showman,2017,7.5,Michael Gracey,"Biography, Drama, Musical",https://www.imdb.com/title/tt1485796/
+1230,tt8637428,The Farewell,2019,7.5,Lulu Wang,"Comedy, Drama",https://www.imdb.com/title/tt8637428/
+1244,tt10551102,Small Axe: Lovers Rock,2020,7.5,Steve McQueen,"Drama, History",https://www.imdb.com/title/tt10551102/
+1254,tt5537002,Killers of the Flower Moon,2023,7.5,Martin Scorsese,"Crime, Drama, History, Western",https://www.imdb.com/title/tt5537002/
+37,tt0018217,October (Ten Days that Shook the World),1928,7.4,"Grigoriy Aleksandrov, Sergei Eisenstein","Drama, History",https://www.imdb.com/title/tt0018217/
+56,tt0022599,À nous la liberté,1931,7.4,René Clair,"Comedy, Musical",https://www.imdb.com/title/tt0022599/
+66,tt0023649,Vampyr,1932,7.4,Carl Theodor Dreyer,"Fantasy, Horror",https://www.imdb.com/title/tt0023649/
+102,tt0028333,Swing Time,1936,7.4,George Stevens,"Comedy, Musical, Romance",https://www.imdb.com/title/tt0028333/
+114,tt0029608,Stella Dallas,1937,7.4,King Vidor,"Drama, Romance",https://www.imdb.com/title/tt0029608/
+120,tt0030287,Jezebel,1938,7.4,William Wyler,"Drama, Romance",https://www.imdb.com/title/tt0030287/
+159,tt0035169,The Palm Beach Story,1942,7.4,Preston Sturges,"Comedy, Romance",https://www.imdb.com/title/tt0035169/
+187,tt0037800,I Know Where I'm Going!,1945,7.4,"Michael Powell, Emeric Pressburger","Drama, Romance",https://www.imdb.com/title/tt0037800/
+196,tt0038854,The Postman Always Rings Twice,1946,7.4,Tay Garnett,"Crime, Drama, Film-Noir, Mystery, Romance, Thriller",https://www.imdb.com/title/tt0038854/
+228,tt0041090,Adam's Rib,1949,7.4,George Cukor,"Comedy, Romance",https://www.imdb.com/title/tt0041090/
+255,tt0043511,Europe '51,1952,7.4,Roberto Rossellini,Drama,https://www.imdb.com/title/tt0043511/
+266,tt0045537,The Band Wagon,1953,7.4,Vincente Minnelli,"Comedy, Musical, Romance",https://www.imdb.com/title/tt0045537/
+286,tt0047469,Senso,1954,7.4,Luchino Visconti,"Drama, Romance, War",https://www.imdb.com/title/tt0047469/
+323,tt0049010,Bigger Than Life,1956,7.4,Nicholas Ray,Drama,https://www.imdb.com/title/tt0049010/
+326,tt0051207,The Wrong Man,1956,7.4,Alfred Hitchcock,"Drama, Film-Noir",https://www.imdb.com/title/tt0051207/
+328,tt0049470,The Man Who Knew Too Much,1956,7.4,Alfred Hitchcock,"Crime, Drama, Mystery, Thriller",https://www.imdb.com/title/tt0049470/
+331,tt0050105,An Affair to Remember,1957,7.4,Leo McCarey,"Drama, Romance",https://www.imdb.com/title/tt0050105/
+360,tt0053146,Black Orpheus,1959,7.4,Marcel Camus,"Drama, Musical, Romance",https://www.imdb.com/title/tt0053146/
+379,tt0054389,Shoot the Piano Player,1960,7.4,François Truffaut,"Crime, Drama, Thriller",https://www.imdb.com/title/tt0054389/
+382,tt0053967,The Young One,1960,7.4,Luis Buñuel,Drama,https://www.imdb.com/title/tt0053967/
+387,tt0055093,Lola,1961,7.4,Jacques Demy,"Drama, Romance",https://www.imdb.com/title/tt0055093/
+394,tt0054745,Chronicle of a Summer,1961,7.4,"Edgar Morin, Jean Rouch","Documentary, History",https://www.imdb.com/title/tt0054745/
+415,tt0054159,Passenger,1963,7.4,"Andrzej Munk, Witold Lesiewicz","Drama, War",https://www.imdb.com/title/tt0054159/
+430,tt0057129,The Haunting,1963,7.4,Robert Wise,Horror,https://www.imdb.com/title/tt0057129/
+434,tt0058003,Red Desert,1964,7.4,Michelangelo Antonioni,Drama,https://www.imdb.com/title/tt0058003/
+453,tt0059229,Juliet of the Spirits,1965,7.4,Federico Fellini,"Comedy, Drama, Fantasy",https://www.imdb.com/title/tt0059229/
+463,tt0059592,Pierrot le fou,1965,7.4,Jean-Luc Godard,"Crime, Drama, Romance",https://www.imdb.com/title/tt0059592/
+467,tt0060176,Blow-Up,1966,7.4,Michelangelo Antonioni,"Drama, Mystery, Thriller",https://www.imdb.com/title/tt0060176/
+474,tt0060675,Masculine Feminine,1966,7.4,Jean-Luc Godard,"Drama, Romance",https://www.imdb.com/title/tt0060675/
+495,tt0061770,Hombre,1967,7.4,Martin Ritt,"Drama, Western",https://www.imdb.com/title/tt0061770/
+501,tt0063850,If....,1968,7.4,Lindsay Anderson,"Crime, Drama",https://www.imdb.com/title/tt0063850/
+521,tt0064482,In the Year of the Pig,1968,7.4,Emile de Antonio,"Documentary, History, War",https://www.imdb.com/title/tt0064482/
+524,tt0066491,Tristana,1970,7.4,Luis Buñuel,Drama,https://www.imdb.com/title/tt0066491/
+528,tt0065724,Five Easy Pieces,1970,7.4,Bob Rafelson,Drama,https://www.imdb.com/title/tt0065724/
+580,tt0068699,High Plains Drifter,1973,7.4,Clint Eastwood,"Drama, Western",https://www.imdb.com/title/tt0068699/
+582,tt0069704,American Graffiti,1973,7.4,George Lucas,"Comedy, Drama",https://www.imdb.com/title/tt0069704/
+601,tt0071249,Bring Me the Head of Alfredo Garcia,1974,7.4,Sam Peckinpah,"Action, Crime, Drama, Thriller, Western",https://www.imdb.com/title/tt0071249/
+609,tt0072271,The Texas Chain Saw Massacre,1974,7.4,Tobe Hooper,Horror,https://www.imdb.com/title/tt0072271/
+614,tt0073629,The Rocky Horror Picture Show,1975,7.4,Jim Sharman,"Comedy, Horror, Musical",https://www.imdb.com/title/tt0073629/
+626,tt0073540,Picnic at Hanging Rock,1975,7.4,Peter Weir,"Drama, Mystery",https://www.imdb.com/title/tt0073540/
+634,tt0074285,Carrie,1976,7.4,Brian De Palma,Horror,https://www.imdb.com/title/tt0074285/
+645,tt0075675,The American Friend,1977,7.4,Wim Wenders,"Crime, Drama, Mystery, Thriller",https://www.imdb.com/title/tt0075675/
+668,tt0079641,Nosferatu the Vampyre,1979,7.4,Werner Herzog,"Drama, Horror",https://www.imdb.com/title/tt0079641/
+681,tt0078875,The Tin Drum,1979,7.4,Volker Schlöndorff,"Drama, War",https://www.imdb.com/title/tt0078875/
+698,tt0082432,Gallipoli,1981,7.4,Peter Weir,"Adventure, Drama, History, War",https://www.imdb.com/title/tt0082432/
+700,tt0082089,Body Heat,1981,7.4,Lawrence Kasdan,"Crime, Drama, Romance, Thriller",https://www.imdb.com/title/tt0082089/
+712,tt0084805,Tootsie,1982,7.4,Sydney Pollack,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0084805/
+721,tt0085180,L'Argent,1983,7.4,Robert Bresson,"Crime, Drama",https://www.imdb.com/title/tt0085180/
+727,tt0086425,Terms of Endearment,1983,7.4,James L. Brooks,"Comedy, Drama",https://www.imdb.com/title/tt0086425/
+738,tt0087781,The Natural,1984,7.4,Barry Levinson,"Drama, Sport",https://www.imdb.com/title/tt0087781/
+744,tt0086960,Beverly Hills Cop,1984,7.4,Martin Brest,"Action, Comedy, Crime, Thriller",https://www.imdb.com/title/tt0086960/
+746,tt0088184,Stranger Than Paradise,1984,7.4,Jim Jarmusch,"Comedy, Drama",https://www.imdb.com/title/tt0088184/
+808,tt0095715,Alice,1988,7.4,Jan Svankmajer,"Animation, Adventure, Family, Fantasy",https://www.imdb.com/title/tt0095715/
+825,tt0095037,"Distant Voices, Still Lives",1988,7.4,Terence Davies,"Drama, Music",https://www.imdb.com/title/tt0095037/
+846,tt0103130,Trust,1990,7.4,Hal Hartley,"Comedy, Crime, Drama",https://www.imdb.com/title/tt0103130/
+859,tt0099871,Jacob's Ladder,1990,7.4,Adrian Lyne,"Drama, Horror, Mystery",https://www.imdb.com/title/tt0099871/
+884,tt0102816,Center Stage,1991,7.4,Stanley Kwan,"Biography, Drama, Romance",https://www.imdb.com/title/tt0102816/
+885,tt0103905,Man Bites Dog,1992,7.4,"Rémy Belvaux, André Bonzel, Benoît Poelvoorde","Comedy, Crime, Drama",https://www.imdb.com/title/tt0103905/
+887,tt0103874,Dracula,1992,7.4,Francis Ford Coppola,"Fantasy, Horror, Romance",https://www.imdb.com/title/tt0103874/
+923,tt0110299,Lamerica,1994,7.4,Gianni Amelio,"Comedy, Drama",https://www.imdb.com/title/tt0110299/
+1064,tt0398883,The Consequences of Love,2004,7.4,Paolo Sorrentino,"Crime, Drama, Romance",https://www.imdb.com/title/tt0398883/
+1126,tt1664894,Cave of Forgotten Dreams,2010,7.4,Werner Herzog,"Documentary, History",https://www.imdb.com/title/tt1664894/
+1144,tt1827512,The Kid with a Bike,2011,7.4,"Jean-Pierre Dardenne, Luc Dardenne",Drama,https://www.imdb.com/title/tt1827512/
+1235,tt7984734,The Lighthouse,2019,7.4,Robert Eggers,"Drama, Fantasy, Horror, Mystery, Thriller",https://www.imdb.com/title/tt7984734/
+1238,tt9067182,Rocks,2019,7.4,Sarah Gavron,Drama,https://www.imdb.com/title/tt9067182/
+4,tt0006206,Les Vampires,1915,7.3,Louis Feuillade,"Action, Adventure, Crime, Drama, Mystery, Thriller",https://www.imdb.com/title/tt0006206/
+9,tt0011841,Way Down East,1920,7.3,D.W. Griffith,"Drama, Romance",https://www.imdb.com/title/tt0011841/
+10,tt0012532,Orphans of the Storm,1921,7.3,D.W. Griffith,"Drama, History, Romance",https://www.imdb.com/title/tt0012532/
+60,tt0021814,Dracula,1931,7.3,"Tod Browning, Karl Freund","Drama, Fantasy, Horror",https://www.imdb.com/title/tt0021814/
+64,tt0022150,Le Million,1931,7.3,René Clair,"Comedy, Musical",https://www.imdb.com/title/tt0022150/
+70,tt0023458,Shanghai Express,1932,7.3,Josef von Sternberg,"Adventure, Drama, Film-Noir, Romance",https://www.imdb.com/title/tt0023458/
+75,tt0024034,42nd Street,1933,7.3,Lloyd Bacon,"Comedy, Drama, Musical, Romance",https://www.imdb.com/title/tt0024034/
+83,tt0023037,Land Without Bread,1933,7.3,Luis Buñuel,"Documentary, Short",https://www.imdb.com/title/tt0023037/
+106,tt0028683,Camille,1936,7.3,George Cukor,"Drama, Romance",https://www.imdb.com/title/tt0028683/
+186,tt0037638,Detour,1945,7.3,Edgar G. Ulmer,"Crime, Drama, Film-Noir",https://www.imdb.com/title/tt0037638/
+207,tt0038991,The Stranger,1946,7.3,Orson Welles,"Crime, Drama, Film-Noir, Mystery, Thriller",https://www.imdb.com/title/tt0038991/
+216,tt0189219,Spring in a Small Town,1948,7.3,Mu Fei,"Drama, Romance",https://www.imdb.com/title/tt0189219/
+233,tt0041716,On the Town,1949,7.3,"Stanley Donen, Gene Kelly","Comedy, Musical, Romance",https://www.imdb.com/title/tt0041716/
+267,tt0046487,Monsieur Hulot's Holiday,1953,7.3,Jacques Tati,Comedy,https://www.imdb.com/title/tt0046487/
+271,tt0044953,The Naked Spur,1953,7.3,Anthony Mann,"Drama, Thriller, Western",https://www.imdb.com/title/tt0044953/
+293,tt0047443,Salt of the Earth,1954,7.3,Herbert J. Biberman,"Drama, History",https://www.imdb.com/title/tt0047443/
+294,tt0047472,Seven Brides for Seven Brothers,1954,7.3,Stanley Donen,"Comedy, Musical, Romance, Western",https://www.imdb.com/title/tt0047472/
+307,tt0048347,The Man with the Golden Arm,1955,7.3,Otto Preminger,"Crime, Drama, Romance",https://www.imdb.com/title/tt0048347/
+316,tt0048342,The Man from Laramie,1955,7.3,Anthony Mann,"Drama, Western",https://www.imdb.com/title/tt0048342/
+321,tt0049966,Written on the Wind,1956,7.3,Douglas Sirk,Drama,https://www.imdb.com/title/tt0049966/
+422,tt0057495,Shock Corridor,1963,7.3,Samuel Fuller,"Drama, Mystery, Thriller",https://www.imdb.com/title/tt0057495/
+429,tt0057710,An Actor's Revenge,1963,7.3,Kon Ichikawa,"Action, Comedy, Drama",https://www.imdb.com/title/tt0057710/
+445,tt0058138,Gertrud,1964,7.3,Carl Theodor Dreyer,"Drama, Romance",https://www.imdb.com/title/tt0058138/
+464,tt0056537,Subarnarekha,1965,7.3,Ritwik Ghatak,Drama,https://www.imdb.com/title/tt0056537/
+488,tt0062352,Entranced Earth,1967,7.3,Glauber Rocha,Drama,https://www.imdb.com/title/tt0062352/
+491,tt0061781,The Firemen's Ball,1967,7.3,Milos Forman,"Comedy, Drama",https://www.imdb.com/title/tt0061781/
+508,tt0063671,Targets,1968,7.3,Peter Bogdanovich,"Crime, Drama, Thriller",https://www.imdb.com/title/tt0063671/
+526,tt0064106,The Butcher,1970,7.3,Claude Chabrol,"Drama, Mystery, Thriller",https://www.imdb.com/title/tt0064106/
+535,tt0066026,M*A*S*H,1970,7.3,Robert Altman,"Comedy, Drama, War",https://www.imdb.com/title/tt0066026/
+554,tt0067128,Get Carter,1971,7.3,Mike Hodges,"Crime, Thriller",https://www.imdb.com/title/tt0067128/
+647,tt0076786,Suspiria,1977,7.3,Dario Argento,Horror,https://www.imdb.com/title/tt0076786/
+659,tt0077318,The Chant of Jimmie Blacksmith,1978,7.3,Fred Schepisi,"Biography, Crime, Drama, History",https://www.imdb.com/title/tt0077318/
+686,tt0080388,Atlantic City,1980,7.3,Louis Malle,"Crime, Drama, Romance",https://www.imdb.com/title/tt0080388/
+687,tt0080610,The Last Metro,1980,7.3,François Truffaut,"Drama, Romance, War",https://www.imdb.com/title/tt0080610/
+701,tt0082222,Man of Iron,1981,7.3,Andrzej Wajda,"Drama, History",https://www.imdb.com/title/tt0082222/
+702,tt0082979,Reds,1981,7.3,Warren Beatty,"Biography, Drama, History, Romance",https://www.imdb.com/title/tt0082979/
+705,tt0083907,The Evil Dead,1981,7.3,Sam Raimi,Horror,https://www.imdb.com/title/tt0083907/
+708,tt0084516,Poltergeist,1982,7.3,Tobe Hooper,"Horror, Thriller",https://www.imdb.com/title/tt0084516/
+734,tt0085859,Local Hero,1983,7.3,Bill Forsyth,"Comedy, Drama",https://www.imdb.com/title/tt0085859/
+743,tt0087892,A Passage to India,1984,7.3,David Lean,"Adventure, Drama, History",https://www.imdb.com/title/tt0087892/
+758,tt0089424,Kiss of the Spider Woman,1985,7.3,Hector Babenco,Drama,https://www.imdb.com/title/tt0089424/
+772,tt0091886,Salvador,1986,7.3,Oliver Stone,"Drama, History, Thriller, War",https://www.imdb.com/title/tt0091886/
+786,tt0093822,Raising Arizona,1987,7.3,"Joel Coen, Ethan Coen","Comedy, Crime",https://www.imdb.com/title/tt0093822/
+792,tt0093978,A Chinese Ghost Story,1987,7.3,Siu-Tung Ching,"Action, Fantasy, Horror",https://www.imdb.com/title/tt0093978/
+794,tt0092699,Broadcast News,1987,7.3,James L. Brooks,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0092699/
+796,tt0093105,"Good Morning, Vietnam",1987,7.3,Barry Levinson,"Biography, Comedy, Drama, War",https://www.imdb.com/title/tt0093105/
+798,tt0094291,Wall Street,1987,7.3,Oliver Stone,"Crime, Drama",https://www.imdb.com/title/tt0094291/
+800,tt0093206,Red Sorghum,1988,7.3,Yimou Zhang,"Drama, History, Romance, War",https://www.imdb.com/title/tt0093206/
+845,tt0098258,Say Anything,1989,7.3,Cameron Crowe,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0098258/
+900,tt0108328,Thirty Two Short Films About Glenn Gould,1993,7.3,François Girard,"Biography, Drama, Music",https://www.imdb.com/title/tt0108328/
+905,tt0111019,Wild Reeds,1994,7.3,André Téchiné,"Drama, Romance",https://www.imdb.com/title/tt0111019/
+1016,tt0260688,Ali Zaoua: Prince of the Streets,2000,7.3,Nabil Ayouch,"Drama, Crime",https://www.imdb.com/title/tt0260688/
+1058,tt0368913,Osama,2003,7.3,Siddiq Barmak,Drama,https://www.imdb.com/title/tt0368913/
+1193,tt3040964,The Jungle Book,2016,7.3,Jon Favreau,"Animation, Action, Adventure, Drama, Family, Fantasy, Musical",https://www.imdb.com/title/tt3040964/
+1212,tt1825683,Black Panther,2018,7.3,Ryan Coogler,"Action, Adventure, Sci-Fi",https://www.imdb.com/title/tt1825683/
+1220,tt7784604,Hereditary,2018,7.3,Ari Aster,"Drama, Horror, Mystery, Thriller",https://www.imdb.com/title/tt7784604/
+1240,tt6723592,Tenet,2020,7.3,Christopher Nolan,"Action, Sci-Fi, Thriller",https://www.imdb.com/title/tt6723592/
+1243,tt7772582,Never Rarely Sometimes Always,2020,7.3,Eliza Hittman,Drama,https://www.imdb.com/title/tt7772582/
+1245,tt9770150,Nomadland,2020,7.3,Chloé Zhao,Drama,https://www.imdb.com/title/tt9770150/
+1258,tt6587046,The Boy and the Heron,2023,7.3,Hayao Miyazaki,"Animation, Adventure, Drama, Fantasy",https://www.imdb.com/title/tt6587046/
+1259,tt7160372,The Zone of Interest,2023,7.3,Jonathan Glazer,"Drama, History, War",https://www.imdb.com/title/tt7160372/
+2,tt0000439,The Great Train Robbery,1903,7.2,Edwin S. Porter,"Short, Action, Adventure, Crime, Drama, Western",https://www.imdb.com/title/tt0000439/
+7,tt0009968,Broken Blossoms,1919,7.2,D.W. Griffith,"Drama, Romance",https://www.imdb.com/title/tt0009968/
+54,tt0021577,L'Age d'Or,1930,7.2,Luis Buñuel,"Comedy, Drama",https://www.imdb.com/title/tt0021577/
+55,tt0021571,Earth,1930,7.2,Aleksandr Dovzhenko,Drama,https://www.imdb.com/title/tt0021571/
+68,tt0022718,Boudu Saved from Drowning,1932,7.2,Jean Renoir,Comedy,https://www.imdb.com/title/tt0022718/
+80,tt0024803,Zero de Conduite,1933,7.2,Jean Vigo,Drama,https://www.imdb.com/title/tt0024803/
+135,tt0031398,Gunga Din,1939,7.2,George Stevens,"Adventure, Comedy, War",https://www.imdb.com/title/tt0031398/
+153,tt0034398,The Wolf Man,1941,7.2,George Waggner,"Horror, Mystery, Romance",https://www.imdb.com/title/tt0034398/
+158,tt0033563,Dumbo,1941,7.2,"Samuel Armstrong, Norman Ferguson, Wilfred Jackson, Jack Kinney, Bill Roberts, Ben Sharpsteen","Animation, Adventure, Drama, Family, Fantasy, Musical",https://www.imdb.com/title/tt0033563/
+166,tt0034587,Cat People,1942,7.2,Jacques Tourneur,"Fantasy, Horror, Thriller",https://www.imdb.com/title/tt0034587/
+215,tt0040366,Force of Evil,1948,7.2,Abraham Polonsky,"Crime, Drama, Film-Noir",https://www.imdb.com/title/tt0040366/
+262,tt0044357,Angel Face,1952,7.2,Otto Preminger,"Crime, Drama, Film-Noir, Romance, Thriller",https://www.imdb.com/title/tt0044357/
+275,tt0046511,Journey to Italy,1954,7.2,Roberto Rossellini,"Drama, Romance",https://www.imdb.com/title/tt0046511/
+295,tt0047834,Animal Farm,1954,7.2,"Joy Batchelor, John Halas","Animation, Drama",https://www.imdb.com/title/tt0047834/
+296,tt0048308,Lola Montès,1955,7.2,Max Ophüls,"Biography, Drama, Romance",https://www.imdb.com/title/tt0048308/
+306,tt0048488,The Phenix City Story,1955,7.2,Phil Karlson,"Crime, Drama, Film-Noir",https://www.imdb.com/title/tt0048488/
+352,tt0052218,Some Came Running,1958,7.2,Vincente Minnelli,"Drama, Romance",https://www.imdb.com/title/tt0052218/
+353,tt0051554,Horror of Dracula,1958,7.2,Terence Fisher,"Drama, Horror",https://www.imdb.com/title/tt0051554/
+363,tt0053270,Shadows,1958,7.2,John Cassavetes,"Drama, Music, Romance",https://www.imdb.com/title/tt0053270/
+376,tt0150980,The Housemaid,1960,7.2,Kim Ki-young,"Crime, Drama, Horror, Thriller",https://www.imdb.com/title/tt0150980/
+468,tt0060959,Daisies,1966,7.2,Vera Chytilová,Comedy,https://www.imdb.com/title/tt0060959/
+482,tt0062138,Point Blank,1967,7.2,John Boorman,"Crime, Drama, Thriller",https://www.imdb.com/title/tt0062138/
+518,tt0064276,Easy Rider,1969,7.2,Dennis Hopper,"Adventure, Drama",https://www.imdb.com/title/tt0064276/
+527,tt0067866,El Topo,1970,7.2,Alejandro Jodorowsky,"Drama, Western",https://www.imdb.com/title/tt0067866/
+540,tt0065777,The Garden of the Finzi-Continis,1970,7.2,Vittorio De Sica,"Drama, History, War",https://www.imdb.com/title/tt0065777/
+561,tt0067893,Two-Lane Blacktop,1971,7.2,Monte Hellman,Drama,https://www.imdb.com/title/tt0067893/
+572,tt0068575,Fat City,1972,7.2,John Huston,"Drama, Sport",https://www.imdb.com/title/tt0068575/
+594,tt0070518,Pat Garrett & Billy the Kid,1973,7.2,Sam Peckinpah,"Biography, Drama, Western",https://www.imdb.com/title/tt0070518/
+611,tt0071381,Celine and Julie Go Boating,1974,7.2,Jacques Rivette,"Comedy, Drama, Fantasy, Mystery",https://www.imdb.com/title/tt0071381/
+632,tt0074749,The Killing of a Chinese Bookie,1976,7.2,John Cassavetes,"Crime, Drama, Thriller",https://www.imdb.com/title/tt0074749/
+652,tt0076263,Killer of Sheep,1978,7.2,Charles Burnett,Drama,https://www.imdb.com/title/tt0076263/
+653,tt0074486,Eraserhead,1977,7.2,David Lynch,"Fantasy, Horror",https://www.imdb.com/title/tt0074486/
+663,tt0077631,Grease,1978,7.2,Randal Kleiser,"Comedy, Musical, Romance",https://www.imdb.com/title/tt0077631/
+717,tt0084422,The Night of the Shooting Stars,1982,7.2,"Paolo Taviani, Vittorio Taviani","Drama, Fantasy, Romance, War",https://www.imdb.com/title/tt0084422/
+719,tt0083851,The Draughtsman's Contract,1982,7.2,Peter Greenaway,"Comedy, Drama, Mystery",https://www.imdb.com/title/tt0083851/
+730,tt0086541,Videodrome,1983,7.2,David Cronenberg,"Drama, Horror, Sci-Fi, Thriller",https://www.imdb.com/title/tt0086541/
+754,tt0089755,Out of Africa,1985,7.2,Sydney Pollack,"Biography, Drama, Romance",https://www.imdb.com/title/tt0089755/
+764,tt0091867,A Room with a View,1986,7.2,James Ivory,"Drama, Romance",https://www.imdb.com/title/tt0091867/
+766,tt0091474,Manhunter,1986,7.2,Michael Mann,"Crime, Mystery, Thriller",https://www.imdb.com/title/tt0091474/
+770,tt0090830,Children of a Lesser God,1986,7.2,Randa Haines,"Drama, Romance",https://www.imdb.com/title/tt0090830/
+776,tt0090952,Peking Opera Blues,1986,7.2,Hark Tsui,"Action, Comedy, History",https://www.imdb.com/title/tt0090952/
+781,tt0091943,Sherman's March,1985,7.2,Ross McElwee,"Documentary, Biography, Comedy, History, Romance",https://www.imdb.com/title/tt0091943/
+797,tt0093565,Moonstruck,1987,7.2,Norman Jewison,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0093565/
+802,tt0092843,The Dead,1987,7.2,John Huston,Drama,https://www.imdb.com/title/tt0092843/
+823,tt0094964,Dead Ringers,1988,7.2,David Cronenberg,"Drama, Horror, Thriller",https://www.imdb.com/title/tt0094964/
+838,tt0097240,Drugstore Cowboy,1989,7.2,Gus Van Sant,"Crime, Drama",https://www.imdb.com/title/tt0097240/
+841,tt0100842,The Unbelievable Truth,1989,7.2,Hal Hartley,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0100842/
+866,tt0103285,Once Upon a Time in China,1991,7.2,Hark Tsui,Action,https://www.imdb.com/title/tt0103285/
+878,tt0105488,Strictly Ballroom,1992,7.2,Baz Luhrmann,"Comedy, Drama, Music, Romance",https://www.imdb.com/title/tt0105488/
+882,tt0104008,A Tale of Winter,1992,7.2,Éric Rohmer,"Drama, Romance",https://www.imdb.com/title/tt0104008/
+907,tt0110005,Heavenly Creatures,1994,7.2,Peter Jackson,"Biography, Crime, Drama, Thriller",https://www.imdb.com/title/tt0110005/
+920,tt0109382,Dear Diary,1993,7.2,Nanni Moretti,"Biography, Comedy, Drama",https://www.imdb.com/title/tt0109382/
+944,tt0114558,Strange Days,1995,7.2,Kathryn Bigelow,"Crime, Drama, Sci-Fi, Thriller",https://www.imdb.com/title/tt0114558/
+1048,tt0299658,Chicago,2002,7.2,Rob Marshall,"Comedy, Crime, Musical",https://www.imdb.com/title/tt0299658/
+1137,tt1508675,Le Havre,2011,7.2,Aki Kaurismäki,"Comedy, Drama",https://www.imdb.com/title/tt1508675/
+1223,tt6266538,Vice,2018,7.2,Adam McKay,"Biography, Comedy, Drama, History",https://www.imdb.com/title/tt6266538/
+51,tt0021079,Little Caesar,1931,7.1,Mervyn LeRoy,"Action, Crime, Drama, Romance",https://www.imdb.com/title/tt0021079/
+86,tt0025913,Triumph of the Will,1935,7.1,Leni Riefenstahl,"Documentary, History",https://www.imdb.com/title/tt0025913/
+87,tt0025318,It's a Gift,1934,7.1,Norman Z. McLeod,Comedy,https://www.imdb.com/title/tt0025318/
+119,tt0029146,The Life of Emile Zola,1937,7.1,William Dieterle,"Biography, Drama",https://www.imdb.com/title/tt0029146/
+147,tt0032234,The Bank Dick,1940,7.1,Edward F. Cline,Comedy,https://www.imdb.com/title/tt0032234/
+226,tt0041786,The Reckless Moment,1949,7.1,Max Ophüls,"Crime, Drama, Film-Noir",https://www.imdb.com/title/tt0041786/
+232,tt0042040,Whisky Galore!,1949,7.1,Alexander Mackendrick,"Comedy, Crime",https://www.imdb.com/title/tt0042040/
+246,tt0043278,An American in Paris,1951,7.1,Vincente Minnelli,"Drama, Musical, Romance",https://www.imdb.com/title/tt0043278/
+277,tt0045810,Gentlemen Prefer Blondes,1953,7.1,Howard Hawks,"Comedy, Musical, Romance",https://www.imdb.com/title/tt0045810/
+309,tt0048140,Guys and Dolls,1955,7.1,Joseph L. Mankiewicz,"Comedy, Crime, Musical, Romance",https://www.imdb.com/title/tt0048140/
+336,tt0050468,Gunfight at the O.K. Corral,1957,7.1,John Sturges,"Biography, Drama, Western",https://www.imdb.com/title/tt0050468/
+359,tt0053220,Ride Lonesome,1959,7.1,Budd Boetticher,Western,https://www.imdb.com/title/tt0053220/
+381,tt0054067,Black Sunday,1960,7.1,Mario Bava,Horror,https://www.imdb.com/title/tt0054067/
+396,tt0055257,One-Eyed Jacks,1961,7.1,Marlon Brando,"Drama, Western",https://www.imdb.com/title/tt0055257/
+438,tt0058329,Marnie,1964,7.1,Alfred Hitchcock,"Crime, Drama, Mystery, Romance, Thriller",https://www.imdb.com/title/tt0058329/
+442,tt0058006,"Black God, White Devil",1964,7.1,Glauber Rocha,"Adventure, Crime, Drama, Western",https://www.imdb.com/title/tt0058006/
+494,tt0062453,Viy,1967,7.1,"Aleksandr Ptushko, Konstantin Ershov, Georgiy Kropachyov","Drama, Fantasy, Horror",https://www.imdb.com/title/tt0062453/
+520,tt0064609,Lucia,1968,7.1,Humberto Solás,Drama,https://www.imdb.com/title/tt0064609/
+529,tt0066122,Deep End,1970,7.1,Jerzy Skolimowski,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0066122/
+534,tt0065143,The Bird with the Crystal Plumage,1970,7.1,Dario Argento,"Drama, Horror, Mystery, Thriller",https://www.imdb.com/title/tt0065143/
+550,tt0067309,Klute,1971,7.1,Alan J. Pakula,"Crime, Mystery, Thriller",https://www.imdb.com/title/tt0067309/
+558,tt0067961,Wanda,1970,7.1,Barbara Loden,"Crime, Drama",https://www.imdb.com/title/tt0067961/
+588,tt0069995,Don't Look Now,1973,7.1,Nicolas Roeg,"Drama, Horror, Mystery, Thriller",https://www.imdb.com/title/tt0069995/
+591,tt0070707,Sleeper,1973,7.1,Woody Allen,"Comedy, Sci-Fi",https://www.imdb.com/title/tt0070707/
+595,tt0070842,Turkish Delight,1973,7.1,Paul Verhoeven,"Drama, Romance",https://www.imdb.com/title/tt0070842/
+666,tt0079596,My Brilliant Career,1979,7.1,Gillian Armstrong,"Biography, Drama, Romance",https://www.imdb.com/title/tt0079596/
+682,tt0079367,The Jerk,1979,7.1,Carl Reiner,Comedy,https://www.imdb.com/title/tt0079367/
+690,tt0080437,The Big Red One,1980,7.1,Samuel Fuller,"Drama, War",https://www.imdb.com/title/tt0080437/
+695,tt0082269,Diva,1981,7.1,Jean-Jacques Beineix,"Crime, Drama, Music, Thriller",https://www.imdb.com/title/tt0082269/
+706,tt0083929,Fast Times at Ridgemont High,1982,7.1,Amy Heckerling,"Comedy, Drama",https://www.imdb.com/title/tt0083929/
+723,tt0085244,The Big Chill,1983,7.1,Lawrence Kasdan,"Comedy, Drama",https://www.imdb.com/title/tt0085244/
+729,tt0086543,The 4th Man,1983,7.1,Paul Verhoeven,"Drama, Mystery, Thriller",https://www.imdb.com/title/tt0086543/
+775,tt0090985,The Decline of the American Empire,1986,7.1,Denys Arcand,"Comedy, Drama",https://www.imdb.com/title/tt0090985/
+803,tt0093225,Housekeeping,1987,7.1,Bill Forsyth,"Comedy, Drama",https://www.imdb.com/title/tt0093225/
+829,tt0092929,Drowning by Numbers,1988,7.1,Peter Greenaway,"Comedy, Drama",https://www.imdb.com/title/tt0092929/
+858,tt0100486,Reversal of Fortune,1990,7.1,Barbet Schroeder,"Biography, Drama, Mystery",https://www.imdb.com/title/tt0100486/
+873,tt0103099,Tongues Untied,1989,7.1,Marlon Riggs,Documentary,https://www.imdb.com/title/tt0103099/
+1055,tt0364930,Aileen: Life and Death of a Serial Killer,2003,7.1,"Nick Broomfield, Joan Churchill","Documentary, Crime",https://www.imdb.com/title/tt0364930/
+1228,tt1489887,Booksmart,2019,7.1,Olivia Wilde,Comedy,https://www.imdb.com/title/tt1489887/
+1253,tt10638522,Talk to Me,2022,7.1,"Danny Philippou, Michael Philippou","Horror, Thriller",https://www.imdb.com/title/tt10638522/
+17,tt0013140,Foolish Wives,1922,7.0,Erich von Stroheim,"Drama, Thriller",https://www.imdb.com/title/tt0013140/
+57,tt0022080,Limit,1931,7.0,Mario Peixoto,"Drama, Romance",https://www.imdb.com/title/tt0022080/
+110,tt0028212,Sabotage,1936,7.0,Alfred Hitchcock,"Crime, Thriller",https://www.imdb.com/title/tt0028212/
+175,tt0036027,I Walked with a Zombie,1943,7.0,Jacques Tourneur,"Drama, Fantasy, Horror, Romance",https://www.imdb.com/title/tt0036027/
+180,tt0036910,Henry V,1944,7.0,Laurence Olivier,"Biography, Drama, History, War",https://www.imdb.com/title/tt0036910/
+239,tt0042895,Rio Grande,1950,7.0,John Ford,"Drama, Romance, Western",https://www.imdb.com/title/tt0042895/
+261,tt0044487,The Golden Coach,1952,7.0,Jean Renoir,"Comedy, Drama, History, Romance",https://www.imdb.com/title/tt0044487/
+312,tt0048445,Oklahoma!,1955,7.0,Fred Zinnemann,"Drama, Musical, Romance, Western",https://www.imdb.com/title/tt0048445/
+346,tt0051899,Man of the West,1958,7.0,Anthony Mann,"Drama, Western",https://www.imdb.com/title/tt0051899/
+457,tt0058898,Alphaville,1965,7.0,Jean-Luc Godard,"Comedy, Drama, Mystery, Sci-Fi, Thriller",https://www.imdb.com/title/tt0058898/
+573,tt0068687,The Heartbreak Kid,1972,7.0,Elaine May,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0068687/
+600,tt0072308,The Towering Inferno,1974,7.0,John Guillermin,"Action, Drama, Thriller",https://www.imdb.com/title/tt0072308/
+665,tt0077559,Five Deadly Venoms,1978,7.0,Cheh Chang,"Action, Drama, Fantasy, Mystery",https://www.imdb.com/title/tt0077559/
+671,tt0079781,Real Life,1979,7.0,Albert Brooks,Comedy,https://www.imdb.com/title/tt0079781/
+703,tt0083226,Three Brothers,1981,7.0,Francesco Rosi,Drama,https://www.imdb.com/title/tt0083226/
+711,tt0083833,Diner,1982,7.0,Barry Levinson,"Comedy, Drama",https://www.imdb.com/title/tt0083833/
+788,tt0092501,Project A 2,1987,7.0,Jackie Chan,"Action, Comedy, Crime",https://www.imdb.com/title/tt0092501/
+804,tt0094812,Bull Durham,1988,7.0,Ron Shelton,"Comedy, Romance, Sport",https://www.imdb.com/title/tt0094812/
+853,tt0099763,Henry: Portrait of a Serial Killer,1986,7.0,John McNaughton,"Biography, Crime, Drama, Horror, Thriller",https://www.imdb.com/title/tt0099763/
+865,tt0102943,Slacker,1990,7.0,Richard Linklater,"Comedy, Drama",https://www.imdb.com/title/tt0102943/
+892,tt0107157,The Puppetmaster,1993,7.0,Hsiao-Hsien Hou,"Biography, Drama, War",https://www.imdb.com/title/tt0107157/
+904,tt0110308,The Last Seduction,1994,7.0,John Dahl,"Crime, Drama, Romance, Thriller",https://www.imdb.com/title/tt0110308/
+1142,tt1340800,Tinker Tailor Soldier Spy,2011,7.0,Tomas Alfredson,"Drama, Mystery, Thriller",https://www.imdb.com/title/tt1340800/
+1150,tt1259521,The Cabin in the Woods,2011,7.0,Drew Goddard,"Horror, Mystery, Thriller",https://www.imdb.com/title/tt1259521/
+46,tt0019286,Storm Over Asia,1928,6.9,Vsevolod Pudovkin,"Drama, War",https://www.imdb.com/title/tt0019286/
+50,tt0019702,Blackmail,1929,6.9,Alfred Hitchcock,"Crime, Drama, Mystery, Thriller",https://www.imdb.com/title/tt0019702/
+77,tt0023814,The Bitter Tea of General Yen,1932,6.9,Frank Capra,"Drama, Romance, War",https://www.imdb.com/title/tt0023814/
+91,tt0024894,The Black Cat,1934,6.9,Edgar G. Ulmer,"Crime, Horror, Romance, Thriller",https://www.imdb.com/title/tt0024894/
+100,tt0026866,Peter Ibbetson,1935,6.9,Henry Hathaway,"Drama, Fantasy, Romance",https://www.imdb.com/title/tt0026866/
+247,tt0043899,Pandora and the Flying Dutchman,1951,6.9,Albert Lewin,"Drama, Fantasy, Mystery, Romance",https://www.imdb.com/title/tt0043899/
+263,tt0044419,The Big Sky,1952,6.9,Howard Hawks,"Adventure, Drama, Western",https://www.imdb.com/title/tt0044419/
+288,tt0046754,The Barefoot Contessa,1954,6.9,Joseph L. Mankiewicz,"Crime, Drama, Mystery, Romance",https://www.imdb.com/title/tt0046754/
+327,tt0049314,High Society,1956,6.9,Charles Walters,"Comedy, Musical, Romance",https://www.imdb.com/title/tt0049314/
+439,tt0058333,The Masque of the Red Death,1964,6.9,Roger Corman,"Drama, Horror",https://www.imdb.com/title/tt0058333/
+469,tt0059079,Come Drink with Me,1966,6.9,King Hu,"Action, Crime",https://www.imdb.com/title/tt0059079/
+484,tt0062480,Weekend,1967,6.9,Jean-Luc Godard,"Adventure, Comedy, Drama",https://www.imdb.com/title/tt0062480/
+536,tt0066601,Zabriskie Point,1970,6.9,Michelangelo Antonioni,Drama,https://www.imdb.com/title/tt0066601/
+547,tt0067204,The Hired Hand,1971,6.9,Peter Fonda,"Drama, Western",https://www.imdb.com/title/tt0067204/
+641,tt0076299,The Last Wave,1977,6.9,Peter Weir,"Drama, Fantasy, Mystery, Thriller",https://www.imdb.com/title/tt0076299/
+662,tt0078446,Up in Smoke,1978,6.9,"Lou Adler, Tommy Chong","Adventure, Comedy, Music",https://www.imdb.com/title/tt0078446/
+748,tt0086497,Utu,1983,6.9,Geoff Murphy,"Adventure, Drama, History, War",https://www.imdb.com/title/tt0086497/
+787,tt0094349,Yeelen,1987,6.9,Souleymane Cissé,"Drama, Fantasy",https://www.imdb.com/title/tt0094349/
+850,tt0099939,King of New York,1990,6.9,Abel Ferrara,"Crime, Thriller",https://www.imdb.com/title/tt0099939/
+876,tt0102511,Naked Lunch,1991,6.9,David Cronenberg,"Drama, Mystery",https://www.imdb.com/title/tt0102511/
+889,tt0103634,Aileen Wuornos: The Selling of a Serial Killer,1992,6.9,Nick Broomfield,"Documentary, Crime",https://www.imdb.com/title/tt0103634/
+926,tt0112431,Babe,1995,6.9,Chris Noonan,"Comedy, Drama, Family",https://www.imdb.com/title/tt0112431/
+981,tt0096251,Tetsuo: The Iron Man,1989,6.9,Shin'ya Tsukamoto,"Horror, Sci-Fi",https://www.imdb.com/title/tt0096251/
+1215,tt3104988,Crazy Rich Asians,2018,6.9,Jon M. Chu,"Comedy, Drama, Romance",https://www.imdb.com/title/tt3104988/
+1222,tt5688932,Sorry to Bother You,2018,6.9,Boots Riley,"Comedy, Drama, Fantasy, Sci-Fi",https://www.imdb.com/title/tt5688932/
+1241,tt10514222,Ma Rainey's Black Bottom,2020,6.9,George C. Wolfe,"Drama, Music",https://www.imdb.com/title/tt10514222/
+149,tt0032376,"Dance, Girl, Dance",1940,6.8,"Dorothy Arzner, Roy Del Ruth","Comedy, Drama, Music",https://www.imdb.com/title/tt0032376/
+270,tt0045557,The Bigamist,1953,6.8,Ida Lupino,"Drama, Film-Noir",https://www.imdb.com/title/tt0045557/
+287,tt0047495,Silver Lode,1954,6.8,Allan Dwan,"Drama, Western",https://www.imdb.com/title/tt0047495/
+291,tt0046828,Carmen Jones,1954,6.8,Otto Preminger,"Drama, Musical, Romance",https://www.imdb.com/title/tt0046828/
+437,tt0058555,Scorpio Rising,1963,6.8,Kenneth Anger,"Short, Music",https://www.imdb.com/title/tt0058555/
+440,tt0056371,Before the Revolution,1964,6.8,Bernardo Bertolucci,"Drama, Romance",https://www.imdb.com/title/tt0056371/
+512,tt0064940,Satyricon,1969,6.8,Federico Fellini,"Drama, Fantasy",https://www.imdb.com/title/tt0064940/
+530,tt0066413,The Spider's Stratagem,1970,6.8,Bernardo Bertolucci,"Drama, Mystery",https://www.imdb.com/title/tt0066413/
+570,tt0070849,Last Tango in Paris,1972,6.8,Bernardo Bertolucci,"Drama, Romance",https://www.imdb.com/title/tt0070849/
+597,tt0070155,The Harder They Come,1972,6.8,Perry Henzell,"Crime, Drama, Music",https://www.imdb.com/title/tt0070155/
+651,tt0076666,Saturday Night Fever,1977,6.8,John Badham,"Drama, Music",https://www.imdb.com/title/tt0076666/
+680,tt0079501,Mad Max,1979,6.8,George Miller,"Action, Adventure, Sci-Fi, Thriller",https://www.imdb.com/title/tt0079501/
+769,tt0091939,She's Gotta Have It,1986,6.8,Spike Lee,"Comedy, Romance",https://www.imdb.com/title/tt0091939/
+784,tt0090907,The Horse Thief,1986,6.8,"Zhuangzhuang Tian, Peicheng Pan",Drama,https://www.imdb.com/title/tt0090907/
+877,tt0105275,Romper Stomper,1992,6.8,Geoffrey Wright,"Crime, Drama, Thriller",https://www.imdb.com/title/tt0105275/
+948,tt0117968,Three Lives and Only One Death,1996,6.8,Raúl Ruiz,"Comedy, Crime, Fantasy, Mystery",https://www.imdb.com/title/tt0117968/
+1196,tt4273292,Under the Shadow,2016,6.8,Babak Anvari,"Drama, Fantasy, Horror, Thriller, War",https://www.imdb.com/title/tt4273292/
+1204,tt4291600,Lady Macbeth,2016,6.8,William Oldroyd,"Drama, Romance",https://www.imdb.com/title/tt4291600/
+1233,tt6062774,Monos,2019,6.8,Alejandro Landes,"Adventure, Drama, Thriller",https://www.imdb.com/title/tt6062774/
+1255,tt1517268,Barbie,2023,6.8,Greta Gerwig,"Adventure, Comedy, Fantasy",https://www.imdb.com/title/tt1517268/
+171,tt0036341,The Seventh Victim,1943,6.7,Mark Robson,"Drama, Horror, Mystery",https://www.imdb.com/title/tt0036341/
+456,tt0129222,The Man Who Had His Hair Cut Short,1965,6.7,André Delvaux,Drama,https://www.imdb.com/title/tt0129222/
+537,tt0066214,Performance,1970,6.7,"Donald Cammell, Nicolas Roeg","Crime, Drama",https://www.imdb.com/title/tt0066214/
+553,tt0067467,Red Psalm,1972,6.7,Miklós Jancsó,"Drama, Musical, War",https://www.imdb.com/title/tt0067467/
+718,tt0086369,A Question of Silence,1982,6.7,Marleen Gorris,Drama,https://www.imdb.com/title/tt0086369/
+736,tt0085426,The Last Battle,1983,6.7,Luc Besson,Sci-Fi,https://www.imdb.com/title/tt0085426/
+749,tt0089841,Prizzi's Honor,1985,6.7,John Huston,"Comedy, Crime, Drama, Romance",https://www.imdb.com/title/tt0089841/
+759,tt0089869,The Quiet Earth,1985,6.7,Geoff Murphy,"Drama, Mystery, Sci-Fi",https://www.imdb.com/title/tt0089869/
+813,tt0096337,A Tale of the Wind,1988,6.7,Joris Ivens,"Drama, Fantasy",https://www.imdb.com/title/tt0096337/
+828,tt0094606,The Accidental Tourist,1988,6.7,Lawrence Kasdan,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0094606/
+847,tt0100536,"No Fear, No Die",1990,6.7,Claire Denis,Drama,https://www.imdb.com/title/tt0100536/
+888,tt0103919,Candyman,1992,6.7,Bernard Rose,"Horror, Thriller",https://www.imdb.com/title/tt0103919/
+1236,tt6803046,The Vast of Night,2019,6.7,Andrew Patterson,"Drama, Mystery, Sci-Fi, Thriller",https://www.imdb.com/title/tt6803046/
+12,tt0013626,The Smiling Madame Beudet,1923,6.6,Germaine Dulac,"Short, Drama",https://www.imdb.com/title/tt0013626/
+26,tt0015772,The Eagle,1925,6.6,Clarence Brown,"Action, Adventure, Comedy, Drama, History, Romance",https://www.imdb.com/title/tt0015772/
+74,tt0023202,Me and My Gal,1932,6.6,Raoul Walsh,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0023202/
+107,tt0028358,Things to Come,1936,6.6,William Cameron Menzies,"Drama, Sci-Fi, War",https://www.imdb.com/title/tt0028358/
+190,tt0036630,San Pietro,1945,6.6,John Huston,"Documentary, Short, War",https://www.imdb.com/title/tt0036630/
+214,tt0040766,Secret Beyond the Door...,1947,6.6,Fritz Lang,"Drama, Film-Noir, Mystery, Romance, Thriller",https://www.imdb.com/title/tt0040766/
+218,tt0040679,The Paleface,1948,6.6,Norman Z. McLeod,"Comedy, Family, Western",https://www.imdb.com/title/tt0040679/
+344,tt0051658,Gigi,1958,6.6,"Vincente Minnelli, Charles Walters","Comedy, Musical, Romance",https://www.imdb.com/title/tt0051658/
+388,tt0054861,The Exiles,1961,6.6,Kent Mackenzie,Drama,https://www.imdb.com/title/tt0054861/
+426,tt0057372,The Nutty Professor,1963,6.6,Jerry Lewis,"Comedy, Romance, Sci-Fi",https://www.imdb.com/title/tt0057372/
+459,tt0059170,"Faster, Pussycat! Kill! Kill!",1965,6.6,Russ Meyer,"Action, Comedy",https://www.imdb.com/title/tt0059170/
+548,tt0067958,WR: Mysteries of the Organism,1971,6.6,Dusan Makavejev,"Comedy, Drama, Fantasy",https://www.imdb.com/title/tt0067958/
+555,tt0067741,Shaft,1971,6.6,Gordon Parks,"Action, Crime, Thriller",https://www.imdb.com/title/tt0067741/
+629,tt0074851,The Man Who Fell to Earth,1976,6.6,Nicolas Roeg,"Drama, Sci-Fi",https://www.imdb.com/title/tt0074851/
+637,tt0074102,In the Realm of the Senses,1976,6.6,Nagisa Ôshima,"Drama, Romance",https://www.imdb.com/title/tt0074102/
+644,tt0077309,Outsiders,1977,6.6,Ousmane Sembene,Drama,https://www.imdb.com/title/tt0077309/
+691,tt0081076,Loulou,1980,6.6,Maurice Pialat,"Drama, Romance",https://www.imdb.com/title/tt0081076/
+1194,tt1619029,Jackie,2016,6.6,Pablo Larraín,"Biography, Drama",https://www.imdb.com/title/tt1619029/
+1209,tt5109784,Mother!,2017,6.6,Darren Aronofsky,"Drama, Horror, Mystery",https://www.imdb.com/title/tt5109784/
+1239,tt7557108,Saint Maud,2019,6.6,Rose Glass,"Drama, Horror, Mystery, Thriller",https://www.imdb.com/title/tt7557108/
+47,tt0020286,A Throw of Dice,1929,6.5,Franz Osten,"Adventure, Drama, Romance",https://www.imdb.com/title/tt0020286/
+172,tt0036135,The Man in Grey,1943,6.5,Leslie Arliss,"Drama, History, Romance",https://www.imdb.com/title/tt0036135/
+302,tt0048363,The Mad Masters,1955,6.5,Jean Rouch,"Documentary, Short, Horror",https://www.imdb.com/title/tt0048363/
+476,tt0060304,2 or 3 Things I Know About Her,1967,6.5,Jean-Luc Godard,"Comedy, Drama",https://www.imdb.com/title/tt0060304/
+502,tt0062864,David Holzman's Diary,1967,6.5,Jim McBride,"Comedy, Drama",https://www.imdb.com/title/tt0062864/
+771,tt0090798,Caravaggio,1986,6.5,Derek Jarman,"Biography, Drama, History, Romance",https://www.imdb.com/title/tt0090798/
+839,tt0096841,The Asthenic Syndrome,1989,6.5,Kira Muratova,Drama,https://www.imdb.com/title/tt0096841/
+956,tt0114134,The Pillow Book,1996,6.5,Peter Greenaway,Drama,https://www.imdb.com/title/tt0114134/
+8,tt0011870,Within Our Gates,1920,6.4,Oscar Micheaux,"Drama, Romance",https://www.imdb.com/title/tt0011870/
+38,tt0018037,The Jazz Singer,1927,6.4,Alan Crosland,"Drama, Music, Musical, Romance",https://www.imdb.com/title/tt0018037/
+167,tt0035881,Fires Were Started,1943,6.4,Humphrey Jennings,"Drama, War",https://www.imdb.com/title/tt0035881/
+224,tt0040550,Louisiana Story,1948,6.4,Robert J. Flaherty,"Adventure, Drama",https://www.imdb.com/title/tt0040550/
+280,tt0046414,Beat the Devil,1953,6.4,John Huston,"Action, Adventure, Comedy, Crime, Drama, Romance",https://www.imdb.com/title/tt0046414/
+300,tt0047840,Artists and Models,1955,6.4,Frank Tashlin,"Comedy, Musical, Romance",https://www.imdb.com/title/tt0047840/
+425,tt0056952,The Cool World,1963,6.4,Shirley Clarke,"Crime, Drama",https://www.imdb.com/title/tt0056952/
+577,tt0069332,Super Fly,1972,6.4,Gordon Parks Jr.,"Action, Crime, Drama, Music, Thriller",https://www.imdb.com/title/tt0069332/
+78,tt0024548,She Done Him Wrong,1933,6.3,Lowell Sherman,"Comedy, Drama, History, Musical, Romance",https://www.imdb.com/title/tt0024548/
+140,tt0031066,Babes in Arms,1939,6.3,Busby Berkeley,"Comedy, Musical",https://www.imdb.com/title/tt0031066/
+392,tt0055069,The Ladies Man,1961,6.3,Jerry Lewis,Comedy,https://www.imdb.com/title/tt0055069/
+475,tt0130976,Report,1967,6.3,Bruce Conner,"Short, History",https://www.imdb.com/title/tt0130976/
+648,tt0076725,Sleeping Dogs,1977,6.3,Roger Donaldson,"Action, Drama, Thriller",https://www.imdb.com/title/tt0076725/
+655,tt0077681,The Hills Have Eyes,1977,6.3,Wes Craven,"Horror, Thriller",https://www.imdb.com/title/tt0077681/
+854,tt0099053,Archangel,1990,6.3,Guy Maddin,"Comedy, Drama, Romance, War",https://www.imdb.com/title/tt0099053/
+862,tt0102757,The Rapture,1991,6.3,Michael Tolkin,"Drama, Mystery, Thriller",https://www.imdb.com/title/tt0102757/
+1171,tt1441395,Under the Skin,2013,6.3,Jonathan Glazer,"Drama, Horror, Mystery, Sci-Fi, Thriller",https://www.imdb.com/title/tt1441395/
+1237,tt9000224,The Assistant,2019,6.3,Kitty Green,Drama,https://www.imdb.com/title/tt9000224/
+93,tt0025335,Judge Priest,1934,6.2,John Ford,"Comedy, Drama, Romance",https://www.imdb.com/title/tt0025335/
+398,tt5896468,Dog Star Man,1964,6.2,Stan Brakhage,"Fantasy, Mystery, Drama",https://www.imdb.com/title/tt5896468/
+408,tt0057318,A Dog's Life,1962,6.2,"Paolo Cavara, Gualtiero Jacopetti, Franco Prosperi","Documentary, Horror",https://www.imdb.com/title/tt0057318/
+3,tt0004972,The Birth of a Nation,1915,6.1,D.W. Griffith,"Drama, War",https://www.imdb.com/title/tt0004972/
+115,tt0206442,Song at Midnight,1937,6.1,Weibang Ma-Xu,"Horror, Romance",https://www.imdb.com/title/tt0206442/
+627,tt0073166,India Song,1975,6.1,Marguerite Duras,"Drama, Fantasy, Romance",https://www.imdb.com/title/tt0073166/
+575,tt0069089,Pink Flamingos,1972,6.0,John Waters,"Comedy, Crime",https://www.imdb.com/title/tt0069089/
+428,tt0197719,Mediterranean,1963,5.9,Jean-Daniel Pollet,"Documentary, Short",https://www.imdb.com/title/tt0197719/
+649,tt0076293,Last Chants for a Slow Dance,1977,5.9,Jon Jost,Drama,https://www.imdb.com/title/tt0076293/
+624,tt0073650,"Salò, or the 120 Days of Sodom",1975,5.8,Pier Paolo Pasolini,Drama,https://www.imdb.com/title/tt0073650/
+925,tt0131356,Deseret,1995,5.8,James Benning,Documentary,https://www.imdb.com/title/tt0131356/
+1018,tt0230783,Signs & Wonders,2000,5.8,"Jonathan Nossiter, Natalie Douka",Drama,https://www.imdb.com/title/tt0230783/
+303,tt0048121,Hill 24 Doesn't Answer,1955,5.7,Thorold Dickinson,"Adventure, Drama, Romance, War",https://www.imdb.com/title/tt0048121/
+556,tt0067810,Sweet Sweetback's Baadasssss Song,1971,5.5,Melvin Van Peebles,"Crime, Drama, Thriller",https://www.imdb.com/title/tt0067810/
+707,tt0083230,Too Early/Too Late,1981,5.4,"Danièle Huillet, Jean-Marie Straub",Documentary,https://www.imdb.com/title/tt0083230/
+465,tt0060511,Hold Me While I'm Naked,1966,5.3,George Kuchar,"Short, Comedy, Drama",https://www.imdb.com/title/tt0060511/
+486,tt0127354,Wavelength,1967,5.3,Michael Snow,Drama,https://www.imdb.com/title/tt0127354/
+403,tt0056060,Heaven and Earth Magic,1962,5.0,Harry Smith,"Animation, Fantasy",https://www.imdb.com/title/tt0056060/
+417,tt0054880,Flaming Creatures,1963,4.5,Jack Smith,"Comedy, Drama, Horror",https://www.imdb.com/title/tt0054880/
+460,tt0059880,Vinyl,1965,4.1,Andy Warhol,Sci-Fi,https://www.imdb.com/title/tt0059880/
+424,tt0138329,Blonde Cobra,1963,2.9,Ken Jacobs,Short,https://www.imdb.com/title/tt0138329/

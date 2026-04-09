@@ -1,4 +1,4 @@
-![test](https://github.com/fabito/htk8s/workflows/test/badge.svg)
+![test](https://github.com/antoniocanelas/k3s-raspi-media-center/workflows/test/badge.svg)
 
 # HTPC powered by k3s
 
@@ -103,7 +103,7 @@ You should also be able to reach each component's UI using the links below. Don'
 |jellyfin|http://localhost/
 |qbittorrent|http://localhost/qbittorrent/
 
-Check the [ingress-route.yaml](base/ingress-route.yaml) for more details.
+Check [`base/ingress-route-external.yaml`](base/ingress-route-external.yaml) for external routing details.
 
 Most media modules are configured to respond on a custom basepath via Traefik middleware. Jellyfin redirects `/jellyfin` to `/jellyfin/web/` automatically. Plex and Home Assistant are exposed directly via port-forward.
 

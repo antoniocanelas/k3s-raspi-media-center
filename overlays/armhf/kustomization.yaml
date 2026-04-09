@@ -22,6 +22,14 @@ images:
   newTag: arm64v8-latest
 - name: lscr.io/linuxserver/lidarr
   newTag: arm64v8-latest
+- name: linuxserver/prowlarr
+  newTag: arm64v8-latest
+- name: lscr.io/linuxserver/readarr
+  newTag: arm64v8-latest
+- name: lscr.io/linuxserver/kavita
+  newTag: arm64v8-latest
+- name: santiagosayshey/profilarr
+  newTag: latest
 
 resources:
 - ../../base

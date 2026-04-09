@@ -59,8 +59,8 @@ spec:
           assrt:
             token: ''
           auth:
-            apikey: ''
-            password: ''
+            apikey: '168992260e408889b7173e8015b4bbd2'
+            password: 570c0e43355144c7f8d2fa33f66b704b
             type: form
             username: admin
           avistaz:
@@ -116,7 +116,7 @@ spec:
             external_webhook_password: ''
             external_webhook_url: ''
             external_webhook_username: ''
-            flask_secret_key: ''
+            flask_secret_key: '977f2f868958dba31c236e7b2767b1b0b9c9b960c129ba123d2f9d775f14630a'
             hi_extension: hi
             hostname: ''
             ignore_ass_subs: false

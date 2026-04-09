@@ -8,3 +8,6 @@ base/plex*.yaml
 
 # Generated manifest files
 deploy/
+
+# Runtime config backups
+service_config_backup/

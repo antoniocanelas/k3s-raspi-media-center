@@ -9,6 +9,8 @@ labels:
   pairs:
     app: media
 
+#- transmission
+#- profilarr
 resources:
 - namespace.yaml
 - ingress-route-external.yaml
@@ -18,10 +20,8 @@ resources:
 - external-services.yaml
 - nas-storage.yaml
 - ssd-storage.yaml
-#- transmission
 - qbittorrent
 - prowlarr
-#- profilarr
 - radarr
 - sonarr
 - bazarr
@@ -33,30 +33,30 @@ resources:
 #- lidarr
 
 patches:
-- target:
-    version: v1
+- patch: |-
+    - op: add
+      path: /spec/selector
+      value:
+        external-backend: "true"
+  target:
     kind: Service
     name: homeassistant-external
-  patch: |-
+    version: v1
+- patch: |-
     - op: add
       path: /spec/selector
       value:
         external-backend: "true"
-- target:
-    version: v1
+  target:
     kind: Service
     name: jellyfin-external
-  patch: |-
+    version: v1
+- patch: |-
     - op: add
       path: /spec/selector
       value:
         external-backend: "true"
-- target:
-    version: v1
+  target:
     kind: Service
     name: plex-external
-  patch: |-
-    - op: add
-      path: /spec/selector
-      value:
-        external-backend: "true"
+    version: v1
