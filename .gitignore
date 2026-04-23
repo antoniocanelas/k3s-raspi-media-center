@@ -11,3 +11,6 @@ deploy/
 
 # Runtime config backups
 service_config_backup/
+
+# Secret files with real credentials (use *.example.yaml as template)
+base/bazarr/secret.yaml

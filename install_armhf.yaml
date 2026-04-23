@@ -404,8 +404,8 @@ spec:
           assrt:
             token: ''
           auth:
-            apikey: '168992260e408889b7173e8015b4bbd2'
-            password: 570c0e43355144c7f8d2fa33f66b704b
+            apikey: ${BAZARR_API_KEY}
+            password: ${BAZARR_AUTH_PASSWORD}
             type: form
             username: admin
           avistaz:
@@ -461,7 +461,7 @@ spec:
             external_webhook_password: ''
             external_webhook_url: ''
             external_webhook_username: ''
-            flask_secret_key: '977f2f868958dba31c236e7b2767b1b0b9c9b960c129ba123d2f9d775f14630a'
+            flask_secret_key: ${BAZARR_FLASK_SECRET}
             hi_extension: hi
             hostname: ''
             ignore_ass_subs: false
@@ -562,9 +562,9 @@ spec:
           opensubtitlescom:
             include_ai_translated: false
             include_machine_translated: false
-            password: ''
+            password: ${OPENSUBTITLES_PASS}
             use_hash: true
-            username: ''
+            username: ${OPENSUBTITLES_USER}
           plex:
             apikey: ''
             auth_method: apikey
@@ -715,6 +715,9 @@ spec:
             username: ''
 
           EOF
+        envFrom:
+        - secretRef:
+            name: bazarr-credentials
         image: busybox
         name: config
         volumeMounts:

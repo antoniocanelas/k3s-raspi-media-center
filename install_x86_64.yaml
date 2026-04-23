@@ -318,7 +318,7 @@ spec:
           value: "1000"
         - name: PGID
           value: "1000"
-        image: linuxserver/bazarr:v1.5.6-ls342
+        image: linuxserver/bazarr:v1.5.6-ls345
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -404,8 +404,8 @@ spec:
           assrt:
             token: ''
           auth:
-            apikey: '168992260e408889b7173e8015b4bbd2'
-            password: 570c0e43355144c7f8d2fa33f66b704b
+            apikey: ${BAZARR_API_KEY}
+            password: ${BAZARR_AUTH_PASSWORD}
             type: form
             username: admin
           avistaz:
@@ -461,7 +461,7 @@ spec:
             external_webhook_password: ''
             external_webhook_url: ''
             external_webhook_username: ''
-            flask_secret_key: '977f2f868958dba31c236e7b2767b1b0b9c9b960c129ba123d2f9d775f14630a'
+            flask_secret_key: ${BAZARR_FLASK_SECRET}
             hi_extension: hi
             hostname: ''
             ignore_ass_subs: false
@@ -562,9 +562,9 @@ spec:
           opensubtitlescom:
             include_ai_translated: false
             include_machine_translated: false
-            password: ''
+            password: ${OPENSUBTITLES_PASS}
             use_hash: true
-            username: ''
+            username: ${OPENSUBTITLES_USER}
           plex:
             apikey: ''
             auth_method: apikey
@@ -715,6 +715,9 @@ spec:
             username: ''
 
           EOF
+        envFrom:
+        - secretRef:
+            name: bazarr-credentials
         image: busybox
         name: config
         volumeMounts:
@@ -769,7 +772,7 @@ spec:
           value: "1000"
         - name: PGID
           value: "1000"
-        image: linuxserver/prowlarr:2.3.0.5236-ls134
+        image: linuxserver/prowlarr:2.3.5.5327-ls143
         livenessProbe:
           exec:
             command:
@@ -876,7 +879,7 @@ spec:
           value: "1000"
         - name: WEBUI_PORT
           value: "8080"
-        image: lscr.io/linuxserver/qbittorrent:5.1.4
+        image: lscr.io/linuxserver/qbittorrent:5.1.4-r3-ls451
         livenessProbe:
           failureThreshold: 8
           httpGet:
@@ -999,7 +1002,7 @@ spec:
           value: "1000"
         - name: PGID
           value: "1000"
-        image: linuxserver/radarr:6.0.4.10291-ls289
+        image: linuxserver/radarr:6.1.1.10360-ls300
         livenessProbe:
           exec:
             command:
@@ -1128,7 +1131,7 @@ spec:
           value: "1000"
         - name: PGID
           value: "1000"
-        image: linuxserver/sonarr:4.0.16.2944-ls300
+        image: linuxserver/sonarr:4.0.17.2952-ls308
         livenessProbe:
           exec:
             command:

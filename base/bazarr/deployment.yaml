@@ -25,19 +25,22 @@ spec:
         command: ['sh', '-c', 'until wget -qO- sonarr:8989/sonarr &> /dev/null && wget -qO- radarr:7878/radarr &> /dev/null; do echo waiting for sonarr and radarr; sleep 2; done;']
       - name: config
         image: busybox
-        command: 
+        envFrom:
+        - secretRef:
+            name: bazarr-credentials
+        command:
         - "sh"
         - "-c"
         - |
           mkdir -p /config/bazarr/config
           export RADARR_API_KEY=$(cat config/radarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
           export SONARR_API_KEY=$(cat config/sonarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
-          
+
           echo "RADARR_API_KEY: $RADARR_API_KEY"
           echo "SONARR_API_KEY: $SONARR_API_KEY"
-          
+
           cat << EOF > config/bazarr/config/config.yaml
-          
+
           ---
           addic7ed:
             cookies: ''
@@ -59,8 +62,8 @@ spec:
           assrt:
             token: ''
           auth:
-            apikey: '168992260e408889b7173e8015b4bbd2'
-            password: 570c0e43355144c7f8d2fa33f66b704b
+            apikey: ${BAZARR_API_KEY}
+            password: ${BAZARR_AUTH_PASSWORD}
             type: form
             username: admin
           avistaz:
@@ -116,7 +119,7 @@ spec:
             external_webhook_password: ''
             external_webhook_url: ''
             external_webhook_username: ''
-            flask_secret_key: '977f2f868958dba31c236e7b2767b1b0b9c9b960c129ba123d2f9d775f14630a'
+            flask_secret_key: ${BAZARR_FLASK_SECRET}
             hi_extension: hi
             hostname: ''
             ignore_ass_subs: false
@@ -217,9 +220,9 @@ spec:
           opensubtitlescom:
             include_ai_translated: false
             include_machine_translated: false
-            password: ''
+            password: ${OPENSUBTITLES_PASS}
             use_hash: true
-            username: ''
+            username: ${OPENSUBTITLES_USER}
           plex:
             apikey: ''
             auth_method: apikey
@@ -370,7 +373,7 @@ spec:
             username: ''
 
           EOF
-          
+
         volumeMounts:
           - mountPath: /config
             name: config
