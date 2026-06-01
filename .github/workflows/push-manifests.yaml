@@ -31,7 +31,7 @@ jobs:
       - name: Generate manifests
         run: |
           mkdir -p ./deploy/x86
-          kustomize build ./overlays/x86 --load_restrictor=LoadRestrictionsNone > ./deploy/x86/install.yaml
+          kustomize build ./overlays/x86 --load-restrictor=LoadRestrictionsNone > ./deploy/x86/install.yaml
       - name: Push manifests
         run: |
           flux push artifact $OCI_REPO:${{ github.sha }} \
