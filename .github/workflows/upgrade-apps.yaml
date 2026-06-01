@@ -8,9 +8,12 @@ on:
 jobs:
   upgrade:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup tools
         uses: ./.github/actions/tools
@@ -27,7 +30,7 @@ jobs:
 
       - name: Create Pull Request
         if: steps.upgrade.outputs.apps_updated == 'true'
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v6
         with:
           commit-message: ${{ steps.upgrade.outputs.commit_message }}
           title: 'chore(apps): bump to latest versions'
