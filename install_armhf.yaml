@@ -1,3 +1,4 @@
+# This is an auto-generated file. DO NOT EDIT
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -731,16 +732,16 @@ spec:
           periodSeconds: 10
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: arr-data-pvc
           subPath: radarr
         - mountPath: /movies
-          name: htpc-home
+          name: arr-data-pvc
           subPath: media/movies
         - mountPath: /downloads
-          name: htpc-home
+          name: arr-data-pvc
           subPath: downloads
         - mountPath: /data
-          name: htpc-home
+          name: arr-data-pvc
       initContainers:
       - command:
         - sh
@@ -830,22 +831,22 @@ spec:
           periodSeconds: 10
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: arr-data-pvc
           subPath: readarr
         - mountPath: /books
-          name: htpc-home
+          name: arr-data-pvc
           subPath: media/books/books
         - mountPath: /audiobooks
-          name: htpc-home
+          name: arr-data-pvc
           subPath: media/books/audiobooks
         - mountPath: /comics
-          name: htpc-home
+          name: arr-data-pvc
           subPath: media/books/comics
         - mountPath: /downloads
-          name: htpc-home
+          name: arr-data-pvc
           subPath: downloads
         - mountPath: /data
-          name: htpc-home
+          name: arr-data-pvc
       initContainers:
       - command:
         - sh
@@ -855,24 +856,28 @@ spec:
         name: chown
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: arr-data-pvc
           subPath: readarr
         - mountPath: /books
-          name: htpc-home
+          name: arr-data-pvc
           subPath: media/books/books
         - mountPath: /audiobooks
-          name: htpc-home
+          name: arr-data-pvc
           subPath: media/books/audiobooks
         - mountPath: /comics
-          name: htpc-home
+          name: arr-data-pvc
           subPath: media/books/comics
       - args:
         - |
-          echo 'Customizing config...'
+          echo 'Configuring Readarr at startup...'
           if [[ ! -f /config/config.xml ]]; then
-            echo '<Config><UrlBase>/readarr</UrlBase></Config>'> /config/config.xml
+            echo 'Creating default config.xml with UrlBase=/readarr'
+            echo '<Config><UrlBase>/readarr</UrlBase></Config>' > /config/config.xml
+            echo 'Config created successfully'
+          else
+            echo 'Config already exists, skipping creation'
           fi
-          echo 'Done customizing.'
+          echo 'Readarr startup config complete'
         command:
         - sh
         - -c
@@ -883,7 +888,7 @@ spec:
           runAsUser: 1000
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: arr-data-pvc
           subPath: readarr
       securityContext:
         fsGroup: 1000
@@ -955,16 +960,10 @@ spec:
           periodSeconds: 10
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
-          subPath: sonarr
-        - mountPath: /tv
-          name: htpc-home
-          subPath: media/tv
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
+          name: arr-data-pvc
+          subPath: jellyfin
         - mountPath: /data
-          name: htpc-home
+          name: arr-data-pvc
       initContainers:
       - command:
         - sh
@@ -992,7 +991,7 @@ spec:
           runAsUser: 1000
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: arr-data-pvc
           subPath: sonarr
       securityContext:
         fsGroup: 1000
@@ -1049,14 +1048,10 @@ spec:
         resources: {}
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
-          subPath: transmission
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
-        - mountPath: /watch
-          name: htpc-home
-          subPath: watch
+          name: arr-data-pvc
+          subPath: jellyfin
+        - mountPath: /data
+          name: arr-data-pvc
       initContainers:
       - command:
         - sh
