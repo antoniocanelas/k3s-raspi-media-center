@@ -1,7 +1,13 @@
 version: 2
 updates:
   - package-ecosystem: "docker"
-    directory: "/overlays"
+    directory: "/overlays/x86"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "[docker] "
+  - package-ecosystem: "docker"
+    directory: "/overlays/armhf"
     schedule:
       interval: "weekly"
     commit-message:
