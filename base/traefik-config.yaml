@@ -12,6 +12,14 @@ spec:
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
 
+    persistence:
+      enabled: true
+      name: data
+      accessMode: ReadWriteOnce
+      size: 128Mi
+      path: /data
+      storageClass: "local-path"
+
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
