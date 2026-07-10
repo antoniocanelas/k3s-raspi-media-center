@@ -961,7 +961,13 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: arr-data-pvc
-          subPath: jellyfin
+          subPath: sonarr
+        - mountPath: /tv
+          name: arr-data-pvc
+          subPath: media/tv
+        - mountPath: /downloads
+          name: arr-data-pvc
+          subPath: downloads
         - mountPath: /data
           name: arr-data-pvc
       initContainers:
