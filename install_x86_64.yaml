@@ -3,14 +3,22 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    app: htpc
+    app: media
   name: media
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: media
+  name: tailscale
+  namespace: media
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: htpc
+    app: media
   name: bazarr
   namespace: media
 spec:
@@ -20,29 +28,30 @@ spec:
     protocol: TCP
     targetPort: 6767
   selector:
+    app: media
     run: bazarr
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: htpc
-  name: jackett
+    app: media
+  name: homeassistant-external
   namespace: media
 spec:
   ports:
-  - name: webui
-    port: 9117
-    protocol: TCP
-    targetPort: 9117
+  - name: http
+    port: 8123
+    targetPort: 8123
   selector:
-    run: jackett
+    app: media
+    external-backend: "true"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: htpc
+    app: media
   name: jellyfin
   namespace: media
 spec:
@@ -52,45 +61,46 @@ spec:
     protocol: TCP
     targetPort: 8096
   selector:
+    app: media
     run: jellyfin
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: htpc
-  name: kavita
+    app: media
+  name: jellyfin-external
   namespace: media
 spec:
   ports:
-  - name: webui
-    port: 5000
-    protocol: TCP
-    targetPort: 5000
+  - name: http
+    port: 8096
+    targetPort: 8096
   selector:
-    app.kubernetes.io/name: kavita
+    app: media
+    external-backend: "true"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: htpc
-  name: lidarr
+    app: media
+  name: plex-external
   namespace: media
 spec:
   ports:
-  - name: webui
-    port: 8686
-    protocol: TCP
-    targetPort: 8686
+  - name: http
+    port: 32400
+    targetPort: 32400
   selector:
-    run: lidarr
+    app: media
+    external-backend: "true"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: htpc
+    app: media
   name: prowlarr
   namespace: media
 spec:
@@ -100,13 +110,39 @@ spec:
     protocol: TCP
     targetPort: 9696
   selector:
+    app: media
     run: prowlarr
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: htpc
+    app: media
+  name: qbittorrent
+  namespace: media
+spec:
+  ports:
+  - name: webui
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: qbittorrent-tcp
+    port: 6881
+    protocol: TCP
+    targetPort: 6881
+  - name: qbittorrent-udp
+    port: 6881
+    protocol: UDP
+    targetPort: 6881
+  selector:
+    app: media
+    run: qbittorrent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: media
   name: radarr
   namespace: media
 spec:
@@ -116,29 +152,14 @@ spec:
     protocol: TCP
     targetPort: 7878
   selector:
+    app: media
     run: radarr
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: htpc
-  name: readarr
-  namespace: media
-spec:
-  ports:
-  - name: webui
-    port: 8787
-    protocol: TCP
-    targetPort: 8787
-  selector:
-    run: readarr
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: htpc
+    app: media
   name: sonarr
   namespace: media
 spec:
@@ -148,64 +169,113 @@ spec:
     protocol: TCP
     targetPort: 8989
   selector:
+    app: media
     run: sonarr
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: htpc
-  name: transmission
-  namespace: media
-spec:
-  ports:
-  - name: webui
-    port: 9091
-    protocol: TCP
-    targetPort: 9091
-  selector:
-    run: transmission
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
-    app: htpc
-  name: arr-data-pv
+    app: media
+  name: nas-media-pv
 spec:
   accessModes:
   - ReadWriteMany
   capacity:
-    storage: 400Gi
-  mountOptions:
-  - hard
-  - nfsvers=3
+    storage: 1Ti
   nfs:
-    path: /volume1/arr-data
+    path: /volume1/media
     server: 192.168.0.200
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: nas-local-path
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app: media
+  name: ssd-config-pv
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 20Gi
+  nfs:
+    path: /ssd/config
+    server: 192.168.0.240
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ssd-local-path
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app: media
+  name: ssd-downloads-pv
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 200Gi
+  nfs:
+    path: /ssd/downloads
+    server: 192.168.0.240
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ssd-local-path
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    app: htpc
-  name: arr-data-pvc
+    app: media
+  name: nas-media-pvc
   namespace: media
 spec:
   accessModes:
   - ReadWriteMany
   resources:
     requests:
-      storage: 400Gi
-  storageClassName: ""
-  volumeName: arr-data-pv
+      storage: 1Ti
+  storageClassName: nas-local-path
+  volumeName: nas-media-pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: media
+  name: ssd-config-pvc
+  namespace: media
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: ssd-local-path
+  volumeName: ssd-config-pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: media
+  name: ssd-downloads-pvc
+  namespace: media
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: ssd-local-path
+  volumeName: ssd-downloads-pv
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: htpc
+    app: media
     run: bazarr
   name: bazarr
   namespace: media
@@ -213,37 +283,68 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      app: media
       run: bazarr
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
+        app: media
         run: bazarr
     spec:
       containers:
       - env:
         - name: TZ
-          value: Pacific/Auckland
+          value: Europe/Lisbon
         - name: PUID
           value: "1000"
         - name: PGID
           value: "1000"
         image: linuxserver/bazarr:v1.5.6-ls349
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /bazarr
+            port: webui
+          periodSeconds: 20
+          timeoutSeconds: 5
         name: bazarr
         ports:
         - containerPort: 6767
           name: webui
+        readinessProbe:
+          failureThreshold: 12
+          httpGet:
+            path: /bazarr
+            port: webui
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        startupProbe:
+          failureThreshold: 60
+          httpGet:
+            path: /bazarr
+            port: webui
+          periodSeconds: 5
+          timeoutSeconds: 3
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: config
           subPath: bazarr
         - mountPath: /movies
-          name: htpc-home
-          subPath: media/movies
+          name: media
+          subPath: movies
         - mountPath: /tv
-          name: htpc-home
-          subPath: media/tv
-        - mountPath: /data
-          name: htpc-home
+          name: media
+          subPath: tv
       initContainers:
       - command:
         - sh
@@ -255,342 +356,380 @@ spec:
       - command:
         - sh
         - -c
-        - "mkdir -p /htpc/bazarr/config\nexport RADARR_API_KEY=$(cat /htpc/radarr/config.xml
-          | sed -ne \"/ApiKey/{s/.*<ApiKey>\\(.*\\)<\\/ApiKey>.*/\\1/p;q;}\")\nexport
-          SONARR_API_KEY=$(cat /htpc/sonarr/config.xml | sed -ne \"/ApiKey/{s/.*<ApiKey>\\(.*\\)<\\/ApiKey>.*/\\1/p;q;}\")\ncat
-          << EOF > /htpc/bazarr/config/config.ini\n[sonarr]\napikey = ${SONARR_API_KEY}\nfull_update
-          = Daily\nip = sonarr\nonly_monitored = False\nbase_url = /sonarr\nssl =
-          False\nport = 8989\n\n[radarr]\napikey = ${RADARR_API_KEY}\nfull_update
-          = Daily\nip = radarr\nonly_monitored = False\nbase_url = /radarr\nssl =
-          False\nport = 7878\n\n[general]\nmovie_default_hi = False\nmovie_default_language
-          = []\nip = 0.0.0.0\nuse_scenename = True\nuse_postprocessing = False\nenabled_providers
-          = subscene,tvsubtitles\nauto_update = True\nport = 6767\nuse_radarr = True\nbase_url
-          = /bazarr/\npage_size = 25\nminimum_score_movie = 70\nbranch = master\nsingle_language
-          = False\nuse_sonarr = True\nserie_default_hi = False\npath_mappings_movie
-          = [['/movies', '/movies'], ['', ''], ['', ''], ['', ''], ['', '']]\nserie_default_enabled
-          = False\nmovie_default_enabled = False\nserie_default_language = []\npath_mappings
-          = [['/tv', '/tv'], ['', ''], ['', ''], ['', ''], ['', '']]\npostprocessing_cmd
-          = \nminimum_score = 90\ndebug = False\nuse_embedded_subs = True\nadaptive_searching
-          = False\nEOF\n"
-        image: busybox
-        name: config
-        volumeMounts:
-        - mountPath: /htpc
-          name: htpc-home
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - name: htpc-home
-        persistentVolumeClaim:
-          claimName: arr-data-pvc
-      - name: arr-data-pvc
-        persistentVolumeClaim:
-          claimName: arr-data-pvc
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: htpc
-    run: jackett
-  name: jackett
-  namespace: media
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      run: jackett
-  template:
-    metadata:
-      labels:
-        run: jackett
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Pacific/Auckland
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        image: linuxserver/jackett:v0.24.1985-ls417
-        name: jackett
-        ports:
-        - containerPort: 9117
-          name: webui
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: jackett
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
-      initContainers:
-      - args:
-        - 'echo start; [[ ! -f /config/Jackett/ServerConfig.json ]] && mkdir -p /config/Jackett/
-          &&  echo ''{ "BasePathOverride": "/jackett"}'' > /config/Jackett/ServerConfig.json;
-          echo end;'
-        command:
-        - sh
-        - -c
-        image: busybox
-        name: config
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: jackett
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - name: htpc-home
-        persistentVolumeClaim:
-          claimName: arr-data-pvc
-      - name: arr-data-pvc
-        persistentVolumeClaim:
-          claimName: arr-data-pvc
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: htpc
-    run: jellyfin
-  name: jellyfin
-  namespace: media
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      run: jellyfin
-  template:
-    metadata:
-      labels:
-        run: jellyfin
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Pacific/Auckland
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        image: lscr.io/linuxserver/jellyfin:10.11.10ubu2404-ls34
-        name: jellyfin
-        ports:
-        - containerPort: 8096
-          name: webui
-          protocol: TCP
-        - containerPort: 8920
-          name: webui-ssl
-          protocol: TCP
-        volumeMounts:
-        - mountPath: /config
-          name: arr-data-pvc
-          subPath: jellyfin
-        - mountPath: /data
-          name: arr-data-pvc
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - name: htpc-home
-        persistentVolumeClaim:
-          claimName: arr-data-pvc
-      - name: arr-data-pvc
-        persistentVolumeClaim:
-          claimName: arr-data-pvc
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: htpc
-  name: kavita
-  namespace: media
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: kavita
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: kavita
-    spec:
-      containers:
-      - env:
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: TZ
-          value: Pacific/Auckland
-        image: lscr.io/linuxserver/kavita:v0.9.0.2-ls110
-        name: kavita
-        ports:
-        - containerPort: 5000
-          name: webui
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: kavita
-        - mountPath: /books
-          name: htpc-home
-          subPath: media/books/books
-        - mountPath: /manga
-          name: htpc-home
-          subPath: media/books/manga
-        - mountPath: /comics
-          name: htpc-home
-          subPath: media/books/comics
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config /books /comics /manga
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: kavita
-        - mountPath: /books
-          name: htpc-home
-          subPath: media/books/books
-        - mountPath: /manga
-          name: htpc-home
-          subPath: media/books/manga
-        - mountPath: /comics
-          name: htpc-home
-          subPath: media/books/comics
-      - args:
         - |
-          echo 'Customizing Kavita config...'
-          if [[ ! -f /config/appsettings.json ]]; then
-            echo '{"BaseUrl": "/kavita"}' > /config/appsettings.json
-            echo 'Kavita appsettings.json created.'
-          else
-            echo 'Kavita appsettings.json already exists.'
-          fi
-          echo 'Done customizing Kavita config.'
-        command:
-        - sh
-        - -c
+          mkdir -p /config/bazarr/config
+          export RADARR_API_KEY=$(cat config/radarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
+          export SONARR_API_KEY=$(cat config/sonarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
+
+          echo "RADARR_API_KEY: $RADARR_API_KEY"
+          echo "SONARR_API_KEY: $SONARR_API_KEY"
+
+          cat << EOF > config/bazarr/config/config.yaml
+
+          ---
+          addic7ed:
+            cookies: ''
+            password: ''
+            user_agent: ''
+            username: ''
+            vip: false
+          analytics:
+            enabled: true
+          anidb:
+            api_client: ''
+            api_client_ver: 1
+          animetosho:
+            anidb_api_client: ''
+            anidb_api_client_ver: 1
+            search_threshold: 6
+          anticaptcha:
+            anti_captcha_key: ''
+          assrt:
+            token: ''
+          auth:
+            apikey: ${BAZARR_API_KEY}
+            password: ${BAZARR_AUTH_PASSWORD}
+            type: form
+            username: admin
+          avistaz:
+            cookies: ''
+            user_agent: ''
+          backup:
+            day: 6
+            folder: /config/backup
+            frequency: Weekly
+            hour: 3
+            retention: 31
+          betaseries:
+            token: ''
+          cinemaz:
+            cookies: ''
+            user_agent: ''
+          cors:
+            enabled: false
+          deathbycaptcha:
+            password: ''
+            username: ''
+          embeddedsubtitles:
+            fallback_lang: en
+            hi_fallback: false
+            included_codecs: []
+            timeout: 600
+            unknown_as_fallback: false
+          general:
+            adaptive_searching: false
+            adaptive_searching_delay: 3w
+            adaptive_searching_delta: 1w
+            anti_captcha_provider: null
+            auto_update: true
+            base_url: /bazarr
+            branch: master
+            chmod: '0640'
+            chmod_enabled: false
+            concurrent_jobs: 4
+            days_to_upgrade_subs: 7
+            debug: false
+            default_und_audio_lang: ''
+            default_und_embedded_subtitles_lang: ''
+            dont_notify_manual_actions: false
+            embedded_subs_show_desired: true
+            embedded_subtitles_parser: ffprobe
+            enable_strm_support: false
+            enabled_integrations: []
+            enabled_providers:
+              - opensubtitlescom
+              - tvsubtitles
+              - yifysubtitles
+              - wizdom
+            external_webhook_password: ''
+            external_webhook_url: ''
+            external_webhook_username: ''
+            flask_secret_key: ${BAZARR_FLASK_SECRET}
+            hi_extension: hi
+            hostname: ''
+            ignore_ass_subs: false
+            ignore_pgs_subs: false
+            ignore_vobsub_subs: false
+            instance_name: Bazarr
+            ip: '*'
+            language_equals: []
+            minimum_score: 70
+            minimum_score_movie: 60
+            movie_default_enabled: true
+            movie_default_profile: 1
+            movie_tag_enabled: false
+            multithreading: true
+            page_size: 25
+            parse_embedded_audio_track: false
+            path_mappings:
+              - - /tv/
+                - /tv/
+            path_mappings_movie:
+              - - /movies/
+                - /movies/
+            port: 6767
+            postprocessing_cmd: ''
+            postprocessing_threshold: 90
+            postprocessing_threshold_movie: 70
+            remove_profile_tags: []
+            serie_default_enabled: false
+            serie_default_profile: 1
+            serie_tag_enabled: false
+            single_language: false
+            skip_hashing: false
+            subfolder: current
+            subfolder_custom: ''
+            subzero_mods: common
+            theme: auto
+            upgrade_frequency: 12
+            upgrade_manual: true
+            upgrade_subs: true
+            use_embedded_subs: true
+            use_external_webhook: false
+            use_plex: false
+            use_postprocessing: false
+            use_postprocessing_threshold: false
+            use_postprocessing_threshold_movie: false
+            use_radarr: true
+            use_scenename: true
+            use_sonarr: true
+            utf8_encode: true
+            wanted_search_frequency: 6
+            wanted_search_frequency_movie: 6
+          hdbits:
+            passkey: ''
+            username: ''
+          jimaku:
+            api_key: ''
+            enable_ai_subs: false
+            enable_archives_download: false
+            enable_name_search_fallback: true
+          karagarga:
+            f_password: ''
+            f_username: ''
+            password: ''
+            username: ''
+          ktuvit:
+            email: ''
+            hashed_password: ''
+          legendasdivx:
+            password: ''
+            skip_wrong_fps: false
+            username: ''
+          legendasnet:
+            password: ''
+            username: ''
+          log:
+            exclude_filter: ''
+            ignore_case: false
+            include_filter: ''
+            use_regex: false
+          movie_scores:
+            audio_codec: 3
+            edition: 1
+            hash: 119
+            hearing_impaired: 1
+            release_group: 13
+            resolution: 2
+            source: 7
+            streaming_service: 1
+            title: 60
+            video_codec: 2
+            year: 30
+          napiprojekt:
+            only_authors: false
+            only_real_names: false
+          napisy24:
+            password: ''
+            username: ''
+          opensubtitlescom:
+            include_ai_translated: false
+            include_machine_translated: false
+            password: ${OPENSUBTITLES_PASS}
+            use_hash: true
+            username: ${OPENSUBTITLES_USER}
+          plex:
+            apikey: ''
+            auth_method: apikey
+            client_identifier: ''
+            disable_auto_migration: false
+            email: ''
+            encryption_key: ''
+            ip: 127.0.0.1
+            migration_attempted: false
+            migration_successful: false
+            migration_timestamp: ''
+            movie_library: []
+            movie_library_ids: []
+            port: 32400
+            series_library: []
+            series_library_ids: []
+            server_local: false
+            server_machine_id: ''
+            server_name: ''
+            server_url: ''
+            set_episode_added: false
+            set_movie_added: false
+            ssl: false
+            token: ''
+            update_movie_library: false
+            update_series_library: false
+            user_id: ''
+            username: ''
+          podnapisi:
+            verify_ssl: true
+          postgresql:
+            database: ''
+            enabled: false
+            host: localhost
+            password: ''
+            port: 5432
+            url: ''
+            username: ''
+          proxy:
+            exclude:
+              - localhost
+              - 127.0.0.1
+            password: ''
+            port: ''
+            type: null
+            url: ''
+            username: ''
+          radarr:
+            apikey: ${RADARR_API_KEY}
+            base_url: /radarr
+            defer_search_signalr: false
+            excluded_tags: []
+            full_update: Daily
+            full_update_day: 6
+            full_update_hour: 4
+            http_timeout: 60
+            ip: radarr
+            movies_sync: 60
+            movies_sync_on_live: true
+            only_monitored: false
+            port: 7878
+            ssl: false
+            sync_only_monitored_movies: false
+            use_ffprobe_cache: true
+          series_scores:
+            audio_codec: 3
+            episode: 30
+            hash: 359
+            hearing_impaired: 1
+            release_group: 14
+            resolution: 2
+            season: 30
+            series: 180
+            source: 7
+            streaming_service: 1
+            video_codec: 2
+            year: 90
+          sonarr:
+            apikey: ${SONARR_API_KEY}
+            base_url: /sonarr
+            defer_search_signalr: false
+            exclude_season_zero: false
+            excluded_series_types: []
+            excluded_tags: []
+            full_update: Daily
+            full_update_day: 6
+            full_update_hour: 4
+            http_timeout: 60
+            ip: sonarr
+            only_monitored: false
+            port: 8989
+            series_sync: 60
+            series_sync_on_live: true
+            ssl: false
+            sync_only_monitored_episodes: false
+            sync_only_monitored_series: false
+            use_ffprobe_cache: true
+          subdl:
+            api_key: ''
+          subf2m:
+            user_agent: ''
+            verify_ssl: true
+          subsource:
+            apikey: ''
+          subsync:
+            checker:
+              blacklisted_languages: []
+              blacklisted_providers: []
+            debug: false
+            force_audio: false
+            gss: true
+            max_offset_seconds: 60
+            no_fix_framerate: true
+            subsync_movie_threshold: 70
+            subsync_threshold: 90
+            use_subsync: false
+            use_subsync_movie_threshold: false
+            use_subsync_threshold: false
+          subx:
+            api_key: ''
+          titlovi:
+            password: ''
+            username: ''
+          titulky:
+            approved_only: false
+            password: ''
+            skip_wrong_fps: false
+            username: ''
+          translator:
+            default_score: 50
+            gemini_key: ''
+            gemini_model: gemini-2.0-flash
+            lingarr_token: ''
+            lingarr_url: http://lingarr:9876
+            translator_info: true
+            translator_type: google_translate
+          turkcealtyaziorg:
+            cookies: ''
+            user_agent: ''
+          whisperai:
+            endpoint: http://127.0.0.1:9000
+            loglevel: INFO
+            pass_video_name: false
+            response: 5
+            timeout: 3600
+          xsubs:
+            password: ''
+            username: ''
+
+          EOF
+        envFrom:
+        - secretRef:
+            name: bazarr-credentials
         image: busybox
         name: config
-        securityContext:
-          runAsGroup: 1000
-          runAsUser: 1000
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
-          subPath: kavita
+          name: config
+        - mountPath: /movies
+          name: media
+          subPath: media/movies
+        - mountPath: /tv
+          name: media
+          subPath: media/tv
       securityContext:
         fsGroup: 1000
       volumes:
-      - name: htpc-home
+      - name: config
         persistentVolumeClaim:
-          claimName: arr-data-pvc
-      - name: arr-data-pvc
+          claimName: ssd-config-pvc
+      - name: downloads
         persistentVolumeClaim:
-          claimName: arr-data-pvc
+          claimName: ssd-downloads-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: nas-media-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: htpc
-    run: lidarr
-  name: lidarr
-  namespace: media
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      run: lidarr
-  template:
-    metadata:
-      labels:
-        run: lidarr
-    spec:
-      containers:
-      - env:
-        - name: TZ
-          value: Pacific/Auckland
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: LIDARR__SERVER__URLBASE
-          value: /lidarr
-        - name: LIDARR__AUTH__METHOD
-          value: external
-        - name: LIDARR__AUTH__REQUIRED
-          value: enabled
-        - name: LIDARR__AUTH__APIKEY
-          value: htk8s-api-key-secure
-        image: lscr.io/linuxserver/lidarr:3.1.0.4875-ls29
-        livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:8686/lidarr/api/v1/health?ApiKey=$LIDARR__AUTH__APIKEY"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        name: lidarr
-        ports:
-        - containerPort: 8686
-          name: webui
-        readinessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:8686/lidarr/api/v1/system/status?ApiKey=$LIDARR__AUTH__APIKEY"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: lidarr
-        - mountPath: /music
-          name: htpc-home
-          subPath: media/music
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
-        - mountPath: /data
-          name: htpc-home
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config && chown -R 1000:1000 /music
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: lidarr
-        - mountPath: /music
-          name: htpc-home
-          subPath: media/music
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - name: htpc-home
-        persistentVolumeClaim:
-          claimName: arr-data-pvc
-      - name: arr-data-pvc
-        persistentVolumeClaim:
-          claimName: arr-data-pvc
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: htpc
+    app: media
     run: prowlarr
   name: prowlarr
   namespace: media
@@ -598,16 +737,20 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      app: media
       run: prowlarr
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
+        app: media
         run: prowlarr
     spec:
       containers:
       - env:
         - name: TZ
-          value: Pacific/Auckland
+          value: Europe/Lisbon
         - name: PUID
           value: "1000"
         - name: PGID
@@ -620,8 +763,10 @@ spec:
             - -c
             - curl "http://localhost:9696/prowlarr/api/v1/health?ApiKey=$(sed -ne
               '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+          failureThreshold: 8
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
         name: prowlarr
         ports:
         - containerPort: 9696
@@ -633,23 +778,32 @@ spec:
             - -c
             - curl "http://localhost:9696/prowlarr/api/v1/system/status?ApiKey=$(sed
               -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+          failureThreshold: 8
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        startupProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - curl "http://localhost:9696/prowlarr/api/v1/system/status?ApiKey=$(sed
+              -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+          failureThreshold: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: config
           subPath: prowlarr
       initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: prowlarr
       - args:
         - |
           echo 'Customizing Prowlarr config...'
@@ -667,25 +821,145 @@ spec:
           runAsUser: 1000
         volumeMounts:
         - mountPath: /config
-          name: htpc-home
+          name: config
           subPath: prowlarr
-        - mountPath: /data
-          name: htpc-home
       securityContext:
         fsGroup: 1000
       volumes:
-      - name: htpc-home
+      - name: config
         persistentVolumeClaim:
-          claimName: arr-data-pvc
-      - name: arr-data-pvc
-        persistentVolumeClaim:
-          claimName: arr-data-pvc
+          claimName: ssd-config-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: htpc
+    app: media
+    run: qbittorrent
+  name: qbittorrent
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media
+      run: qbittorrent
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: media
+        run: qbittorrent
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Europe/Lisbon
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: WEBUI_PORT
+          value: "8080"
+        image: lscr.io/linuxserver/qbittorrent:latest
+        livenessProbe:
+          failureThreshold: 8
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+        name: qbittorrent
+        ports:
+        - containerPort: 8080
+          name: webui
+          protocol: TCP
+        - containerPort: 6881
+          name: qbittorrent-tcp
+          protocol: TCP
+        - containerPort: 6881
+          name: qbittorrent-udp
+          protocol: UDP
+        readinessProbe:
+          failureThreshold: 8
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        startupProbe:
+          failureThreshold: 30
+          periodSeconds: 10
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 2
+        volumeMounts:
+        - mountPath: /config
+          name: config
+          subPath: qbittorrent
+        - mountPath: /downloads
+          name: downloads
+        - mountPath: /media
+          name: media
+      initContainers:
+      - args:
+        - |
+          mkdir -p /config/qBittorrent
+          if [ ! -f /config/qBittorrent/qBittorrent.conf ]; then
+            printf '%s\n' \
+              '[BitTorrent]' \
+              'Session\DefaultSavePath=/downloads/completed' \
+              'Session\GlobalMaxRatio=0' \
+              'Session\MaxRatioAction=0' \
+              'Session\TempPath=/downloads/incomplete' \
+              'Session\TempPathEnabled=true' \
+              '' \
+              '[Preferences]' \
+              'WebUI\AuthSubnetWhitelist=192.168.0.0/24' \
+              'WebUI\Address=*' \
+              'WebUI\Port=8080' \
+              > /config/qBittorrent/qBittorrent.conf
+          fi
+        command:
+        - sh
+        - -c
+        image: busybox
+        name: config
+        securityContext:
+          runAsGroup: 1000
+          runAsUser: 1000
+        volumeMounts:
+        - mountPath: /config
+          name: config
+          subPath: qbittorrent
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: ssd-config-pvc
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: ssd-downloads-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: nas-media-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: media
     run: radarr
   name: radarr
   namespace: media
@@ -693,16 +967,20 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      app: media
       run: radarr
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
+        app: media
         run: radarr
     spec:
       containers:
       - env:
         - name: TZ
-          value: Pacific/Auckland
+          value: Europe/Lisbon
         - name: PUID
           value: "1000"
         - name: PGID
@@ -715,8 +993,10 @@ spec:
             - -c
             - curl "http://localhost:7878/radarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}'
               </config/config.xml)"
+          failureThreshold: 8
           initialDelaySeconds: 30
-          periodSeconds: 10
+          periodSeconds: 15
+          timeoutSeconds: 5
         name: radarr
         ports:
         - containerPort: 7878
@@ -728,156 +1008,55 @@ spec:
             - -c
             - curl "http://localhost:7878/radarr/api/system/status?ApiKey=$(sed -ne
               '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          initialDelaySeconds: 30
+          failureThreshold: 8
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+          requests:
+            cpu: 1000m
+            memory: 2Gi
+        startupProbe:
+          failureThreshold: 30
           periodSeconds: 10
+          tcpSocket:
+            port: 7878
+          timeoutSeconds: 2
         volumeMounts:
         - mountPath: /config
-          name: arr-data-pvc
+          name: config
           subPath: radarr
         - mountPath: /movies
-          name: arr-data-pvc
-          subPath: media/movies
+          name: media
+          subPath: movies
         - mountPath: /downloads
-          name: arr-data-pvc
-          subPath: downloads
-        - mountPath: /data
-          name: arr-data-pvc
+          name: downloads
       initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config && chown -R 1000:1000 /movies
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: radarr
-        - mountPath: /movies
-          name: htpc-home
-          subPath: media/movies
-      - args:
-        - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/radarr</UrlBase></Config>'>
-          /config/config.xml;echo end;
-        command:
-        - sh
-        - -c
-        image: busybox
-        name: config
-        securityContext:
-          runAsGroup: 1000
-          runAsUser: 1000
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: radarr
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      - name: htpc-home
-        persistentVolumeClaim:
-          claimName: arr-data-pvc
-      - name: arr-data-pvc
-        persistentVolumeClaim:
-          claimName: arr-data-pvc
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: htpc
-    run: readarr
-  name: readarr
-  namespace: media
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      run: readarr
-  template:
-    metadata:
-      labels:
-        run: readarr
-    spec:
-      containers:
-      - env:
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: TZ
-          value: Pacific/Auckland
-        image: lscr.io/linuxserver/readarr:nightly-0.4.16.2788-ls395
-        livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:8787/readarr/api/v1/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}'
-              </config/config.xml)"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        name: readarr
-        ports:
-        - containerPort: 8787
-        readinessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:8787/readarr/api/v1/system/status?ApiKey=$(sed
-              -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        volumeMounts:
-        - mountPath: /config
-          name: arr-data-pvc
-          subPath: readarr
-        - mountPath: /books
-          name: arr-data-pvc
-          subPath: media/books/books
-        - mountPath: /audiobooks
-          name: arr-data-pvc
-          subPath: media/books/audiobooks
-        - mountPath: /comics
-          name: arr-data-pvc
-          subPath: media/books/comics
-        - mountPath: /downloads
-          name: arr-data-pvc
-          subPath: downloads
-        - mountPath: /data
-          name: arr-data-pvc
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config /books /comics /audiobooks
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: arr-data-pvc
-          subPath: readarr
-        - mountPath: /books
-          name: arr-data-pvc
-          subPath: media/books/books
-        - mountPath: /audiobooks
-          name: arr-data-pvc
-          subPath: media/books/audiobooks
-        - mountPath: /comics
-          name: arr-data-pvc
-          subPath: media/books/comics
       - args:
         - |
-          echo 'Configuring Readarr at startup...'
-          if [[ ! -f /config/config.xml ]]; then
-            echo 'Creating default config.xml with UrlBase=/readarr'
-            echo '<Config><UrlBase>/readarr</UrlBase></Config>' > /config/config.xml
-            echo 'Config created successfully'
-          else
-            echo 'Config already exists, skipping creation'
+          if [ ! -f /config/config.xml ]; then
+            printf '%s\n' \
+              '<Config>' \
+              '  <UrlBase>/radarr</UrlBase>' \
+              '  <LogLevel>debug</LogLevel>' \
+              '  <BindAddress>*</BindAddress>' \
+              '  <Port>7878</Port>' \
+              '  <SslPort>9898</SslPort>' \
+              '  <EnableSsl>False</EnableSsl>' \
+              '  <LaunchBrowser>True</LaunchBrowser>' \
+              '  <AuthenticationMethod>Forms</AuthenticationMethod>' \
+              '  <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>' \
+              '  <Branch>master</Branch>' \
+              '  <SslCertPath></SslCertPath>' \
+              '  <SslCertPassword></SslCertPassword>' \
+              '  <InstanceName>Radarr</InstanceName>' \
+              '  <UpdateMechanism>Docker</UpdateMechanism>' \
+              '</Config>' \
+              > /config/config.xml
           fi
-          echo 'Readarr startup config complete'
         command:
         - sh
         - -c
@@ -888,23 +1067,28 @@ spec:
           runAsUser: 1000
         volumeMounts:
         - mountPath: /config
-          name: arr-data-pvc
-          subPath: readarr
+          name: config
+          subPath: radarr
+      nodeSelector:
+        kubernetes.io/hostname: pi-master-00
       securityContext:
         fsGroup: 1000
       volumes:
-      - name: htpc-home
+      - name: config
         persistentVolumeClaim:
-          claimName: arr-data-pvc
-      - name: arr-data-pvc
+          claimName: ssd-config-pvc
+      - name: downloads
         persistentVolumeClaim:
-          claimName: arr-data-pvc
+          claimName: ssd-downloads-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: nas-media-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: htpc
+    app: media
     run: sonarr
   name: sonarr
   namespace: media
@@ -912,16 +1096,20 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      app: media
       run: sonarr
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
+        app: media
         run: sonarr
     spec:
       containers:
       - env:
         - name: TZ
-          value: Pacific/Auckland
+          value: Europe/Lisbon
         - name: PUID
           value: "1000"
         - name: PGID
@@ -934,8 +1122,10 @@ spec:
             - -c
             - curl "http://localhost:8989/sonarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}'
               </config/config.xml)"
-          initialDelaySeconds: 90
-          periodSeconds: 10
+          failureThreshold: 8
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
         name: sonarr
         ports:
         - containerPort: 8989
@@ -947,46 +1137,55 @@ spec:
             - -c
             - curl "http://localhost:8989/sonarr/api/system/status?ApiKey=$(sed -ne
               '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          initialDelaySeconds: 60
-          periodSeconds: 10
+          failureThreshold: 8
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
         startupProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:8989/sonarr/api/system/status?ApiKey=$(sed -ne
-              '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
           failureThreshold: 30
           periodSeconds: 10
+          tcpSocket:
+            port: 8989
+          timeoutSeconds: 2
         volumeMounts:
         - mountPath: /config
-          name: arr-data-pvc
+          name: config
           subPath: sonarr
         - mountPath: /tv
-          name: arr-data-pvc
-          subPath: media/tv
+          name: media
+          subPath: tv
         - mountPath: /downloads
-          name: arr-data-pvc
-          subPath: downloads
-        - mountPath: /data
-          name: arr-data-pvc
+          name: downloads
       initContainers:
-      - command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config && chown -R 1000:1000 /tv
-        image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: sonarr
-        - mountPath: /tv
-          name: htpc-home
-          subPath: media/tv
       - args:
-        - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/sonarr</UrlBase></Config>'>
-          /config/config.xml;echo end;
+        - |
+          if [ ! -f /config/config.xml ]; then
+            printf '%s\n' \
+              '<Config>' \
+              '  <UrlBase>/sonarr</UrlBase>' \
+              '  <LogLevel>debug</LogLevel>' \
+              '  <BindAddress>*</BindAddress>' \
+              '  <Port>8989</Port>' \
+              '  <SslPort>9898</SslPort>' \
+              '  <EnableSsl>False</EnableSsl>' \
+              '  <LaunchBrowser>True</LaunchBrowser>' \
+              '  <AuthenticationMethod>Forms</AuthenticationMethod>' \
+              '  <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>' \
+              '  <Branch>main</Branch>' \
+              '  <SslCertPath></SslCertPath>' \
+              '  <SslCertPassword></SslCertPassword>' \
+              '  <InstanceName>Sonarr</InstanceName>' \
+              '  <UpdateMechanism>Docker</UpdateMechanism>' \
+              '</Config>' \
+              > /config/config.xml
+          fi
         command:
         - sh
         - -c
@@ -997,195 +1196,467 @@ spec:
           runAsUser: 1000
         volumeMounts:
         - mountPath: /config
-          name: arr-data-pvc
+          name: config
           subPath: sonarr
       securityContext:
         fsGroup: 1000
       volumes:
-      - name: htpc-home
+      - name: config
         persistentVolumeClaim:
-          claimName: arr-data-pvc
-      - name: arr-data-pvc
+          claimName: ssd-config-pvc
+      - name: downloads
         persistentVolumeClaim:
-          claimName: arr-data-pvc
+          claimName: ssd-downloads-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: nas-media-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: htpc
-    run: transmission
-  name: transmission
+    app: media
+    run: tailscale
+  name: tailscale
   namespace: media
 spec:
   replicas: 1
   selector:
     matchLabels:
-      run: transmission
+      app: media
+      run: tailscale
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
-        run: transmission
+        app: media
+        run: tailscale
     spec:
       containers:
       - env:
-        - name: TZ
-          value: Pacific/Auckland
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: WHITELIST
-          value: ""
-        - name: HOST_WHITELIST
-          value: ""
-        image: linuxserver/transmission:4.1.1-r1-ls346
-        name: transmission
-        ports:
-        - containerPort: 9091
-          name: webui
-          protocol: TCP
-        - containerPort: 51413
-          name: torrent-tcp
-          protocol: TCP
-        - containerPort: 51413
-          name: torrent-udp
-          protocol: UDP
-        resources: {}
+        - name: TS_AUTHKEY
+          valueFrom:
+            secretKeyRef:
+              key: authkey
+              name: tailscale-auth
+        - name: TS_STATE_DIR
+          value: /var/lib/tailscale
+        - name: TS_USERSPACE
+          value: "false"
+        - name: TS_ROUTES
+          value: 192.168.0.0/24
+        - name: TS_EXTRA_ARGS
+          value: --hostname=pi-master-00
+        image: ghcr.io/tailscale/tailscale:latest
+        imagePullPolicy: Always
+        name: tailscale
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
         volumeMounts:
-        - mountPath: /config
-          name: arr-data-pvc
-          subPath: jellyfin
-        - mountPath: /data
-          name: arr-data-pvc
+        - mountPath: /var/lib/tailscale
+          name: config
+          subPath: tailscale
+        - mountPath: /dev/net/tun
+          name: tun
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
       initContainers:
       - command:
-        - sh
+        - /bin/sh
         - -c
-        - chown -R 1000:1000 /config
+        - |
+          sysctl -w net.ipv4.ip_forward=1
+          sysctl -w net.ipv6.conf.all.forwarding=1
         image: busybox
-        name: chown
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: transmission
-        - mountPath: /downloads
-          name: htpc-home
-          subPath: downloads
-        - mountPath: /watch
-          name: htpc-home
-          subPath: watch
-        - mountPath: /data
-          name: htpc-home
-      securityContext:
-        fsGroup: 1000
+        name: sysctls
+        securityContext:
+          privileged: true
+      nodeSelector:
+        kubernetes.io/hostname: pi-master-00
+      serviceAccountName: tailscale
       volumes:
-      - name: htpc-home
+      - name: config
         persistentVolumeClaim:
-          claimName: arr-data-pvc
-      - name: arr-data-pvc
-        persistentVolumeClaim:
-          claimName: arr-data-pvc
+          claimName: ssd-config-pvc
+      - hostPath:
+          path: /dev/net/tun
+          type: CharDevice
+        name: tun
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   labels:
-    app: htpc
-  name: htpc
+    app: media
+  name: homeassistant-external
+  namespace: media
+spec:
+  entryPoints:
+  - homeassistantsecure
+  routes:
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`)
+    priority: 1
+    services:
+    - kind: Service
+      name: homeassistant-external
+      namespace: media
+      port: 8123
+  tls:
+    certResolver: letsencrypt
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app: media
+  name: media
   namespace: media
 spec:
   entryPoints:
   - web
-  - websecure
   routes:
   - kind: Rule
-    match: PathPrefix(`/`)
-    middlewares: []
-    priority: 0
+    match: Host(`qbittorrent.telheira`)
+    priority: 1
     services:
     - kind: Service
-      name: jellyfin
+      name: qbittorrent
       namespace: media
-      port: 8096
+      port: 8080
   - kind: Rule
-    match: PathPrefix(`/jackett`)
-    middlewares: []
-    priority: 0
-    services:
-    - kind: Service
-      name: jackett
-      namespace: media
-      port: 9117
-  - kind: Rule
-    match: PathPrefix(`/sonarr`)
-    middlewares: []
-    priority: 0
-    services:
-    - kind: Service
-      name: sonarr
-      namespace: media
-      port: 8989
-  - kind: Rule
-    match: PathPrefix(`/radarr`)
-    middlewares: []
-    priority: 0
-    services:
-    - kind: Service
-      name: radarr
-      namespace: media
-      port: 7878
-  - kind: Rule
-    match: PathPrefix(`/bazarr`)
-    middlewares: []
-    priority: 0
-    services:
-    - kind: Service
-      name: bazarr
-      namespace: media
-      port: 6767
-  - kind: Rule
-    match: PathPrefix(`/transmission`)
-    middlewares: []
-    priority: 0
-    services:
-    - kind: Service
-      name: transmission
-      namespace: media
-      port: 9091
-  - kind: Rule
-    match: PathPrefix(`/prowlarr`)
-    middlewares: []
-    priority: 0
+    match: Host(`qbittorrent.telheira`) && PathPrefix(`/prowlarr`)
+    priority: 100
     services:
     - kind: Service
       name: prowlarr
       namespace: media
       port: 9696
   - kind: Rule
-    match: PathPrefix(`/readarr`)
-    middlewares: []
-    priority: 0
+    match: Host(`qbittorrent.telheira`) && PathPrefix(`/radarr`)
+    priority: 100
     services:
     - kind: Service
-      name: readarr
+      name: radarr
       namespace: media
-      port: 8787
+      port: 7878
   - kind: Rule
-    match: PathPrefix(`/kavita`)
-    middlewares: []
-    priority: 0
+    match: Host(`qbittorrent.telheira`) && PathPrefix(`/sonarr`)
+    priority: 100
     services:
     - kind: Service
-      name: kavita
+      name: sonarr
       namespace: media
-      port: 5000
+      port: 8989
   - kind: Rule
-    match: PathPrefix(`/lidarr`)
-    middlewares: []
-    priority: 0
+    match: Host(`qbittorrent.telheira`) && PathPrefix(`/bazarr`)
+    middlewares:
+    - name: redirect-bazarr-to-subdomain
+      namespace: media
+    priority: 200
     services:
     - kind: Service
-      name: lidarr
+      name: qbittorrent
       namespace: media
-      port: 8686
+      port: 8080
+  - kind: Rule
+    match: Host(`bazarr.telheira`)
+    priority: 5
+    services:
+    - kind: Service
+      name: bazarr
+      namespace: media
+      port: 6767
+  - kind: Rule
+    match: Host(`ha.telheira`)
+    priority: 5
+    services:
+    - kind: Service
+      name: homeassistant-external
+      namespace: media
+      port: 8123
+  - kind: Rule
+    match: Host(`jellyfin.telheira`)
+    priority: 5
+    services:
+    - kind: Service
+      name: jellyfin-external
+      namespace: media
+      port: 8096
+  - kind: Rule
+    match: Host(`plex.telheira`)
+    priority: 5
+    services:
+    - kind: Service
+      name: plex-external
+      namespace: media
+      port: 32400
+  - kind: Rule
+    match: PathPrefix(`/sonarr`)
+    priority: 1
+    services:
+    - kind: Service
+      name: sonarr
+      namespace: media
+      port: 8989
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app: media
+  name: media-external
+  namespace: media
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/prowlarr`)
+    priority: 200
+    services:
+    - kind: Service
+      name: prowlarr
+      namespace: media
+      port: 9696
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/radarr`)
+    priority: 200
+    services:
+    - kind: Service
+      name: radarr
+      namespace: media
+      port: 7878
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/sonarr`)
+    priority: 200
+    services:
+    - kind: Service
+      name: sonarr
+      namespace: media
+      port: 8989
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/bazarr`)
+    priority: 200
+    services:
+    - kind: Service
+      name: bazarr
+      namespace: media
+      port: 6767
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/jellyfin`)
+    middlewares:
+    - name: jellyfin-redirect
+      namespace: media
+    - name: strip-jellyfin
+      namespace: media
+    priority: 200
+    services:
+    - kind: Service
+      name: jellyfin-external
+      namespace: media
+      port: 8096
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/qbittorrent`)
+    middlewares:
+    - name: strip-qbittorrent
+      namespace: media
+    priority: 200
+    services:
+    - kind: Service
+      name: qbittorrent
+      namespace: media
+      port: 8080
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`)
+    priority: 1
+    services:
+    - kind: Service
+      name: qbittorrent
+      namespace: media
+      port: 8080
+  tls:
+    certResolver: letsencrypt
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app: media
+  name: plex-external
+  namespace: media
+spec:
+  entryPoints:
+  - plexsecure
+  routes:
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`)
+    priority: 1
+    services:
+    - kind: Service
+      name: plex-external
+      namespace: media
+      port: 32400
+  tls:
+    certResolver: letsencrypt
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app: media
+  name: plex-subdomain
+  namespace: media
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host(`plex.telheira.tplinkdns.com`)
+    priority: 100
+    services:
+    - kind: Service
+      name: plex-external
+      namespace: media
+      port: 32400
+  tls:
+    certResolver: letsencrypt
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: jellyfin-redirect
+  namespace: media
+spec:
+  redirectRegex:
+    permanent: false
+    regex: ^https?://([^/]+)/jellyfin$
+    replacement: https://$1/jellyfin/web/
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: plex-redirect
+  namespace: media
+spec:
+  redirectRegex:
+    permanent: false
+    regex: ^https?://([^/]+)/plex$
+    replacement: https://$1/plex/
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: redirect-bazarr-to-subdomain
+  namespace: media
+spec:
+  redirectRegex:
+    permanent: true
+    regex: ^https?://qbittorrent\.telheira/bazarr/?(.*)$
+    replacement: http://bazarr.telheira/$1
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-bazarr
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /bazarr
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-ha
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /ha
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-jellyfin
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /jellyfin
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-plex
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /plex
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-prowlarr
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /prowlarr
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-qbittorrent
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /qbittorrent
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-radarr
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /radarr
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-sonarr
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /sonarr

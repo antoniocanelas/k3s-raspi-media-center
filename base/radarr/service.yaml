@@ -2,6 +2,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: radarr
+  labels:
+    app: media
 spec:
   ports:
   - port: 7878
@@ -9,4 +11,5 @@ spec:
     targetPort: 7878
     name: webui
   selector:
+    app: media
     run: radarr

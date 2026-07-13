@@ -1,0 +1,16 @@
+# Zero endpoints live: selector matches no pod and there is no manually
+# created Endpoints/EndpointSlice either. Tracked as-is for accuracy.
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyfin-external
+  labels:
+    app: media
+spec:
+  ports:
+  - port: 8096
+    targetPort: 8096
+    name: http
+  selector:
+    app: media
+    external-backend: "true"

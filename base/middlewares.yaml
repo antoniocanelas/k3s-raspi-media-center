@@ -1,0 +1,150 @@
+# All Traefik Middlewares actually deployed on the live cluster. Some of
+# these (strip-bazarr, strip-ha, strip-plex, strip-prowlarr, strip-radarr,
+# strip-sonarr) are not referenced by any current IngressRoute rule - they
+# exist live but appear to be leftover/unused. Kept for accuracy.
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  annotations: {}
+  labels:
+    app: media
+  name: jellyfin-redirect
+  namespace: media
+spec:
+  redirectRegex:
+    permanent: false
+    regex: ^https?://([^/]+)/jellyfin$
+    replacement: https://$1/jellyfin/web/
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  annotations: {}
+  labels:
+    app: media
+  name: plex-redirect
+  namespace: media
+spec:
+  redirectRegex:
+    permanent: false
+    regex: ^https?://([^/]+)/plex$
+    replacement: https://$1/plex/
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  annotations: {}
+  labels:
+    app: media
+  name: redirect-bazarr-to-subdomain
+  namespace: media
+spec:
+  redirectRegex:
+    permanent: true
+    regex: ^https?://qbittorrent\.telheira/bazarr/?(.*)$
+    replacement: http://bazarr.telheira/$1
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  annotations: {}
+  labels:
+    app: media
+  name: strip-bazarr
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /bazarr
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  annotations: {}
+  labels:
+    app: media
+  name: strip-ha
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /ha
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  annotations: {}
+  labels:
+    app: media
+  name: strip-jellyfin
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /jellyfin
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  annotations: {}
+  labels:
+    app: media
+  name: strip-plex
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /plex
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  annotations: {}
+  labels:
+    app: media
+  name: strip-prowlarr
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /prowlarr
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  annotations: {}
+  labels:
+    app: media
+  name: strip-qbittorrent
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /qbittorrent
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  annotations: {}
+  labels:
+    app: media
+  name: strip-radarr
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /radarr
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  annotations: {}
+  labels:
+    app: media
+  name: strip-sonarr
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /sonarr

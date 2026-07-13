@@ -2,62 +2,87 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app: media
     run: sonarr
   name: sonarr
+  namespace: media
 spec:
   replicas: 1
   selector:
     matchLabels:
+      app: media
       run: sonarr
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
+        app: media
         run: sonarr
     spec:
       securityContext:
         fsGroup: 1000
       initContainers:
-      - name: chown
-        image: busybox
-        command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config && chown -R 1000:1000 /tv
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: sonarr
-        - mountPath: /tv
-          name: htpc-home
-          subPath: media/tv
       - name: config
         image: busybox
         command:
         - sh
         - -c
+        args:
+        - |
+          if [ ! -f /config/config.xml ]; then
+            printf '%s\n' \
+              '<Config>' \
+              '  <UrlBase>/sonarr</UrlBase>' \
+              '  <LogLevel>debug</LogLevel>' \
+              '  <BindAddress>*</BindAddress>' \
+              '  <Port>8989</Port>' \
+              '  <SslPort>9898</SslPort>' \
+              '  <EnableSsl>False</EnableSsl>' \
+              '  <LaunchBrowser>True</LaunchBrowser>' \
+              '  <AuthenticationMethod>Forms</AuthenticationMethod>' \
+              '  <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>' \
+              '  <Branch>main</Branch>' \
+              '  <SslCertPath></SslCertPath>' \
+              '  <SslCertPassword></SslCertPassword>' \
+              '  <InstanceName>Sonarr</InstanceName>' \
+              '  <UpdateMechanism>Docker</UpdateMechanism>' \
+              '</Config>' \
+              > /config/config.xml
+          fi
         securityContext:
           runAsUser: 1000
           runAsGroup: 1000
-        args:
-        - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/$(SONARR)</UrlBase></Config>'>
-          /config/config.xml;echo end;
         volumeMounts:
         - mountPath: /config
-          name: arr-data-pvc
+          name: config
           subPath: sonarr
       containers:
-      - env:
+      - name: sonarr
+        env:
         - name: TZ
-          value: Pacific/Auckland
+          value: Europe/Lisbon
         - name: PUID
           value: '1000'
         - name: PGID
           value: '1000'
-        image: linuxserver/sonarr
-        name: sonarr
+        image: linuxserver/sonarr:arm64v8-latest
         ports:
         - containerPort: 8989
           name: webui
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        startupProbe:
+          tcpSocket:
+            port: 8989
+          failureThreshold: 30
+          periodSeconds: 10
+          timeoutSeconds: 2
         livenessProbe:
           exec:
             command:
@@ -65,8 +90,10 @@ spec:
             - -c
             - curl "http://localhost:8989/sonarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}'
               </config/config.xml)"
-          initialDelaySeconds: 90
-          periodSeconds: 10
+          failureThreshold: 8
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
         readinessProbe:
           exec:
             command:
@@ -74,30 +101,26 @@ spec:
             - -c
             - curl "http://localhost:8989/sonarr/api/system/status?ApiKey=$(sed -ne
               '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          initialDelaySeconds: 60
-          periodSeconds: 10
-        startupProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - curl "http://localhost:8989/sonarr/api/system/status?ApiKey=$(sed -ne
-              '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          failureThreshold: 30
-          periodSeconds: 10
+          failureThreshold: 8
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          timeoutSeconds: 5
         volumeMounts:
           - mountPath: /config
-            name: arr-data-pvc
+            name: config
             subPath: sonarr
           - mountPath: /tv
-            name: arr-data-pvc
-            subPath: media/tv
+            name: media
+            subPath: tv
           - mountPath: /downloads
-            name: arr-data-pvc
-            subPath: downloads
-          - mountPath: /data
-            name: arr-data-pvc
+            name: downloads
       volumes:
-        - name: arr-data-pvc
+        - name: config
           persistentVolumeClaim:
-            claimName: arr-data-pvc
+            claimName: ssd-config-pvc
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: ssd-downloads-pvc
+        - name: media
+          persistentVolumeClaim:
+            claimName: nas-media-pvc

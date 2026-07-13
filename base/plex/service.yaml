@@ -1,0 +1,17 @@
+# Zero endpoints live: selector matches no pod and there is no manually
+# created Endpoints/EndpointSlice either. Plex does not appear to run inside
+# this cluster at all - tracked as-is for accuracy.
+apiVersion: v1
+kind: Service
+metadata:
+  name: plex-external
+  labels:
+    app: media
+spec:
+  ports:
+  - port: 32400
+    targetPort: 32400
+    name: http
+  selector:
+    app: media
+    external-backend: "true"

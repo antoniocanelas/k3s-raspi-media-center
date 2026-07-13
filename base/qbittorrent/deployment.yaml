@@ -1,0 +1,125 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: {}
+  labels:
+    app: media
+    run: qbittorrent
+  name: qbittorrent
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media
+      run: qbittorrent
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: media
+        run: qbittorrent
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Europe/Lisbon
+        - name: PUID
+          value: '1000'
+        - name: PGID
+          value: '1000'
+        - name: WEBUI_PORT
+          value: '8080'
+        image: lscr.io/linuxserver/qbittorrent:latest
+        livenessProbe:
+          failureThreshold: 8
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+        name: qbittorrent
+        ports:
+        - containerPort: 8080
+          name: webui
+          protocol: TCP
+        - containerPort: 6881
+          name: qbittorrent-tcp
+          protocol: TCP
+        - containerPort: 6881
+          name: qbittorrent-udp
+          protocol: UDP
+        readinessProbe:
+          failureThreshold: 8
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        startupProbe:
+          failureThreshold: 30
+          periodSeconds: 10
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 2
+        volumeMounts:
+        - mountPath: /config
+          name: config
+          subPath: qbittorrent
+        - mountPath: /downloads
+          name: downloads
+        - mountPath: /media
+          name: media
+      initContainers:
+      - args:
+        - |
+          mkdir -p /config/qBittorrent
+          if [ ! -f /config/qBittorrent/qBittorrent.conf ]; then
+            printf '%s\n' \
+              '[BitTorrent]' \
+              'Session\DefaultSavePath=/downloads/completed' \
+              'Session\GlobalMaxRatio=0' \
+              'Session\MaxRatioAction=0' \
+              'Session\TempPath=/downloads/incomplete' \
+              'Session\TempPathEnabled=true' \
+              '' \
+              '[Preferences]' \
+              'WebUI\AuthSubnetWhitelist=192.168.0.0/24' \
+              'WebUI\Address=*' \
+              'WebUI\Port=8080' \
+              > /config/qBittorrent/qBittorrent.conf
+          fi
+        command:
+        - sh
+        - -c
+        image: busybox
+        name: config
+        securityContext:
+          runAsGroup: 1000
+          runAsUser: 1000
+        volumeMounts:
+        - mountPath: /config
+          name: config
+          subPath: qbittorrent
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: ssd-config-pvc
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: ssd-downloads-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: nas-media-pvc

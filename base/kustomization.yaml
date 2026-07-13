@@ -3,54 +3,23 @@ kind: Kustomization
 
 namespace: media
 
-labels:
-- pairs:
-    app: htpc
-
+# NOTE (2026-07-10): this file previously built a stack that never matched
+# the live cluster - a global `app: htpc` label, jackett/transmission/readarr
+# /kavita/lidarr (none of which run live), and a single arr-data-pvc that
+# doesn't exist. It has been reconciled to match what's actually deployed.
+# See git history for the prior version and base/*/deployment.yaml removed
+# from this list if you want to bring a component back.
 resources:
 - namespace.yaml
-- jackett
-- radarr
-- sonarr
+- storage.yaml
 - bazarr
 - prowlarr
-- transmission
-- ingress-route.yaml
-- readarr
+- qbittorrent
+- radarr
+- sonarr
+- tailscale
 - jellyfin
-- kavita
-- lidarr
-- arr-nfs.yaml
-
-patches:
-- path: volumes_patch.yaml
-- path: env_variables_patch.yaml
-
-# Note: vars is still experimental in replacement but works for substitution
-# Will be replaced with replacements in future Kustomize versions
-vars:
-  - name: SONARR
-    objref:
-      kind: Service
-      name: sonarr
-      apiVersion: v1
-  - name: RADARR
-    objref:
-      kind: Service
-      name: radarr
-      apiVersion: v1
-  - name: PROWLARR
-    objref:
-      kind: Service
-      name: prowlarr
-      apiVersion: v1
-  - name: READARR
-    objref:
-      kind: Service
-      name: readarr
-      apiVersion: v1
-  - name: KAVITA
-    objref:
-      kind: Service
-      name: kavita
-      apiVersion: v1
+- homeassistant
+- plex
+- ingress-routes.yaml
+- middlewares.yaml

@@ -1,94 +1,127 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations: {}
   labels:
+    app: media
     run: radarr
   name: radarr
+  namespace: media
 spec:
   replicas: 1
   selector:
     matchLabels:
+      app: media
       run: radarr
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
+        app: media
         run: radarr
     spec:
-      securityContext:
-        fsGroup: 1000
-      initContainers:
-      - name: chown
-        image: busybox
-        command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /config && chown -R 1000:1000 /movies
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: radarr
-        - mountPath: /movies
-          name: htpc-home
-          subPath: media/movies
-      - name: config
-        image: busybox
-        command:
-        - sh
-        - -c
-        securityContext:
-          runAsUser: 1000
-          runAsGroup: 1000
-        args:
-        - echo start;[[ ! -f /config/config.xml ]] && echo '<Config><UrlBase>/$(RADARR)</UrlBase></Config>'>
-          /config/config.xml;echo end;
-        volumeMounts:
-        - mountPath: /config
-          name: htpc-home
-          subPath: radarr
       containers:
       - env:
         - name: TZ
-          value: Pacific/Auckland
+          value: Europe/Lisbon
         - name: PUID
           value: '1000'
         - name: PGID
           value: '1000'
-        image: linuxserver/radarr
-        name: radarr
-        ports:
-        - containerPort: 7878
-          name: webui
+        image: linuxserver/radarr:arm64v8-latest
         livenessProbe:
           exec:
             command:
             - /bin/sh
             - -c
-            - curl "http://localhost:7878/radarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}'
-              </config/config.xml)"
+            - curl "http://localhost:7878/radarr/api/health?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+          failureThreshold: 8
           initialDelaySeconds: 30
-          periodSeconds: 10
+          periodSeconds: 15
+          timeoutSeconds: 5
+        name: radarr
+        ports:
+        - containerPort: 7878
+          name: webui
         readinessProbe:
           exec:
             command:
             - /bin/sh
             - -c
-            - curl "http://localhost:7878/radarr/api/system/status?ApiKey=$(sed -ne
-              '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
-          initialDelaySeconds: 30
+            - curl "http://localhost:7878/radarr/api/system/status?ApiKey=$(sed -ne '/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}' </config/config.xml)"
+          failureThreshold: 8
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+          requests:
+            cpu: 1000m
+            memory: 2Gi
+        startupProbe:
+          failureThreshold: 30
           periodSeconds: 10
+          tcpSocket:
+            port: 7878
+          timeoutSeconds: 2
         volumeMounts:
         - mountPath: /config
-          name: arr-data-pvc
+          name: config
           subPath: radarr
         - mountPath: /movies
-          name: arr-data-pvc
-          subPath: media/movies
+          name: media
+          subPath: movies
         - mountPath: /downloads
-          name: arr-data-pvc
-          subPath: downloads
-        - mountPath: /data
-          name: arr-data-pvc
+          name: downloads
+      initContainers:
+      - args:
+        - |
+          if [ ! -f /config/config.xml ]; then
+            printf '%s\n' \
+              '<Config>' \
+              '  <UrlBase>/radarr</UrlBase>' \
+              '  <LogLevel>debug</LogLevel>' \
+              '  <BindAddress>*</BindAddress>' \
+              '  <Port>7878</Port>' \
+              '  <SslPort>9898</SslPort>' \
+              '  <EnableSsl>False</EnableSsl>' \
+              '  <LaunchBrowser>True</LaunchBrowser>' \
+              '  <AuthenticationMethod>Forms</AuthenticationMethod>' \
+              '  <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>' \
+              '  <Branch>master</Branch>' \
+              '  <SslCertPath></SslCertPath>' \
+              '  <SslCertPassword></SslCertPassword>' \
+              '  <InstanceName>Radarr</InstanceName>' \
+              '  <UpdateMechanism>Docker</UpdateMechanism>' \
+              '</Config>' \
+              > /config/config.xml
+          fi
+        command:
+        - sh
+        - -c
+        image: busybox
+        name: config
+        securityContext:
+          runAsGroup: 1000
+          runAsUser: 1000
+        volumeMounts:
+        - mountPath: /config
+          name: config
+          subPath: radarr
+      nodeSelector:
+        kubernetes.io/hostname: pi-master-00
+      securityContext:
+        fsGroup: 1000
       volumes:
-        - name: arr-data-pvc
-          persistentVolumeClaim:
-            claimName: arr-data-pvc
+      - name: config
+        persistentVolumeClaim:
+          claimName: ssd-config-pvc
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: ssd-downloads-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: nas-media-pvc

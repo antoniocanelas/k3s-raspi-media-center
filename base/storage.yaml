@@ -1,0 +1,104 @@
+# Replaces the old single arr-data-pvc (arr-nfs.yaml) / local-path-pvc (pvc.yaml)
+# architecture, neither of which reflects the live cluster. Live storage is
+# split into three NFS-backed volumes, all served from the Synology NAS
+# (192.168.0.200) except the two "ssd" ones, which are actually NFS-exported
+# by pi-master-00 itself (192.168.0.240) from local SSD storage.
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nas-media-pv
+  labels:
+    app: media
+spec:
+  capacity:
+    storage: 1Ti
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nas-local-path
+  nfs:
+    server: 192.168.0.200
+    path: /volume1/media
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nas-media-pvc
+  namespace: media
+  labels:
+    app: media
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nas-local-path
+  volumeName: nas-media-pv
+  resources:
+    requests:
+      storage: 1Ti
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ssd-config-pv
+  labels:
+    app: media
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ssd-local-path
+  nfs:
+    server: 192.168.0.240
+    path: /ssd/config
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ssd-config-pvc
+  namespace: media
+  labels:
+    app: media
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ssd-local-path
+  volumeName: ssd-config-pv
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ssd-downloads-pv
+  labels:
+    app: media
+spec:
+  capacity:
+    storage: 200Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ssd-local-path
+  nfs:
+    server: 192.168.0.240
+    path: /ssd/downloads
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ssd-downloads-pvc
+  namespace: media
+  labels:
+    app: media
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ssd-local-path
+  volumeName: ssd-downloads-pv
+  resources:
+    requests:
+      storage: 100Gi

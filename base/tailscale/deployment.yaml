@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: {}
+  labels:
+    app: media
+    run: tailscale
+  name: tailscale
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media
+      run: tailscale
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: media
+        run: tailscale
+    spec:
+      containers:
+      - env:
+        - name: TS_AUTHKEY
+          valueFrom:
+            secretKeyRef:
+              key: authkey
+              name: tailscale-auth
+        - name: TS_STATE_DIR
+          value: /var/lib/tailscale
+        - name: TS_USERSPACE
+          value: 'false'
+        - name: TS_ROUTES
+          value: 192.168.0.0/24
+        - name: TS_EXTRA_ARGS
+          value: --hostname=pi-master-00
+        image: ghcr.io/tailscale/tailscale:latest
+        imagePullPolicy: Always
+        name: tailscale
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
+        volumeMounts:
+        - mountPath: /var/lib/tailscale
+          name: config
+          subPath: tailscale
+        - mountPath: /dev/net/tun
+          name: tun
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      initContainers:
+      - command:
+        - /bin/sh
+        - -c
+        - |
+          sysctl -w net.ipv4.ip_forward=1
+          sysctl -w net.ipv6.conf.all.forwarding=1
+        image: busybox
+        name: sysctls
+        securityContext:
+          privileged: true
+      nodeSelector:
+        kubernetes.io/hostname: pi-master-00
+      serviceAccountName: tailscale
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: ssd-config-pvc
+      - hostPath:
+          path: /dev/net/tun
+          type: CharDevice
+        name: tun
