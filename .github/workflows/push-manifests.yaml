@@ -15,6 +15,9 @@ env:
 jobs:
   kubernetes:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [x86, armhf]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,14 +33,14 @@ jobs:
         uses: ./.github/actions/tools
       - name: Generate manifests
         run: |
-          mkdir -p ./deploy/x86
-          kustomize build ./overlays/x86 --load-restrictor=LoadRestrictionsNone > ./deploy/x86/install.yaml
+          mkdir -p ./deploy/${{ matrix.arch }}
+          kustomize build ./overlays/${{ matrix.arch }} --load-restrictor=LoadRestrictionsNone > ./deploy/${{ matrix.arch }}/install.yaml
       - name: Push manifests
         run: |
-          flux push artifact $OCI_REPO:${{ github.sha }} \
-            --path="./deploy/x86" \
+          flux push artifact $OCI_REPO:${{ matrix.arch }}-${{ github.sha }} \
+            --path="./deploy/${{ matrix.arch }}" \
             --source="$(git config --get remote.origin.url)" \
             --revision="${{ github.ref_name }}@sha1:$(git rev-parse HEAD)"
       - name: Tag manifests
         run: |
-          flux tag artifact $OCI_REPO:${{ github.sha }} --tag latest
+          flux tag artifact $OCI_REPO:${{ matrix.arch }}-${{ github.sha }} --tag ${{ matrix.arch }}-latest
