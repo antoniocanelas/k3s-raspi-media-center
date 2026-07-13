@@ -1,6 +1,7 @@
-# Zero endpoints live: selector matches no pod and there is no manually
-# created Endpoints/EndpointSlice either. Home Assistant does not appear to
-# run inside this cluster at all - tracked as-is for accuracy.
+# Home Assistant runs on a separate Pi (192.168.0.100), not in this cluster.
+# No selector - backed by a manually-managed EndpointSlice (endpointslice.yaml)
+# instead of a pod. Fixed 2026-07-10: this Service previously had a selector
+# matching zero pods, so it silently routed nowhere for ~110 days.
 apiVersion: v1
 kind: Service
 metadata:
@@ -12,6 +13,3 @@ spec:
   - port: 8123
     targetPort: 8123
     name: http
-  selector:
-    app: media
-    external-backend: "true"

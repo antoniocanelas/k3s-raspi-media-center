@@ -1,3 +1,7 @@
+# Jellyfin runs on the Synology NAS (192.168.0.200), not in this cluster.
+# No selector - backed by a manually-managed EndpointSlice (endpointslice.yaml)
+# instead of a pod. Fixed 2026-07-10: this Service previously had a selector
+# matching zero pods, so it silently routed nowhere for ~120 days.
 apiVersion: v1
 kind: Service
 metadata:
@@ -10,6 +14,3 @@ spec:
     protocol: TCP
     targetPort: 8096
     name: webui
-  selector:
-    app: media
-    run: jellyfin

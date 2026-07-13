@@ -1,0 +1,33 @@
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: jellyfin
+  namespace: media
+  labels:
+    app: media
+    kubernetes.io/service-name: jellyfin
+addressType: IPv4
+ports:
+- name: webui
+  port: 8096
+  protocol: TCP
+endpoints:
+- addresses:
+  - "192.168.0.200"
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: jellyfin-external
+  namespace: media
+  labels:
+    app: media
+    kubernetes.io/service-name: jellyfin-external
+addressType: IPv4
+ports:
+- name: http
+  port: 8096
+  protocol: TCP
+endpoints:
+- addresses:
+  - "192.168.0.200"

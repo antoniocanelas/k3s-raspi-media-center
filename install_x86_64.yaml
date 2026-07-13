@@ -43,9 +43,6 @@ spec:
   - name: http
     port: 8123
     targetPort: 8123
-  selector:
-    app: media
-    external-backend: "true"
 ---
 apiVersion: v1
 kind: Service
@@ -60,9 +57,6 @@ spec:
     port: 8096
     protocol: TCP
     targetPort: 8096
-  selector:
-    app: media
-    run: jellyfin
 ---
 apiVersion: v1
 kind: Service
@@ -76,9 +70,6 @@ spec:
   - name: http
     port: 8096
     targetPort: 8096
-  selector:
-    app: media
-    external-backend: "true"
 ---
 apiVersion: v1
 kind: Service
@@ -92,9 +83,6 @@ spec:
   - name: http
     port: 32400
     targetPort: 32400
-  selector:
-    app: media
-    external-backend: "true"
 ---
 apiVersion: v1
 kind: Service
@@ -1286,6 +1274,74 @@ spec:
           path: /dev/net/tun
           type: CharDevice
         name: tun
+---
+addressType: IPv4
+apiVersion: discovery.k8s.io/v1
+endpoints:
+- addresses:
+  - 192.168.0.100
+kind: EndpointSlice
+metadata:
+  labels:
+    app: media
+    kubernetes.io/service-name: homeassistant-external
+  name: homeassistant-external
+  namespace: media
+ports:
+- name: http
+  port: 8123
+  protocol: TCP
+---
+addressType: IPv4
+apiVersion: discovery.k8s.io/v1
+endpoints:
+- addresses:
+  - 192.168.0.200
+kind: EndpointSlice
+metadata:
+  labels:
+    app: media
+    kubernetes.io/service-name: jellyfin
+  name: jellyfin
+  namespace: media
+ports:
+- name: webui
+  port: 8096
+  protocol: TCP
+---
+addressType: IPv4
+apiVersion: discovery.k8s.io/v1
+endpoints:
+- addresses:
+  - 192.168.0.200
+kind: EndpointSlice
+metadata:
+  labels:
+    app: media
+    kubernetes.io/service-name: jellyfin-external
+  name: jellyfin-external
+  namespace: media
+ports:
+- name: http
+  port: 8096
+  protocol: TCP
+---
+addressType: IPv4
+apiVersion: discovery.k8s.io/v1
+endpoints:
+- addresses:
+  - 192.168.0.200
+kind: EndpointSlice
+metadata:
+  labels:
+    app: media
+    kubernetes.io/service-name: plex-external
+  name: plex-external
+  namespace: media
+ports:
+- name: http
+  port: 32400
+  protocol: TCP
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute

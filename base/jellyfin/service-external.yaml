@@ -1,5 +1,6 @@
-# Zero endpoints live: selector matches no pod and there is no manually
-# created Endpoints/EndpointSlice either. Tracked as-is for accuracy.
+# Same NAS-hosted Jellyfin as service.yaml, fronted separately for the
+# telheira.tplinkdns.com routes. No selector - see endpointslice.yaml.
+# Fixed 2026-07-10, see service.yaml for context.
 apiVersion: v1
 kind: Service
 metadata:
@@ -11,6 +12,3 @@ spec:
   - port: 8096
     targetPort: 8096
     name: http
-  selector:
-    app: media
-    external-backend: "true"

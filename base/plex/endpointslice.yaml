@@ -1,0 +1,16 @@
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: plex-external
+  namespace: media
+  labels:
+    app: media
+    kubernetes.io/service-name: plex-external
+addressType: IPv4
+ports:
+- name: http
+  port: 32400
+  protocol: TCP
+endpoints:
+- addresses:
+  - "192.168.0.200"

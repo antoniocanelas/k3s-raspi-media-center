@@ -1,10 +1,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# deployment.yaml is intentionally NOT included: there is no live Jellyfin
-# Deployment in the cluster. The "jellyfin" and "jellyfin-external" Services
-# both currently have zero endpoints - kept here only because they exist
-# live, not because Jellyfin is actually reachable through them right now.
+# deployment.yaml is intentionally NOT included: Jellyfin runs on the
+# Synology NAS (192.168.0.200), not as a Deployment in this cluster.
+# See service.yaml and endpointslice.yaml.
 resources:
 - service.yaml
 - service-external.yaml
+- endpointslice.yaml
