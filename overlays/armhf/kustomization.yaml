@@ -7,12 +7,19 @@ resources:
 images:
   - name: linuxserver/jackett
     newTag: arm64v8-latest
+  # sonarr/radarr/bazarr/prowlarr: switched from the rolling "arm64v8-latest"
+  # tag to pinned versions (2026-07-14). LinuxServer.io publishes these as
+  # multi-arch manifests, so the same tag works on both overlays - and since
+  # these Deployments use imagePullPolicy: IfNotPresent, the old rolling tag
+  # never actually re-pulled once cached on a node, so it was silently stale.
   - name: linuxserver/sonarr
-    newTag: arm64v8-latest
+    newTag: 4.0.19.2979-ls319
   - name: linuxserver/radarr
-    newTag: arm64v8-latest
+    newTag: 6.3.0.10514-ls311
   - name: linuxserver/bazarr
-    newTag: arm64v8-latest
+    newTag: v1.6.0-ls354
+  - name: linuxserver/prowlarr
+    newTag: 2.4.0.5397-ls153
   - name: linuxserver/transmission
     newTag: arm64v8-latest
   - name: emby/embyserver

@@ -6,17 +6,17 @@ images:
   - name: linuxserver/jackett
     newTag: v0.24.1985-ls417
   - name: linuxserver/sonarr
-    newTag: 4.0.17.2952-ls312
+    newTag: 4.0.19.2979-ls319
   - name: linuxserver/radarr
-    newTag: 6.1.1.10360-ls304
+    newTag: 6.3.0.10514-ls311
   - name: linuxserver/bazarr
-    newTag: v1.5.6-ls349
+    newTag: v1.6.0-ls354
   - name: linuxserver/transmission
     newTag: 4.1.1-r1-ls346
   - name: emby/embyserver
     newTag: 4.10.0.13-debug-amd64
   - name: linuxserver/prowlarr
-    newTag: 2.3.5.5327-ls147
+    newTag: 2.4.0.5397-ls153
   - name: lscr.io/linuxserver/readarr
     newTag: nightly-0.4.16.2788-ls395
   - name: lscr.io/linuxserver/jellyfin

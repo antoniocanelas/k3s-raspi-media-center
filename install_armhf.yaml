@@ -289,7 +289,7 @@ spec:
           value: "1000"
         - name: PGID
           value: "1000"
-        image: linuxserver/bazarr:arm64v8-latest
+        image: linuxserver/bazarr:v1.6.0-ls354
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -743,7 +743,7 @@ spec:
           value: "1000"
         - name: PGID
           value: "1000"
-        image: linuxserver/prowlarr:arm64v8-latest
+        image: linuxserver/prowlarr:2.4.0.5397-ls153
         livenessProbe:
           exec:
             command:
@@ -973,7 +973,7 @@ spec:
           value: "1000"
         - name: PGID
           value: "1000"
-        image: linuxserver/radarr:arm64v8-latest
+        image: linuxserver/radarr:6.3.0.10514-ls311
         livenessProbe:
           exec:
             command:
@@ -1102,7 +1102,7 @@ spec:
           value: "1000"
         - name: PGID
           value: "1000"
-        image: linuxserver/sonarr:arm64v8-latest
+        image: linuxserver/sonarr:4.0.19.2979-ls319
         livenessProbe:
           exec:
             command:
