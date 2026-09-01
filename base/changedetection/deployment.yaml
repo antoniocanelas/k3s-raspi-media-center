@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: changedetection
+  name: changedetection
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: changedetection
+  template:
+    metadata:
+      labels:
+        run: changedetection
+    spec:
+      securityContext:
+        fsGroup: 1000
+      initContainers:
+      - name: chown
+        image: busybox
+        command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /datastore
+        volumeMounts:
+        - mountPath: /datastore
+          name: changedetection-data
+      containers:
+      - name: changedetection
+        image: ghcr.io/dgtlmoon/changedetection.io:latest
+        env:
+        - name: TZ
+          value: Pacific/Auckland
+        - name: PUID
+          value: '1000'
+        - name: PGID
+          value: '1000'
+        ports:
+        - containerPort: 5000
+          name: webui
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+          - mountPath: /datastore
+            name: changedetection-data
+      volumes:
+        - name: changedetection-data
+          persistentVolumeClaim:
+            claimName: changedetection-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: changedetection-pvc
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi

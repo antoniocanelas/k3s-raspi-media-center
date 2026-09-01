@@ -13,6 +13,7 @@ resources:
 - namespace.yaml
 - storage.yaml
 - bazarr
+- changedetection
 - prowlarr
 - qbittorrent
 - radarr

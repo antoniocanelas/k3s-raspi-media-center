@@ -94,6 +94,14 @@ spec:
       namespace: media
       port: 32400
   - kind: Rule
+    match: Host(`changedetection.telheira`)
+    priority: 5
+    services:
+    - kind: Service
+      name: changedetection
+      namespace: media
+      port: 5000
+  - kind: Rule
     match: PathPrefix(`/sonarr`)
     priority: 1
     services:
@@ -146,6 +154,14 @@ spec:
       name: bazarr
       namespace: media
       port: 6767
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/changedetection`)
+    priority: 200
+    services:
+    - kind: Service
+      name: changedetection
+      namespace: media
+      port: 5000
   - kind: Rule
     match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/jellyfin`)
     middlewares:
