@@ -1,7 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations: {}
   labels:
     app: media
     run: bazarr
@@ -21,34 +20,80 @@ spec:
         app: media
         run: bazarr
     spec:
+      initContainers:
+      - name: config
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command:
+        - sh
+        - -c
+        - |
+          set -e
+          mkdir -p /config/bazarr/config /config/config
+          RADARR_API_KEY=$(cat config/radarr/config.xml 2>/dev/null | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}" || true)
+          SONARR_API_KEY=$(cat config/sonarr/config.xml 2>/dev/null | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}" || true)
+
+          printf '%s\n' '---' 'general:' '  base_url: /bazarr' '  enabled_integrations:' '    - sonarr' '    - radarr' '  serie_default_enabled: true' '  movie_default_enabled: true' '  port: 6767' '  use_radarr: true' '  use_sonarr: true' '  use_embedded_subs: true' '  upgrade_subs: true' '  wanted_search_frequency: 6' > /config/bazarr/config/config.yaml
+          cp /config/bazarr/config/config.yaml /config/config/config.yaml || true
+          chown -R 1000:1000 /config/bazarr/config /config/config || true
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /movies
+          name: media
+          subPath: media/movies
+        - mountPath: /tv
+          name: media
+          subPath: media/tv
+
+      - name: wait-for-sonarr-and-radarr
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command:
+        - sh
+        - -c
+        - |
+          until nc -z sonarr 8989 >/dev/null 2>&1 && nc -z radarr 7878 >/dev/null 2>&1; do
+            echo "waiting for sonarr and radarr (tcp)"
+            sleep 2
+          done
+
       containers:
-      - env:
+      - name: bazarr
+        image: linuxserver/bazarr:arm64v8-latest
+        imagePullPolicy: IfNotPresent
+        env:
         - name: TZ
           value: Europe/Lisbon
         - name: PUID
-          value: '1000'
+          value: "1000"
         - name: PGID
-          value: '1000'
-        image: linuxserver/bazarr:arm64v8-latest
+          value: "1000"
+        ports:
+        - containerPort: 6767
+          name: webui
         livenessProbe:
-          failureThreshold: 3
           httpGet:
             path: /bazarr
             port: webui
           periodSeconds: 20
           timeoutSeconds: 5
-        name: bazarr
-        ports:
-        - containerPort: 6767
-          name: webui
+          failureThreshold: 3
         readinessProbe:
-          failureThreshold: 12
           httpGet:
             path: /bazarr
             port: webui
           periodSeconds: 5
-          successThreshold: 1
           timeoutSeconds: 5
+          failureThreshold: 12
+          successThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /bazarr
+            port: webui
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 60
         resources:
           limits:
             cpu: 1000m
@@ -56,13 +101,6 @@ spec:
           requests:
             cpu: 500m
             memory: 1Gi
-        startupProbe:
-          failureThreshold: 60
-          httpGet:
-            path: /bazarr
-            port: webui
-          periodSeconds: 5
-          timeoutSeconds: 3
         volumeMounts:
         - mountPath: /config
           name: config
@@ -73,363 +111,86 @@ spec:
         - mountPath: /tv
           name: media
           subPath: tv
+
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: ssd-config-pvc
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: ssd-downloads-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: nas-media-pvc
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: media
+    run: bazarr
+  name: bazarr
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media
+      run: bazarr
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: media
+        run: bazarr
+    spec:
+      # nodeSelector intentionally omitted to allow scheduling on any healthy node
       initContainers:
-      - command:
-        - sh
-        - -c
-        - until wget -qO- sonarr:8989/sonarr &> /dev/null && wget -qO- radarr:7878/radarr &> /dev/null; do echo waiting for sonarr and radarr; sleep 2; done;
+      - name: config
         image: busybox
-        name: wait-for-sonarr-and-radarr
-      - command:
+        imagePullPolicy: IfNotPresent
+        command:
         - sh
         - -c
         - |
           mkdir -p /config/bazarr/config
-          export RADARR_API_KEY=$(cat config/radarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
+          export RADARR_API_KEY=$(cat config/radarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}" )
           export SONARR_API_KEY=$(cat config/sonarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
 
           echo "RADARR_API_KEY: $RADARR_API_KEY"
           echo "SONARR_API_KEY: $SONARR_API_KEY"
 
-          cat << EOF > config/bazarr/config/config.yaml
-
-          ---
-          addic7ed:
-            cookies: ''
-            password: ''
-            user_agent: ''
-            username: ''
-            vip: false
-          analytics:
-            enabled: true
-          anidb:
-            api_client: ''
-            api_client_ver: 1
-          animetosho:
-            anidb_api_client: ''
-            anidb_api_client_ver: 1
-            search_threshold: 6
-          anticaptcha:
-            anti_captcha_key: ''
-          assrt:
-            token: ''
-          auth:
-            apikey: ${BAZARR_API_KEY}
-            password: ${BAZARR_AUTH_PASSWORD}
-            type: form
-            username: admin
-          avistaz:
-            cookies: ''
-            user_agent: ''
-          backup:
-            day: 6
-            folder: /config/backup
-            frequency: Weekly
-            hour: 3
-            retention: 31
-          betaseries:
-            token: ''
-          cinemaz:
-            cookies: ''
-            user_agent: ''
-          cors:
-            enabled: false
-          deathbycaptcha:
-            password: ''
-            username: ''
-          embeddedsubtitles:
-            fallback_lang: en
-            hi_fallback: false
-            included_codecs: []
-            timeout: 600
-            unknown_as_fallback: false
-          general:
-            adaptive_searching: false
-            adaptive_searching_delay: 3w
-            adaptive_searching_delta: 1w
-            anti_captcha_provider: null
-            auto_update: true
-            base_url: /bazarr
-            branch: master
-            chmod: '0640'
-            chmod_enabled: false
-            concurrent_jobs: 4
-            days_to_upgrade_subs: 7
-            debug: false
-            default_und_audio_lang: ''
-            default_und_embedded_subtitles_lang: ''
-            dont_notify_manual_actions: false
-            embedded_subs_show_desired: true
-            embedded_subtitles_parser: ffprobe
-            enable_strm_support: false
-            enabled_integrations: []
-            enabled_providers:
-              - opensubtitlescom
-              - tvsubtitles
-              - yifysubtitles
-              - wizdom
-            external_webhook_password: ''
-            external_webhook_url: ''
-            external_webhook_username: ''
-            flask_secret_key: ${BAZARR_FLASK_SECRET}
-            hi_extension: hi
-            hostname: ''
-            ignore_ass_subs: false
-            ignore_pgs_subs: false
-            ignore_vobsub_subs: false
-            instance_name: Bazarr
-            ip: '*'
-            language_equals: []
-            minimum_score: 70
-            minimum_score_movie: 60
-            movie_default_enabled: true
-            movie_default_profile: 1
-            movie_tag_enabled: false
-            multithreading: true
-            page_size: 25
-            parse_embedded_audio_track: false
-            path_mappings:
-              - - /tv/
-                - /tv/
-            path_mappings_movie:
-              - - /movies/
-                - /movies/
-            port: 6767
-            postprocessing_cmd: ''
-            postprocessing_threshold: 90
-            postprocessing_threshold_movie: 70
-            remove_profile_tags: []
-            serie_default_enabled: false
-            serie_default_profile: 1
-            serie_tag_enabled: false
-            single_language: false
-            skip_hashing: false
-            subfolder: current
-            subfolder_custom: ''
-            subzero_mods: common
-            theme: auto
-            upgrade_frequency: 12
-            upgrade_manual: true
-            upgrade_subs: true
-            use_embedded_subs: true
-            use_external_webhook: false
-            use_plex: false
-            use_postprocessing: false
-            use_postprocessing_threshold: false
-            use_postprocessing_threshold_movie: false
-            use_radarr: true
-            use_scenename: true
-            use_sonarr: true
-            utf8_encode: true
-            wanted_search_frequency: 6
-            wanted_search_frequency_movie: 6
-          hdbits:
-            passkey: ''
-            username: ''
-          jimaku:
-            api_key: ''
-            enable_ai_subs: false
-            enable_archives_download: false
-            enable_name_search_fallback: true
-          karagarga:
-            f_password: ''
-            f_username: ''
-            password: ''
-            username: ''
-          ktuvit:
-            email: ''
-            hashed_password: ''
-          legendasdivx:
-            password: ''
-            skip_wrong_fps: false
-            username: ''
-          legendasnet:
-            password: ''
-            username: ''
-          log:
-            exclude_filter: ''
-            ignore_case: false
-            include_filter: ''
-            use_regex: false
-          movie_scores:
-            audio_codec: 3
-            edition: 1
-            hash: 119
-            hearing_impaired: 1
-            release_group: 13
-            resolution: 2
-            source: 7
-            streaming_service: 1
-            title: 60
-            video_codec: 2
-            year: 30
-          napiprojekt:
-            only_authors: false
-            only_real_names: false
-          napisy24:
-            password: ''
-            username: ''
-          opensubtitlescom:
-            include_ai_translated: false
-            include_machine_translated: false
-            password: ${OPENSUBTITLES_PASS}
-            use_hash: true
-            username: ${OPENSUBTITLES_USER}
-          plex:
-            apikey: ''
-            auth_method: apikey
-            client_identifier: ''
-            disable_auto_migration: false
-            email: ''
-            encryption_key: ''
-            ip: 127.0.0.1
-            migration_attempted: false
-            migration_successful: false
-            migration_timestamp: ''
-            movie_library: []
-            movie_library_ids: []
-            port: 32400
-            series_library: []
-            series_library_ids: []
-            server_local: false
-            server_machine_id: ''
-            server_name: ''
-            server_url: ''
-            set_episode_added: false
-            set_movie_added: false
-            ssl: false
-            token: ''
-            update_movie_library: false
-            update_series_library: false
-            user_id: ''
-            username: ''
-          podnapisi:
-            verify_ssl: true
-          postgresql:
-            database: ''
-            enabled: false
-            host: localhost
-            password: ''
-            port: 5432
-            url: ''
-            username: ''
-          proxy:
-            exclude:
-              - localhost
-              - 127.0.0.1
-            password: ''
-            port: ''
-            type: null
-            url: ''
-            username: ''
-          radarr:
-            apikey: ${RADARR_API_KEY}
-            base_url: /radarr
-            defer_search_signalr: false
-            excluded_tags: []
-            full_update: Daily
-            full_update_day: 6
-            full_update_hour: 4
-            http_timeout: 60
-            ip: radarr
-            movies_sync: 60
-            movies_sync_on_live: true
-            only_monitored: false
-            port: 7878
-            ssl: false
-            sync_only_monitored_movies: false
-            use_ffprobe_cache: true
-          series_scores:
-            audio_codec: 3
-            episode: 30
-            hash: 359
-            hearing_impaired: 1
-            release_group: 14
-            resolution: 2
-            season: 30
-            series: 180
-            source: 7
-            streaming_service: 1
-            video_codec: 2
-            year: 90
-          sonarr:
-            apikey: ${SONARR_API_KEY}
-            base_url: /sonarr
-            defer_search_signalr: false
-            exclude_season_zero: false
-            excluded_series_types: []
-            excluded_tags: []
-            full_update: Daily
-            full_update_day: 6
-            full_update_hour: 4
-            http_timeout: 60
-            ip: sonarr
-            only_monitored: false
-            port: 8989
-            series_sync: 60
-            series_sync_on_live: true
-            ssl: false
-            sync_only_monitored_episodes: false
-            sync_only_monitored_series: false
-            use_ffprobe_cache: true
-          subdl:
-            api_key: ''
-          subf2m:
-            user_agent: ''
-            verify_ssl: true
-          subsource:
-            apikey: ''
-          subsync:
-            checker:
-              blacklisted_languages: []
-              blacklisted_providers: []
-            debug: false
-            force_audio: false
-            gss: true
-            max_offset_seconds: 60
-            no_fix_framerate: true
-            subsync_movie_threshold: 70
-            subsync_threshold: 90
-            use_subsync: false
-            use_subsync_movie_threshold: false
-            use_subsync_threshold: false
-          subx:
-            api_key: ''
-          titlovi:
-            password: ''
-            username: ''
-          titulky:
-            approved_only: false
-            password: ''
-            skip_wrong_fps: false
-            username: ''
-          translator:
-            default_score: 50
-            gemini_key: ''
-            gemini_model: gemini-2.0-flash
-            lingarr_token: ''
-            lingarr_url: http://lingarr:9876
-            translator_info: true
-            translator_type: google_translate
-          turkcealtyaziorg:
-            cookies: ''
-            user_agent: ''
-          whisperai:
-            endpoint: http://127.0.0.1:9000
-            loglevel: INFO
-            pass_video_name: false
-            response: 5
-            timeout: 3600
-          xsubs:
-            password: ''
-            username: ''
-
-          EOF
-        envFrom:
-        - secretRef:
-            name: bazarr-credentials
-        image: busybox
-        name: config
+            cat << 'EOF' > /config/bazarr/config/config.yaml
+            ---
+            addic7ed:
+              cookies: ''
+              password: ''
+              user_agent: ''
+              username: ''
+              vip: false
+            analytics:
+              enabled: true
+            auth:
+              apikey: ${BAZARR_API_KEY}
+              password: ${BAZARR_AUTH_PASSWORD}
+              type: form
+              username: admin
+            general:
+              base_url: /bazarr
+              enabled_integrations:
+                - sonarr
+                - radarr
+              serie_default_enabled: true
+              movie_default_enabled: true
+              port: 6767
+              use_radarr: true
+              use_sonarr: true
+              use_embedded_subs: true
+              upgrade_subs: true
+              wanted_search_frequency: 6
+            EOF
         volumeMounts:
         - mountPath: /config
           name: config
@@ -439,6 +200,79 @@ spec:
         - mountPath: /tv
           name: media
           subPath: media/tv
+
+      - name: wait-for-sonarr-and-radarr
+        image: curlimages/curl:8.4.0
+        imagePullPolicy: IfNotPresent
+        command:
+        - sh
+        - -c
+        - |
+          until (
+            [ "$(curl -s -o /dev/null -w '%{http_code}' http://sonarr:8989/sonarr)" = "200" ] || \
+            [ "$(curl -s -o /dev/null -w '%{http_code}' http://sonarr:8989/sonarr)" = "401" ]
+          ) && (
+            [ "$(curl -s -o /dev/null -w '%{http_code}' http://radarr:7878/radarr)" = "200" ] || \
+            [ "$(curl -s -o /dev/null -w '%{http_code}' http://radarr:7878/radarr)" = "401" ]
+          ); do
+            echo waiting for sonarr and radarr
+            sleep 2
+          done
+
+      containers:
+      - name: bazarr
+        image: linuxserver/bazarr:arm64v8-latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: TZ
+          value: Europe/Lisbon
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        ports:
+        - containerPort: 6767
+          name: webui
+        livenessProbe:
+          httpGet:
+            path: /bazarr
+            port: webui
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /bazarr
+            port: webui
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 12
+          successThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /bazarr
+            port: webui
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 60
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /config
+          name: config
+          subPath: bazarr
+        - mountPath: /movies
+          name: media
+          subPath: movies
+        - mountPath: /tv
+          name: media
+          subPath: tv
+
       securityContext:
         fsGroup: 1000
       volumes:

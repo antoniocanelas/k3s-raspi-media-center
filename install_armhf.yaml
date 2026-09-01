@@ -333,14 +333,7 @@ spec:
         - mountPath: /tv
           name: media
           subPath: tv
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - until wget -qO- sonarr:8989/sonarr &> /dev/null && wget -qO- radarr:7878/radarr
-          &> /dev/null; do echo waiting for sonarr and radarr; sleep 2; done;
-        image: busybox
-        name: wait-for-sonarr-and-radarr
+      # Temporarily removed wait-for-sonarr-and-radarr init container for debugging
       - command:
         - sh
         - -c
@@ -356,8 +349,7 @@ spec:
 
           ---
           addic7ed:
-            cookies: ''
-            password: ''
+          # nodeSelector removed to allow scheduling onto healthy nodes
             user_agent: ''
             username: ''
             vip: false
@@ -423,7 +415,9 @@ spec:
             embedded_subs_show_desired: true
             embedded_subtitles_parser: ffprobe
             enable_strm_support: false
-            enabled_integrations: []
+            enabled_integrations:
+              - sonarr
+              - radarr
             enabled_providers:
               - opensubtitlescom
               - tvsubtitles
@@ -460,7 +454,7 @@ spec:
             postprocessing_threshold: 90
             postprocessing_threshold_movie: 70
             remove_profile_tags: []
-            serie_default_enabled: false
+            serie_default_enabled: true
             serie_default_profile: 1
             serie_tag_enabled: false
             single_language: false
