@@ -48,16 +48,3 @@ spec:
         - name: changedetection-data
           persistentVolumeClaim:
             claimName: changedetection-pvc
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: changedetection-pvc
-  namespace: media
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: local-path
-  resources:
-    requests:
-      storage: 10Gi
