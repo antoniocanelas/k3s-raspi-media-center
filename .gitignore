@@ -1,5 +1,6 @@
 temp*.yaml
 base/plex*.yaml
+base/bazarr/secret.yaml
 
 #
 # Locally installed tools
