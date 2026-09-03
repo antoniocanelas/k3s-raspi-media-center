@@ -51,6 +51,19 @@ metadata:
   annotations: {}
   labels:
     app: media
+  name: strip-changedetection
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /changedetection
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  annotations: {}
+  labels:
+    app: media
   name: strip-bazarr
   namespace: media
 spec:

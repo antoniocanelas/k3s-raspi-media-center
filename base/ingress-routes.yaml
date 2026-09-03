@@ -156,6 +156,9 @@ spec:
       port: 6767
   - kind: Rule
     match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/changedetection`)
+    middlewares:
+    - name: strip-changedetection
+      namespace: media
     priority: 200
     services:
     - kind: Service
