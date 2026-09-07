@@ -1,0 +1,60 @@
+---
+# Headless Chromium WebDriver backend for changedetection.io's
+# "WebDriver Chrome/Javascript" fetch method (sites with JS/bot protection,
+# e.g. leroymerlin.pt returning 403 to the plain HTTP client).
+# selenium/standalone-chromium publishes linux/arm64 images for the Pi.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: changedetection-browser
+  labels:
+    run: changedetection-browser
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: changedetection-browser
+  template:
+    metadata:
+      labels:
+        run: changedetection-browser
+    spec:
+      containers:
+      - name: chromium
+        image: selenium/standalone-chromium:131.0
+        ports:
+        - containerPort: 4444
+          name: webdriver
+        env:
+        # keep memory in check on the Pi
+        - name: SE_NODE_MAX_SESSIONS
+          value: '2'
+        - name: SE_NODE_OVERRIDE_MAX_SESSIONS
+          value: 'true'
+        - name: SE_START_XVFB
+          value: 'false'
+        resources:
+          requests:
+            memory: 400Mi
+          limits:
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /dev/shm
+          name: dshm
+      volumes:
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: changedetection-browser
+spec:
+  ports:
+  - port: 4444
+    targetPort: 4444
+    name: webdriver
+  selector:
+    run: changedetection-browser
