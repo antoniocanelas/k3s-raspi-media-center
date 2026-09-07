@@ -1,8 +1,13 @@
 ---
-# Headless Chromium WebDriver backend for changedetection.io's
-# "WebDriver Chrome/Javascript" fetch method (sites with JS/bot protection,
-# e.g. leroymerlin.pt returning 403 to the plain HTTP client).
-# selenium/standalone-chromium publishes linux/arm64 images for the Pi.
+# Lightweight headless-Chrome (CDP) backend for changedetection.io's
+# "WebDriver Chrome/Javascript" fetch method — used for JS-heavy / bot-protected
+# sites (e.g. leroymerlin.pt, worten.pt) that 403 the plain HTTP client.
+#
+# sockpuppetbrowser is changedetection.io's own browser service (CDP/Playwright
+# protocol). Much lighter than a full Selenium Grid + Chromium, which pins a
+# whole CPU core on the Pi 4's software GL and never creates a session.
+# When PLAYWRIGHT_DRIVER_URL is set, changedetection routes the WebDriver
+# fetch method through this instead of Selenium.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,32 +25,28 @@ spec:
         run: changedetection-browser
     spec:
       containers:
-      - name: chromium
-        image: selenium/standalone-chromium:131.0
+      - name: sockpuppet
+        image: dgtlmoon/sockpuppetbrowser:latest
         ports:
-        - containerPort: 4444
-          name: webdriver
+        - containerPort: 3000
+          name: cdp
         env:
-        # keep memory in check on the Pi
-        - name: SE_NODE_MAX_SESSIONS
+        - name: SCREEN_WIDTH
+          value: '1920'
+        - name: SCREEN_HEIGHT
+          value: '1024'
+        - name: SCREEN_DEPTH
+          value: '16'
+        - name: MAX_CONCURRENT_CHROME_PROCESSES
           value: '2'
-        - name: SE_NODE_OVERRIDE_MAX_SESSIONS
-          value: 'true'
-        - name: SE_START_XVFB
-          value: 'false'
+        securityContext:
+          capabilities:
+            add: [SYS_ADMIN]   # required for Chrome sandbox namespaces
         resources:
           requests:
-            memory: 400Mi
+            memory: 300Mi
           limits:
             memory: 1Gi
-        volumeMounts:
-        - mountPath: /dev/shm
-          name: dshm
-      volumes:
-      - name: dshm
-        emptyDir:
-          medium: Memory
-          sizeLimit: 512Mi
 ---
 apiVersion: v1
 kind: Service
@@ -53,8 +54,8 @@ metadata:
   name: changedetection-browser
 spec:
   ports:
-  - port: 4444
-    targetPort: 4444
-    name: webdriver
+  - port: 3000
+    targetPort: 3000
+    name: cdp
   selector:
     run: changedetection-browser

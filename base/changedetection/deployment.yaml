@@ -40,10 +40,10 @@ spec:
         # static assets resolve under the /changedetection path-prefix route.
         - name: USE_X_SETTINGS
           value: '1'
-        # WebDriver+Chrome backend for the "WebDriver Chrome/Javascript"
+        # Headless-Chrome (CDP) backend for the "WebDriver Chrome/Javascript"
         # fetch method (see base/changedetection/browser.yaml).
-        - name: WEBDRIVER_URL
-          value: http://changedetection-browser:4444
+        - name: PLAYWRIGHT_DRIVER_URL
+          value: ws://changedetection-browser:3000
         ports:
         - containerPort: 5000
           name: webui
