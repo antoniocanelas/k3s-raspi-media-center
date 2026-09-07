@@ -9,3 +9,7 @@ base/bazarr/secret.yaml
 
 # Generated manifest files
 deploy/
+
+# local tooling & service config backups (contain secrets)
+.claude/
+service_config_backup/
