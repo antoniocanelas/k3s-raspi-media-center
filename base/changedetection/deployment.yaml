@@ -36,6 +36,10 @@ spec:
           value: '1000'
         - name: PGID
           value: '1000'
+        # Honour X-Forwarded-Prefix from Traefik's stripPrefix middleware so
+        # static assets resolve under the /changedetection path-prefix route.
+        - name: USE_X_SETTINGS
+          value: '1'
         ports:
         - containerPort: 5000
           name: webui
