@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jetson-ai-pv
+  labels:
+    app: jetson-ai
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: jetson-local
+  local:
+    path: /var/lib/jetson-data/ai
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - jetson-orin-01
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jetson-ai-pvc
+  namespace: ai
+  labels:
+    app: jetson-ai
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: jetson-local
+  volumeName: jetson-ai-pv
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jetson-media-config-pv
+  labels:
+    app: media
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: jetson-local
+  local:
+    path: /var/lib/jetson-data/media-config
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - jetson-orin-01
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jetson-media-config-pvc
+  namespace: media
+  labels:
+    app: media
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: jetson-local
+  volumeName: jetson-media-config-pv
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jetson-transcode-pv
+  labels:
+    app: media
+spec:
+  capacity:
+    storage: 30Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: jetson-local
+  local:
+    path: /var/lib/jetson-data/transcode
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - jetson-orin-01
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jetson-transcode-pvc
+  namespace: media
+  labels:
+    app: media
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: jetson-local
+  volumeName: jetson-transcode-pv
+  resources:
+    requests:
+      storage: 30Gi

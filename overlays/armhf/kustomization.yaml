@@ -3,6 +3,8 @@ kind: Kustomization
 
 resources:
 - ../../base
+# Jetson worker (jetson-orin-01): namespace "ai" + local PVs pinned to the node.
+- ../../base/jetson
 
 images:
   - name: linuxserver/jackett

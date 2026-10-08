@@ -2,6 +2,11 @@
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: ai
+---
+apiVersion: v1
+kind: Namespace
+metadata:
   labels:
     app: media
   name: media
@@ -30,6 +35,33 @@ spec:
   selector:
     app: media
     run: bazarr
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: changedetection
+  namespace: media
+spec:
+  ports:
+  - name: webui
+    port: 5000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    run: changedetection
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: changedetection-browser
+  namespace: media
+spec:
+  ports:
+  - name: cdp
+    port: 3000
+    targetPort: 3000
+  selector:
+    run: changedetection-browser
 ---
 apiVersion: v1
 kind: Service
@@ -164,6 +196,78 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
+    app: jetson-ai
+  name: jetson-ai-pv
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 50Gi
+  local:
+    path: /var/lib/jetson-data/ai
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - jetson-orin-01
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: jetson-local
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app: media
+  name: jetson-media-config-pv
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 20Gi
+  local:
+    path: /var/lib/jetson-data/media-config
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - jetson-orin-01
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: jetson-local
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app: media
+  name: jetson-transcode-pv
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 30Gi
+  local:
+    path: /var/lib/jetson-data/transcode
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - jetson-orin-01
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: jetson-local
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
     app: media
   name: nas-media-pv
 spec:
@@ -210,6 +314,67 @@ spec:
     server: 192.168.0.240
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ssd-local-path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: jetson-ai
+  name: jetson-ai-pvc
+  namespace: ai
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: jetson-local
+  volumeName: jetson-ai-pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: changedetection-pvc
+  namespace: media
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: local-path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: media
+  name: jetson-media-config-pvc
+  namespace: media
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: jetson-local
+  volumeName: jetson-media-config-pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: media
+  name: jetson-transcode-pvc
+  namespace: media
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
+  storageClassName: jetson-local
+  volumeName: jetson-transcode-pv
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -290,6 +455,7 @@ spec:
         - name: PGID
           value: "1000"
         image: linuxserver/bazarr:v1.6.0-ls354
+        imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -333,357 +499,21 @@ spec:
         - mountPath: /tv
           name: media
           subPath: tv
-      # Temporarily removed wait-for-sonarr-and-radarr init container for debugging
+      initContainers:
       - command:
         - sh
         - -c
         - |
-          mkdir -p /config/bazarr/config
-          export RADARR_API_KEY=$(cat config/radarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
-          export SONARR_API_KEY=$(cat config/sonarr/config.xml | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}")
+          set -e
+          mkdir -p /config/bazarr/config /config/config
+          RADARR_API_KEY=$(cat config/radarr/config.xml 2>/dev/null | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}" || true)
+          SONARR_API_KEY=$(cat config/sonarr/config.xml 2>/dev/null | sed -ne "/ApiKey/{s/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p;q;}" || true)
 
-          echo "RADARR_API_KEY: $RADARR_API_KEY"
-          echo "SONARR_API_KEY: $SONARR_API_KEY"
-
-          cat << EOF > config/bazarr/config/config.yaml
-
-          ---
-          addic7ed:
-          # nodeSelector removed to allow scheduling onto healthy nodes
-            user_agent: ''
-            username: ''
-            vip: false
-          analytics:
-            enabled: true
-          anidb:
-            api_client: ''
-            api_client_ver: 1
-          animetosho:
-            anidb_api_client: ''
-            anidb_api_client_ver: 1
-            search_threshold: 6
-          anticaptcha:
-            anti_captcha_key: ''
-          assrt:
-            token: ''
-          auth:
-            apikey: ${BAZARR_API_KEY}
-            password: ${BAZARR_AUTH_PASSWORD}
-            type: form
-            username: admin
-          avistaz:
-            cookies: ''
-            user_agent: ''
-          backup:
-            day: 6
-            folder: /config/backup
-            frequency: Weekly
-            hour: 3
-            retention: 31
-          betaseries:
-            token: ''
-          cinemaz:
-            cookies: ''
-            user_agent: ''
-          cors:
-            enabled: false
-          deathbycaptcha:
-            password: ''
-            username: ''
-          embeddedsubtitles:
-            fallback_lang: en
-            hi_fallback: false
-            included_codecs: []
-            timeout: 600
-            unknown_as_fallback: false
-          general:
-            adaptive_searching: false
-            adaptive_searching_delay: 3w
-            adaptive_searching_delta: 1w
-            anti_captcha_provider: null
-            auto_update: true
-            base_url: /bazarr
-            branch: master
-            chmod: '0640'
-            chmod_enabled: false
-            concurrent_jobs: 4
-            days_to_upgrade_subs: 7
-            debug: false
-            default_und_audio_lang: ''
-            default_und_embedded_subtitles_lang: ''
-            dont_notify_manual_actions: false
-            embedded_subs_show_desired: true
-            embedded_subtitles_parser: ffprobe
-            enable_strm_support: false
-            enabled_integrations:
-              - sonarr
-              - radarr
-            enabled_providers:
-              - opensubtitlescom
-              - tvsubtitles
-              - yifysubtitles
-              - wizdom
-            external_webhook_password: ''
-            external_webhook_url: ''
-            external_webhook_username: ''
-            flask_secret_key: ${BAZARR_FLASK_SECRET}
-            hi_extension: hi
-            hostname: ''
-            ignore_ass_subs: false
-            ignore_pgs_subs: false
-            ignore_vobsub_subs: false
-            instance_name: Bazarr
-            ip: '*'
-            language_equals: []
-            minimum_score: 70
-            minimum_score_movie: 60
-            movie_default_enabled: true
-            movie_default_profile: 1
-            movie_tag_enabled: false
-            multithreading: true
-            page_size: 25
-            parse_embedded_audio_track: false
-            path_mappings:
-              - - /tv/
-                - /tv/
-            path_mappings_movie:
-              - - /movies/
-                - /movies/
-            port: 6767
-            postprocessing_cmd: ''
-            postprocessing_threshold: 90
-            postprocessing_threshold_movie: 70
-            remove_profile_tags: []
-            serie_default_enabled: true
-            serie_default_profile: 1
-            serie_tag_enabled: false
-            single_language: false
-            skip_hashing: false
-            subfolder: current
-            subfolder_custom: ''
-            subzero_mods: common
-            theme: auto
-            upgrade_frequency: 12
-            upgrade_manual: true
-            upgrade_subs: true
-            use_embedded_subs: true
-            use_external_webhook: false
-            use_plex: false
-            use_postprocessing: false
-            use_postprocessing_threshold: false
-            use_postprocessing_threshold_movie: false
-            use_radarr: true
-            use_scenename: true
-            use_sonarr: true
-            utf8_encode: true
-            wanted_search_frequency: 6
-            wanted_search_frequency_movie: 6
-          hdbits:
-            passkey: ''
-            username: ''
-          jimaku:
-            api_key: ''
-            enable_ai_subs: false
-            enable_archives_download: false
-            enable_name_search_fallback: true
-          karagarga:
-            f_password: ''
-            f_username: ''
-            password: ''
-            username: ''
-          ktuvit:
-            email: ''
-            hashed_password: ''
-          legendasdivx:
-            password: ''
-            skip_wrong_fps: false
-            username: ''
-          legendasnet:
-            password: ''
-            username: ''
-          log:
-            exclude_filter: ''
-            ignore_case: false
-            include_filter: ''
-            use_regex: false
-          movie_scores:
-            audio_codec: 3
-            edition: 1
-            hash: 119
-            hearing_impaired: 1
-            release_group: 13
-            resolution: 2
-            source: 7
-            streaming_service: 1
-            title: 60
-            video_codec: 2
-            year: 30
-          napiprojekt:
-            only_authors: false
-            only_real_names: false
-          napisy24:
-            password: ''
-            username: ''
-          opensubtitlescom:
-            include_ai_translated: false
-            include_machine_translated: false
-            password: ${OPENSUBTITLES_PASS}
-            use_hash: true
-            username: ${OPENSUBTITLES_USER}
-          plex:
-            apikey: ''
-            auth_method: apikey
-            client_identifier: ''
-            disable_auto_migration: false
-            email: ''
-            encryption_key: ''
-            ip: 127.0.0.1
-            migration_attempted: false
-            migration_successful: false
-            migration_timestamp: ''
-            movie_library: []
-            movie_library_ids: []
-            port: 32400
-            series_library: []
-            series_library_ids: []
-            server_local: false
-            server_machine_id: ''
-            server_name: ''
-            server_url: ''
-            set_episode_added: false
-            set_movie_added: false
-            ssl: false
-            token: ''
-            update_movie_library: false
-            update_series_library: false
-            user_id: ''
-            username: ''
-          podnapisi:
-            verify_ssl: true
-          postgresql:
-            database: ''
-            enabled: false
-            host: localhost
-            password: ''
-            port: 5432
-            url: ''
-            username: ''
-          proxy:
-            exclude:
-              - localhost
-              - 127.0.0.1
-            password: ''
-            port: ''
-            type: null
-            url: ''
-            username: ''
-          radarr:
-            apikey: ${RADARR_API_KEY}
-            base_url: /radarr
-            defer_search_signalr: false
-            excluded_tags: []
-            full_update: Daily
-            full_update_day: 6
-            full_update_hour: 4
-            http_timeout: 60
-            ip: radarr
-            movies_sync: 60
-            movies_sync_on_live: true
-            only_monitored: false
-            port: 7878
-            ssl: false
-            sync_only_monitored_movies: false
-            use_ffprobe_cache: true
-          series_scores:
-            audio_codec: 3
-            episode: 30
-            hash: 359
-            hearing_impaired: 1
-            release_group: 14
-            resolution: 2
-            season: 30
-            series: 180
-            source: 7
-            streaming_service: 1
-            video_codec: 2
-            year: 90
-          sonarr:
-            apikey: ${SONARR_API_KEY}
-            base_url: /sonarr
-            defer_search_signalr: false
-            exclude_season_zero: false
-            excluded_series_types: []
-            excluded_tags: []
-            full_update: Daily
-            full_update_day: 6
-            full_update_hour: 4
-            http_timeout: 60
-            ip: sonarr
-            only_monitored: false
-            port: 8989
-            series_sync: 60
-            series_sync_on_live: true
-            ssl: false
-            sync_only_monitored_episodes: false
-            sync_only_monitored_series: false
-            use_ffprobe_cache: true
-          subdl:
-            api_key: ''
-          subf2m:
-            user_agent: ''
-            verify_ssl: true
-          subsource:
-            apikey: ''
-          subsync:
-            checker:
-              blacklisted_languages: []
-              blacklisted_providers: []
-            debug: false
-            force_audio: false
-            gss: true
-            max_offset_seconds: 60
-            no_fix_framerate: true
-            subsync_movie_threshold: 70
-            subsync_threshold: 90
-            use_subsync: false
-            use_subsync_movie_threshold: false
-            use_subsync_threshold: false
-          subx:
-            api_key: ''
-          titlovi:
-            password: ''
-            username: ''
-          titulky:
-            approved_only: false
-            password: ''
-            skip_wrong_fps: false
-            username: ''
-          translator:
-            default_score: 50
-            gemini_key: ''
-            gemini_model: gemini-2.0-flash
-            lingarr_token: ''
-            lingarr_url: http://lingarr:9876
-            translator_info: true
-            translator_type: google_translate
-          turkcealtyaziorg:
-            cookies: ''
-            user_agent: ''
-          whisperai:
-            endpoint: http://127.0.0.1:9000
-            loglevel: INFO
-            pass_video_name: false
-            response: 5
-            timeout: 3600
-          xsubs:
-            password: ''
-            username: ''
-
-          EOF
-        envFrom:
-        - secretRef:
-            name: bazarr-credentials
+          printf '%s\n' '---' 'general:' '  base_url: /bazarr' '  enabled_integrations:' '    - sonarr' '    - radarr' '  serie_default_enabled: true' '  movie_default_enabled: true' '  port: 6767' '  use_radarr: true' '  use_sonarr: true' '  use_embedded_subs: true' '  upgrade_subs: true' '  wanted_search_frequency: 6' > /config/bazarr/config/config.yaml
+          cp /config/bazarr/config/config.yaml /config/config/config.yaml || true
+          chown -R 1000:1000 /config/bazarr/config /config/config || true
         image: busybox
+        imagePullPolicy: IfNotPresent
         name: config
         volumeMounts:
         - mountPath: /config
@@ -694,6 +524,17 @@ spec:
         - mountPath: /tv
           name: media
           subPath: media/tv
+      - command:
+        - sh
+        - -c
+        - |
+          until nc -z sonarr 8989 >/dev/null 2>&1 && nc -z radarr 7878 >/dev/null 2>&1; do
+            echo "waiting for sonarr and radarr (tcp)"
+            sleep 2
+          done
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        name: wait-for-sonarr-and-radarr
       securityContext:
         fsGroup: 1000
       volumes:
@@ -706,6 +547,104 @@ spec:
       - name: media
         persistentVolumeClaim:
           claimName: nas-media-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: changedetection
+  name: changedetection
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: changedetection
+  template:
+    metadata:
+      labels:
+        run: changedetection
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Pacific/Auckland
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: USE_X_SETTINGS
+          value: "1"
+        - name: PLAYWRIGHT_DRIVER_URL
+          value: ws://changedetection-browser:3000
+        image: ghcr.io/dgtlmoon/changedetection.io:latest
+        name: changedetection
+        ports:
+        - containerPort: 5000
+          name: webui
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+        - mountPath: /datastore
+          name: changedetection-data
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /datastore
+        image: busybox
+        name: chown
+        volumeMounts:
+        - mountPath: /datastore
+          name: changedetection-data
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - name: changedetection-data
+        persistentVolumeClaim:
+          claimName: changedetection-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: changedetection-browser
+  name: changedetection-browser
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: changedetection-browser
+  template:
+    metadata:
+      labels:
+        run: changedetection-browser
+    spec:
+      containers:
+      - env:
+        - name: SCREEN_WIDTH
+          value: "1920"
+        - name: SCREEN_HEIGHT
+          value: "1024"
+        - name: SCREEN_DEPTH
+          value: "16"
+        - name: MAX_CONCURRENT_CHROME_PROCESSES
+          value: "2"
+        image: dgtlmoon/sockpuppetbrowser:latest
+        name: sockpuppet
+        ports:
+        - containerPort: 3000
+          name: cdp
+        resources:
+          limits:
+            memory: 1Gi
+          requests:
+            memory: 300Mi
+        securityContext:
+          capabilities:
+            add:
+            - SYS_ADMIN
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1446,6 +1385,14 @@ spec:
       namespace: media
       port: 32400
   - kind: Rule
+    match: Host(`changedetection.telheira`)
+    priority: 5
+    services:
+    - kind: Service
+      name: changedetection
+      namespace: media
+      port: 5000
+  - kind: Rule
     match: PathPrefix(`/sonarr`)
     priority: 1
     services:
@@ -1497,6 +1444,17 @@ spec:
       name: bazarr
       namespace: media
       port: 6767
+  - kind: Rule
+    match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/changedetection`)
+    middlewares:
+    - name: strip-changedetection
+      namespace: media
+    priority: 200
+    services:
+    - kind: Service
+      name: changedetection
+      namespace: media
+      port: 5000
   - kind: Rule
     match: Host(`telheira.tplinkdns.com`) && PathPrefix(`/jellyfin`)
     middlewares:
@@ -1626,6 +1584,18 @@ spec:
   stripPrefix:
     prefixes:
     - /bazarr
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app: media
+  name: strip-changedetection
+  namespace: media
+spec:
+  stripPrefix:
+    prefixes:
+    - /changedetection
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
