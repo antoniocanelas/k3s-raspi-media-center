@@ -1,5 +1,5 @@
 name: 'kustomize'
-description: 'A GitHub Action with Kubernetes tools'
+description: 'Installs yq, kustomize and kubeval into the workspace and adds them to PATH'
 author: 'Stefan Prodan'
 branding:
   icon: 'command'
@@ -8,8 +8,13 @@ inputs:
   yq_version:
     description: 'The yq version to install'
     required: false
+# Composite (runs on the runner) instead of a Docker action: the Docker build
+# pulled stefanprodan/alpine-base from Docker Hub on every run, and a Docker
+# Hub outage (504, 2026-10-09) silently stopped manifests reaching the cluster.
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-  env:
-    YQ_VERSION: ${{ inputs.yq_version }}
+  using: 'composite'
+  steps:
+    - shell: bash
+      env:
+        YQ_VERSION: ${{ inputs.yq_version }}
+      run: bash "${{ github.action_path }}/entrypoint.sh"
