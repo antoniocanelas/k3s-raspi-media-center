@@ -116,9 +116,21 @@ data:
         labels:
           - person
 
+    # Face recognition (trial since 2026-10-09): large model (ArcFace, GPU).
+    # The model stays loaded in the embeddings process; it only runs on
+    # tracked persons. Enabled on Porta and Portao only (cam60 overrides).
+    # Faces are trained in the Frigate UI (Face Library). Measure Jetson RAM
+    # (was ~960 MB available before) and switch to model_size: small or
+    # disable if memory gets tight.
+    face_recognition:
+      enabled: true
+      model_size: large
+
     cameras:
       cam60:
-        friendly_name: Entrada Geral
+        friendly_name: Geral
+        face_recognition:
+          enabled: false
         live:
           streams:
             Alta qualidade: cam60_hd
@@ -130,7 +142,7 @@ data:
             - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam60_hd
               roles: [record]
       cam62:
-        friendly_name: Entrada Porta
+        friendly_name: Porta
         live:
           streams:
             Alta qualidade: cam62_hd
@@ -162,7 +174,7 @@ data:
             - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam62_hd
               roles: [record]
       cam63:
-        friendly_name: Entrada Portão
+        friendly_name: Portão
         live:
           streams:
             Alta qualidade: cam63_hd
