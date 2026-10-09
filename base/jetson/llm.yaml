@@ -61,8 +61,10 @@ spec:
           value: "1"
         - name: OLLAMA_NUM_PARALLEL
           value: "1"
+        # 8192: with house control the HA agent sends ~5k tokens (Assist tools
+        # + exposed entities); 4096 made Ollama reject the request.
         - name: OLLAMA_CONTEXT_LENGTH
-          value: "4096"
+          value: "8192"
         # qwen3:4b-instruct (Qwen3-4B-Instruct-2507, no thinking): default for
         # the HA agent, reliable tool calls for house control. qwen2.5:3b:
         # faster fallback, weaker answers.
