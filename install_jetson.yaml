@@ -991,7 +991,13 @@ spec:
         - --language
         - pt
         - --beam-size
-        - "1"
+        - "5"
+        - --initial-prompt
+        - Assistente da casa em português de Portugal. Liga, desliga, abre, fecha
+          a luz, o estore, a persiana da sala, da cozinha, do escritório, do quarto
+          dos pais, dos meninos, das visitas, do hall, da garagem, da entrada. Temperatura,
+          termoacumulador, carregador do carro, aquário, aspirador, lá em cima, lá
+          em baixo.
         - --uri
         - tcp://0.0.0.0:10300
         - --data-dir

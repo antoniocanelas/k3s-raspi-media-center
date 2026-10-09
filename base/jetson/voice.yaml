@@ -40,8 +40,12 @@ spec:
         - small-int8
         - --language
         - pt
+        # beam-size 1 misheard most test phrases; 5 is the Whisper default.
         - --beam-size
-        - "1"
+        - "5"
+        # House vocabulary biases recognition towards Assist commands.
+        - --initial-prompt
+        - "Assistente da casa em português de Portugal. Liga, desliga, abre, fecha a luz, o estore, a persiana da sala, da cozinha, do escritório, do quarto dos pais, dos meninos, das visitas, do hall, da garagem, da entrada. Temperatura, termoacumulador, carregador do carro, aquário, aspirador, lá em cima, lá em baixo."
         - --uri
         - tcp://0.0.0.0:10300
         - --data-dir
