@@ -420,6 +420,15 @@ No arranque, o log mostra `mqtt connection success; ready to send data`. Para ve
 
 **Proximos passos (por ordem):**
 1. ~~Ler as cameras atraves do Synology~~ Resolvido com **go2rtc** (`base/jetson/go2rtc.yaml`): mantem uma unica sessao (so video) por camera, gerada a partir do Secret `ai/camera-rtsp`, e o detetor le `rtsp://go2rtc.ai.svc.cluster.local:8554/camNN`. Reinicios do detetor e testes ja nao abrem sessoes nas cameras. Desde a mudanca, as tres cameras ficam estaveis a ~25 fps. Testes manuais devem usar o go2rtc, nunca a camera diretamente. A API do go2rtc (porta 1984) fica so em ClusterIP: permite adicionar fontes arbitrarias e nao deve ser exposta.
+
+   **Streams do go2rtc** (RTSP com o mesmo utilizador/password das cameras):
+
+   | Stream | Origem | Uso |
+   |---|---|---|
+   | `camNN` | substream `stream2`, so video | people-detector (`rtsp://USER:PASS@go2rtc.ai.svc.cluster.local:8554/camNN`) |
+   | `camNN_hd` | `stream1`, video + audio | Home Assistant / LAN (`rtsp://USER:PASS@192.168.0.250:8554/camNN_hd`) |
+
+   O RTSP e publicado na LAN como `hostPort: 8554` so no Jetson (`192.168.0.250`); sem credenciais responde `401 Unauthorized`. O go2rtc so abre a sessao HD na camera enquanto houver um cliente a ver. Para o HA usar o go2rtc, adiciona em *Definicoes > Dispositivos e servicos > Adicionar integracao > Generic Camera* uma camera por stream `camNN_hd` (URL RTSP acima, transporte TCP) e troca as entidades nos dashboards/automacoes.
 2. **Fotografia nas notificacoes:** mapear `cam60/62/63` para `camera.entrada_*`/`camera.jardim_*` e usar `camera.snapshot` como em `automations/security.yaml`.
 3. **Afinar limiares** (`pre-cluster-threshold` de `person`) e zonas com dados reais de alguns dias (falsos positivos/negativos).
 4. **Reconhecimento facial:** as caras ja sao detetadas pelo PeopleNet. Falta um SGIE de embeddings (ArcFace/InsightFace em TensorRT), uma galeria local com fotografias das pessoas da casa (com o conhecimento delas) e a publicacao `pessoa conhecida/desconhecida` por MQTT. Medir memoria junto com o LLM.
