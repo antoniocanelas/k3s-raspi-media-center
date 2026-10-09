@@ -107,10 +107,13 @@ data:
     # source at 0 fps. uridecodebin ignores the audio. Without type=4 there is
     # no built-in RTSP reconnect; a source error ends deepstream-app and
     # Kubernetes restarts the pod.
+    # rtspt:// forces RTP over TCP: UDP RTP from the cameras never reaches the
+    # pod (pod network NAT), and the UDP->TCP fallback is unreliable.
     n=0
     : > /tmp/sources.txt
     for u in "$CAM1_URL" "$CAM2_URL" "$CAM3_URL"; do
       [ -n "$u" ] || continue
+      u="rtspt:${u#rtsp:}"
       cat >> /tmp/sources.txt <<EOF
     [source$n]
     enable=1
