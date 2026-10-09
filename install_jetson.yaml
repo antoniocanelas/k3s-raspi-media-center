@@ -16,6 +16,27 @@ data:
       topic_prefix: frigate
       client_id: frigate-jetson
 
+    # Live view in the Frigate UI: Frigate's own go2rtc restreams our go2rtc
+    # (no new camera sessions). HD gets an AAC copy of the camera's PCMA audio
+    # so browsers can play it.
+    go2rtc:
+      streams:
+        cam60_hd:
+          - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam60_hd
+          - "ffmpeg:cam60_hd#audio=aac"
+        cam60:
+          - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam60
+        cam62_hd:
+          - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam62_hd
+          - "ffmpeg:cam62_hd#audio=aac"
+        cam62:
+          - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam62
+        cam63_hd:
+          - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam63_hd
+          - "ffmpeg:cam63_hd#audio=aac"
+        cam63:
+          - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam63
+
     detectors:
       tensorrt:
         type: tensorrt
@@ -92,6 +113,10 @@ data:
     cameras:
       cam60:
         friendly_name: Entrada Geral
+        live:
+          streams:
+            Alta qualidade: cam60_hd
+            Baixa qualidade: cam60
         ffmpeg:
           inputs:
             - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam60
@@ -100,6 +125,10 @@ data:
               roles: [record]
       cam62:
         friendly_name: Entrada Porta
+        live:
+          streams:
+            Alta qualidade: cam62_hd
+            Baixa qualidade: cam62
         # Plants along the passage kept triggering motion; the path itself
         # stays unmasked (people walk there). Pixels of the 640x480 frame.
         motion:
@@ -128,6 +157,10 @@ data:
               roles: [record]
       cam63:
         friendly_name: Entrada Portão
+        live:
+          streams:
+            Alta qualidade: cam63_hd
+            Baixa qualidade: cam63
         # The hedge/plants along the back wall and the sunlit wooden fence on
         # the right kept the detector busy (~5 detections/s with nobody there).
         # Pixels of the 640x480 detect frame: 0.18 rejects relative
