@@ -102,6 +102,11 @@ data:
     for f in resnet18_trafficcamnet_pruned.onnx cal_trt.bin labels.txt; do
       [ -s "$M/$f" ] || cp "$SRC/$f" "$M/"
     done
+    # type=3 (uridecodebin), not type=4 (rtspsrc): camera .63 also sends a
+    # PCMA audio track, and with type=4 the unlinked audio pad stalls that
+    # source at 0 fps. uridecodebin ignores the audio. Without type=4 there is
+    # no built-in RTSP reconnect; a source error ends deepstream-app and
+    # Kubernetes restarts the pod.
     n=0
     : > /tmp/sources.txt
     for u in "$CAM1_URL" "$CAM2_URL" "$CAM3_URL"; do
@@ -109,13 +114,10 @@ data:
       cat >> /tmp/sources.txt <<EOF
     [source$n]
     enable=1
-    type=4
+    type=3
     uri=$u
     num-sources=1
     gpu-id=0
-    latency=200
-    select-rtp-protocol=4
-    rtsp-reconnect-interval-sec=30
 
     EOF
       n=$((n+1))

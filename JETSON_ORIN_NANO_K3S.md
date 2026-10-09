@@ -347,20 +347,26 @@ Para trocar de modelo, altera `MODEL_URL`/`MODEL_FILE`, `--model` e `--alias` no
 
 **Pipeline:** `base/jetson/people-detector.yaml` corre `deepstream-app` (`nvcr.io/nvidia/deepstream:7.1-samples-multiarch`) com o detetor TrafficCamNet INT8 filtrado para a classe `person`, inferencia a cada 3 frames (`interval=2`) e tracker IOU. O motor TensorRT e construido na primeira execucao (2-8 min, conforme o batch) e guardado em `/var/lib/jetson-data/ai/models/deepstream`. Os URLs vem do Secret `ai/camera-rtsp`; sem ele o pod fica inativo (`sleep`) e nao usa a GPU.
 
-Criar o Secret (no Mac; as credenciais nao passam pelo Git nem pelo historico da shell):
+Criar o Secret (no Mac, zsh; as credenciais nao passam pelo Git nem pelo historico da shell). Utilizador e password sao codificados para URL, porque caracteres como `@ : / #` na password partem o URL e as cameras respondem `Unauthorized`:
 
 ```bash
-read -s CAMPASS
+read "CAMUSER?Utilizador RTSP: " && read -s "CAMPASS?Password RTSP: " && echo && \
+U=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=""))' "$CAMUSER") && \
+P=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=""))' "$CAMPASS") && \
 kubectl --context raspi -n ai create secret generic camera-rtsp \
-  --from-literal=CAM1_URL="rtsp://USER:$CAMPASS@192.168.0.60:554/stream2" \
-  --from-literal=CAM2_URL="rtsp://USER:$CAMPASS@192.168.0.62:554/stream2" \
-  --from-literal=CAM3_URL="rtsp://USER:$CAMPASS@192.168.0.63:554/stream2"
-unset CAMPASS
-kubectl --context raspi -n ai rollout restart deploy/people-detector
+  --from-literal=CAM1_URL="rtsp://$U:$P@192.168.0.60:554/stream2" \
+  --from-literal=CAM2_URL="rtsp://$U:$P@192.168.0.62:554/stream2" \
+  --from-literal=CAM3_URL="rtsp://$U:$P@192.168.0.63:554/stream2" && \
+unset CAMUSER CAMPASS U P
+kubectl --context raspi -n ai delete pod -l app=people-detector
 kubectl --context raspi -n ai logs -f deploy/people-detector | grep -E "Starting|PERF|ERROR"
 ```
 
-Antes de criar o Secret, confirma em cada camera (app VIGI/Tapo): conta de camera ativa para RTSP, substream ativa e que o Surveillance Station continua a gravar com um segundo cliente ligado.
+Para reiniciar o detetor usa `delete pod`, nao `rollout restart`: o Flux reverte a anotacao `restartedAt` e substitui o pod uma segunda vez (o mesmo acontece com o `tailscale`).
+
+Para testar credenciais RTSP no Mac (o `curl` do macOS nao suporta RTSP), envia um `DESCRIBE` com autenticacao Basic/Digest por socket (script Python simples) e espera `RTSP/1.0 200 OK`. As credenciais que funcionam sao as da propria camera (utilizador `admin`), nao as da conta TP-Link.
+
+**Estado em 2026-10-09:** as tres cameras estao ligadas, cada substream a ~25 fps (H.264). A camera `.63` envia tambem audio PCMA; com `type=4` (rtspsrc) essa fonte ficava a 0 fps sem erro, por isso o pipeline usa `type=3` (uridecodebin), que ignora o audio. Com `type=3` nao ha reconexao RTSP integrada: um erro numa fonte termina o `deepstream-app` e o Kubernetes reinicia o pod.
 
 **Medicoes com o video de exemplo (720p, H.264) em 2026-10-09:**
 

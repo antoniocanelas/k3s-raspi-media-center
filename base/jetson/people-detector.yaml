@@ -3,7 +3,9 @@
 # (rtsp://USER:PASS@192.168.0.6x:554/stream2) from Secret ai/camera-rtsp,
 # keys CAM1_URL..CAM3_URL. The Secret is created by hand (never in git); while
 # it is missing the pod idles without touching the GPU. After creating or
-# changing it: kubectl -n ai rollout restart deploy/people-detector
+# changing it: kubectl -n ai delete pod -l app=people-detector
+# (not "rollout restart": Flux reverts the restartedAt annotation and rolls
+# the pod a second time).
 #
 # Output for now is DeepStream's per-stream FPS in the pod logs (**PERF lines).
 # Events to Home Assistant (MQTT) are a follow-up step.
@@ -28,6 +30,11 @@ data:
     for f in resnet18_trafficcamnet_pruned.onnx cal_trt.bin labels.txt; do
       [ -s "$M/$f" ] || cp "$SRC/$f" "$M/"
     done
+    # type=3 (uridecodebin), not type=4 (rtspsrc): camera .63 also sends a
+    # PCMA audio track, and with type=4 the unlinked audio pad stalls that
+    # source at 0 fps. uridecodebin ignores the audio. Without type=4 there is
+    # no built-in RTSP reconnect; a source error ends deepstream-app and
+    # Kubernetes restarts the pod.
     n=0
     : > /tmp/sources.txt
     for u in "$CAM1_URL" "$CAM2_URL" "$CAM3_URL"; do
@@ -35,13 +42,10 @@ data:
       cat >> /tmp/sources.txt <<EOF
     [source$n]
     enable=1
-    type=4
+    type=3
     uri=$u
     num-sources=1
     gpu-id=0
-    latency=200
-    select-rtp-protocol=4
-    rtsp-reconnect-interval-sec=30
 
     EOF
       n=$((n+1))
