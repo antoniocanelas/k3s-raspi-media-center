@@ -328,24 +328,26 @@ Um pod usa a GPU do Orin com tres campos: `runtimeClassName: nvidia`, toleration
 
 ### LLM (implantado)
 
-`base/jetson/llm.yaml` corre o **Ollama** (`dustynv/ollama:0.6.8-r36.4-cu126-22.04`, CUDA 12.6 = JetPack 6.2) em `ai`, substituindo o `llama.cpp` usado no inicio (sem integracao nativa no HA). Modelos em `jetson-ai-pvc` (`/var/lib/jetson-data/ai/models/ollama`), descarregados no arranque se faltarem (`PULL_MODELS`): `qwen2.5:3b` (padrao) e `qwen3:4b`. Um modelo carregado de cada vez, mantido em memoria (`OLLAMA_KEEP_ALIVE=-1`), contexto 4096.
+`base/jetson/llm.yaml` corre a **imagem oficial do Ollama** (`ollama/ollama:0.35.1`), que inclui um build CUDA para JetPack 6 (`libdirs=ollama,cuda_jetpack6`, driver 12.6). Substituiu primeiro o `llama.cpp` (sem integracao nativa no HA) e depois o build `dustynv/ollama:0.6.8`, que nao conseguia desligar o raciocinio do Qwen3. Modelos em `jetson-ai-pvc` (`/var/lib/jetson-data/ai/models/ollama`), descarregados no arranque se faltarem (`PULL_MODELS`): **`qwen3:4b-instruct`** (Qwen3-4B-Instruct-2507, sem thinking; padrao) e `qwen2.5:3b` (alternativa). Um modelo carregado de cada vez, mantido em memoria (`OLLAMA_KEEP_ALIVE=-1`), contexto 4096.
 
 Acesso na LAN pelo Traefik (sem autenticacao), so endpoints de conversa/inferencia (`/v1/*`, `/api/chat`, `/api/generate`, `/api/tags`, `/api/show`, `/api/version`, `/api/ps`); `/api/pull`, `/api/delete`, etc. devolvem 404 na LAN:
-- `http://llm.telheira/v1/chat/completions` (clientes compativeis com OpenAI, modelo `qwen2.5:3b`);
+- `http://llm.telheira/v1/chat/completions` (clientes compativeis com OpenAI);
 - `http://192.168.0.240` (integracao Ollama do Home Assistant).
 
-Gerir modelos so por dentro do cluster: `kubectl --context raspi -n ai exec deploy/llm -- ollama list|pull|stop|ps`.
+Gerir modelos so por dentro do cluster: `kubectl --context raspi -n ai exec deploy/llm -- ollama list|pull|rm|stop|ps`.
 
-**Home Assistant:** integracao Ollama (URL `http://192.168.0.240`) com o agente de conversa `conversation.jetson_qwen2_5_3b` ("Jetson (Qwen2.5 3B)"), criado em 2026-10-09: so conversa (sem `llm_hass_api`, nao controla a casa), `keep_alive -1`, `think` desligado, instrucoes em portugues de Portugal. Para o usar no Assist, escolhe este agente num pipeline em *Definicoes > Assistentes de voz*.
+**Home Assistant:** integracao Ollama (URL `http://192.168.0.240`) com o agente de conversa `conversation.jetson_qwen2_5_3b`, criado em 2026-10-09 so para conversa. Para usar o Qwen3 Instruct com controlo da casa: no agente, modelo `qwen3:4b-instruct`, `think` desligado e *Control Home Assistant* = Assist; o LLM so controla as entidades expostas ao Assist (*Definicoes > Assistentes de voz > Expor*). No pipeline, *Preferir processar comandos localmente* deixa os comandos simples no motor do HA e o resto para o LLM.
 
-**Medicoes em 2026-10-09** (MAXN SUPER, com o people-detector ativo):
+**Comparacao em 2026-10-09** (MAXN SUPER, com o people-detector ativo, 5 perguntas em pt-PT + 3 pedidos de controlo):
 
-| Modelo | Memoria (GPU) | Velocidade | Notas |
-|---|---|---|---|
-| `qwen2.5:3b` | 2,9 GB | ~10 tok/s (respostas curtas em 3-5 s via HA) | portugues aceitavel mas com erros; erra factos (ex.: confunde diferencial com disjuntor de sobrecarga) |
-| `qwen3:4b` | 4,1 GB | nao medido | com o video ativo deixava ~2,3 GB livres, 99% GPU e 74 °C; descarregado |
+| Modelo | Memoria (GPU) | Velocidade | Resposta | Factos | Controlo da casa |
+|---|---|---|---|---|---|
+| **`qwen3:4b-instruct`** (Ollama 0.35.1) | 3,2 GB | 8,5-9 tok/s | 2-10 s | certos | correto, incluindo duas acoes numa frase |
+| `qwen2.5:3b` | 2,9 GB | ~10 tok/s | ~2,5 s | erra (diferencial = "sobrecarga"), conselhos sem sentido | suportado, pouco fiavel |
+| `gemma3:4b` (GGUF do Hugging Face) | 5,2 GB | ~7,4 tok/s | ~5 s | certos, respostas uteis | sem tool calling no Ollama |
+| `qwen3:4b` original (com thinking) | 4,1 GB | ~6,6 tok/s | ~3 min | certos | inutilizavel (raciocina em ingles antes de responder) |
 
-Com o detetor a `interval=2` a GPU ficava a 99% e o `qwen2.5:3b` caia para ~7 tok/s; com `interval=5` sobe para ~10 tok/s e a temperatura desce de 75 para 65 °C. Um modelo 7-8B nao cabe ao lado do video.
+Com o `qwen3:4b-instruct` carregado e o video ativo, o Jetson fica em ~5,3 GB de 7,4 GB e ~66 °C. Com o detetor a `interval=2` a GPU ficava a 99% e os modelos perdiam ~30% de velocidade; com `interval=5` recuperam. Um modelo 7-8B nao cabe ao lado do video.
 
 ### Video: detecao de pessoas
 
