@@ -20,6 +20,56 @@ we want, so they can be applied to every camera with UI automation.
 - ONVIF on port **2020** (WS-Security digest) works for: device info, video encoder
   settings (resolution, fps, bitrate, GovLength), OSD. It **cannot** switch H264+ off.
 
+## Standard profile for all cameras (target)
+
+Apply the same on .60, .62, .63 (and .61 if it comes back). Details and the
+reasons are in the sections below. Items marked *(Claude)* are done over ONVIF
+or in the cluster after the UI changes.
+
+**Video** — *Camera → Stream → Video*
+
+| # | Stream | Setting | Value |
+|---|---|---|---|
+| V1 | Main | Video Encoding | **H264** (not H264+, not H265) |
+| V2 | Main | Resolution / Frame Rate | **2560*1440 / 15** (.62 and .63 are at 1280*720 today) |
+| V3 | Main | Bit Rate Type / Image Quality / Max Bit Rate | **VBR / High / 4096** |
+| V4 | Sub | Video Encoding | **H264** |
+| V5 | Sub | Resolution / Frame Rate | **640*480 / 10** (today 25; Frigate uses 5) |
+| V6 | Main / Sub | Keyframe interval (GovLength) | **30 / 20** = 2 s *(Claude, ONVIF)* |
+| V7 | — | Audio | **the same on every camera**: Off unless sound is wanted (today .62/.63 send audio, .60 does not; audio makes go2rtc run an ffmpeg transcode per live viewer) |
+
+**Security**
+
+| # | Where | Setting | Value |
+|---|---|---|---|
+| S1 | System Settings → User Management | Dedicated stream user | add **`frigate`** (Operator) for RTSP; then *(Claude)* switch Secret `ai/camera-rtsp` to it and stop using `admin` for streaming. `admin` only for occasional ONVIF changes, with António's OK |
+| S2 | System Settings → User Management | `admin` password | strong and unique per camera (stored outside Git) |
+| S3 | Network Settings | Port Forwarding, DDNS, Openapi, SNMP, RTMP, FTP, Email, Multicast, 802.1x, Log Server | **Off** |
+| S4 | Camera → Stream → Advance Settings | SRTP | **Off** |
+| S5 | Network Settings → Network Service → ONVIF | ONVIF / Time Verification | **On / Off** |
+| S6 | Network Settings → Platform Access | VIGI Cloud | *optional*: Off reduces internet exposure but removes VIGI app remote access (HA already covers it) — not decided, keep On for now |
+
+**Camera events**
+
+| # | Where | Setting | Value |
+|---|---|---|---|
+| E1 | Event → Smart Event (Human, Line Crossing, Intrusion) | Push notifications | **unchecked** (alerts come from Frigate/HA; avoids duplicates) |
+| E2 | Event → Smart Event (all rules) | Send to Alarm Server | **unchecked** (no alarm server configured) |
+
+**Consistency**
+
+| # | Where | Setting | Value |
+|---|---|---|---|
+| C1 | System Settings → Firmware Update | Firmware | latest, same on all cameras |
+| C2 | Information → Device Information | Device Name | Frigate name: **Entrada Geral** (.60, today "Frente"), **Entrada Porta** (.62), **Entrada Portão** (.63) |
+| C3 | Camera → Display → OSD | Date, Day of Week, Channel Name, Custom 1-2 | **all Off** (re-check after firmware updates) |
+| C4 | System Settings → Date | Time zone / time | Lisbon (UTC±0 with DST Auto), NTP Auto, 24 h |
+| C5 | Network Settings → Internet Connection | IP | Static 192.168.0.6x /24, gateway/DNS 192.168.0.1 |
+
+**After the UI changes (Claude)**: GovLength over ONVIF (V6), Secret with the
+`frigate` user (S1), check Frigate config for the new main resolution (V2),
+then the verification list at the end of this file.
+
 ## Changes wanted
 
 ### 1. Main stream: H264+ → H264 (required)
