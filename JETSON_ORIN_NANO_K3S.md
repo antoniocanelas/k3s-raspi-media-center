@@ -379,7 +379,7 @@ Teste rapido de uma camera a partir do pod (deve terminar em ~2 s com `Execution
 
 ```bash
 kubectl --context raspi -n ai exec deploy/people-detector -c deepstream -- bash -c \
-  'timeout 20 gst-launch-1.0 rtspsrc location="$CAM2_URL" protocols=tcp ! rtph264depay ! h264parse ! nvv4l2decoder ! fakesink num-buffers=50 2>&1 | grep -E "Execution ended|ERROR"'
+  'timeout 20 gst-launch-1.0 rtspsrc location=rtsp://go2rtc.ai.svc.cluster.local:8554/cam62 protocols=tcp ! rtph264depay ! h264parse ! nvv4l2decoder ! fakesink num-buffers=50 2>&1 | grep -E "Execution ended|ERROR"'
 ```
 
 **Medicoes com o video de exemplo (720p, H.264) em 2026-10-09:**
@@ -419,7 +419,7 @@ No arranque, o log mostra `mqtt connection success; ready to send data`. Para ve
 - `dashboards/video.yaml`: cartao "Detecao de pessoas (Jetson)".
 
 **Proximos passos (por ordem):**
-1. **Ler as cameras atraves do Synology Surveillance Station** (RTSP em `192.168.0.200:554`) em vez de diretamente, para o Jetson deixar de contar para o limite de streams das cameras. Precisa de confirmar a partilha RTSP no Surveillance Station e de um utilizador para o Jetson.
+1. ~~Ler as cameras atraves do Synology~~ Resolvido com **go2rtc** (`base/jetson/go2rtc.yaml`): mantem uma unica sessao (so video) por camera, gerada a partir do Secret `ai/camera-rtsp`, e o detetor le `rtsp://go2rtc.ai.svc.cluster.local:8554/camNN`. Reinicios do detetor e testes ja nao abrem sessoes nas cameras. Desde a mudanca, as tres cameras ficam estaveis a ~25 fps. Testes manuais devem usar o go2rtc, nunca a camera diretamente. A API do go2rtc (porta 1984) fica so em ClusterIP: permite adicionar fontes arbitrarias e nao deve ser exposta.
 2. **Fotografia nas notificacoes:** mapear `cam60/62/63` para `camera.entrada_*`/`camera.jardim_*` e usar `camera.snapshot` como em `automations/security.yaml`.
 3. **Afinar limiares** (`pre-cluster-threshold` de `person`) e zonas com dados reais de alguns dias (falsos positivos/negativos).
 4. **Reconhecimento facial:** as caras ja sao detetadas pelo PeopleNet. Falta um SGIE de embeddings (ArcFace/InsightFace em TensorRT), uma galeria local com fotografias das pessoas da casa (com o conhecimento delas) e a publicacao `pessoa conhecida/desconhecida` por MQTT. Medir memoria junto com o LLM.
