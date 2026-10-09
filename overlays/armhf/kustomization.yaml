@@ -5,6 +5,8 @@ resources:
 - ../../base
 # Jetson worker (jetson-orin-01): namespace "ai" + local PVs pinned to the node.
 - ../../base/jetson
+# Traefik (kube-system HelmChartConfig: ACME resolver, persistence, entrypoints).
+- ../../base/traefik
 
 images:
   - name: linuxserver/jackett

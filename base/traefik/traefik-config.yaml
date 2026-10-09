@@ -12,6 +12,9 @@ spec:
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
 
+    # acme.json must survive restarts: with the chart default (emptyDir) every
+    # Traefik restart re-requests all certificates, and a restart during a
+    # tplinkdns DNS hiccup leaves the external endpoints with no valid cert.
     persistence:
       enabled: true
       name: data
