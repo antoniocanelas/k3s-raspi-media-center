@@ -92,10 +92,12 @@ data:
 
 
     def read(path, default=None):
+        # Some Orin thermal zones (cv0-2) fail on read (EAGAIN surfaces as a
+        # TypeError from the decoder), so treat any error as "no value".
         try:
             with open(path) as f:
                 return f.read().strip()
-        except OSError:
+        except Exception:
             return default
 
 
