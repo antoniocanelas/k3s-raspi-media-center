@@ -579,6 +579,11 @@ spec:
           for m in $PULL_MODELS; do
             ollama show "$m" >/dev/null 2>&1 || ollama pull "$m"
           done
+          # qwen3-jetson = qwen3:4b-instruct without mmap. On the Orin (CPU and
+          # GPU share RAM) a mmapped model stays resident twice: ~4.2 GB on the
+          # GPU plus ~2.5 GB of mapped file. use_mmap false saves ~1.9 GB.
+          printf 'FROM qwen3:4b-instruct\nPARAMETER use_mmap false\nPARAMETER num_ctx 8192\n' > /tmp/Modelfile.qwen3-jetson
+          ollama create qwen3-jetson -f /tmp/Modelfile.qwen3-jetson
           wait $pid
         env:
         - name: OLLAMA_HOST
