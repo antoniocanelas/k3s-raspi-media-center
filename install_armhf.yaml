@@ -867,69 +867,54 @@ spec:
         app: llm
     spec:
       containers:
-      - args:
-        - --model
-        - /models/qwen2.5-1.5b-instruct-q4_k_m.gguf
-        - --alias
-        - qwen2.5-1.5b-instruct
-        - --host
-        - 0.0.0.0
-        - --port
-        - "8080"
-        - --n-gpu-layers
-        - "99"
-        - --ctx-size
-        - "4096"
-        - --parallel
-        - "1"
-        - --metrics
-        command:
-        - llama-server
-        image: dustynv/llama_cpp:r36.4.0
+      - command:
+        - bash
+        - -c
+        - |
+          ollama serve &
+          pid=$!
+          until ollama list >/dev/null 2>&1; do sleep 1; done
+          for m in $PULL_MODELS; do
+            ollama show "$m" >/dev/null 2>&1 || ollama pull "$m"
+          done
+          wait $pid
+        env:
+        - name: OLLAMA_HOST
+          value: 0.0.0.0:11434
+        - name: OLLAMA_MODELS
+          value: /models/ollama
+        - name: OLLAMA_KEEP_ALIVE
+          value: "-1"
+        - name: OLLAMA_MAX_LOADED_MODELS
+          value: "1"
+        - name: OLLAMA_NUM_PARALLEL
+          value: "1"
+        - name: OLLAMA_CONTEXT_LENGTH
+          value: "4096"
+        - name: PULL_MODELS
+          value: qwen2.5:3b qwen3:4b
+        image: dustynv/ollama:0.6.8-r36.4-cu126-22.04
         livenessProbe:
           httpGet:
-            path: /health
+            path: /api/version
             port: http
-          initialDelaySeconds: 120
+          initialDelaySeconds: 60
           periodSeconds: 30
-        name: llama-server
+        name: ollama
         ports:
-        - containerPort: 8080
+        - containerPort: 11434
           name: http
         readinessProbe:
           httpGet:
-            path: /health
+            path: /api/version
             port: http
           periodSeconds: 10
         resources:
           limits:
-            memory: 4Gi
+            memory: 5Gi
           requests:
             cpu: 500m
-            memory: 1536Mi
-        volumeMounts:
-        - mountPath: /models
-          name: models
-          readOnly: true
-          subPath: models
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - |
-          set -e
-          if [ -s "$MODEL_FILE" ]; then echo "model present"; exit 0; fi
-          curl -fL --retry 5 -o "$MODEL_FILE.part" "$MODEL_URL"
-          mv "$MODEL_FILE.part" "$MODEL_FILE"
-        env:
-        - name: MODEL_URL
-          value: https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf
-        - name: MODEL_FILE
-          value: /models/qwen2.5-1.5b-instruct-q4_k_m.gguf
-        image: curlimages/curl:8.10.1
-        name: fetch-model
-        securityContext:
-          runAsUser: 0
+            memory: 2Gi
         volumeMounts:
         - mountPath: /models
           name: models
@@ -1947,7 +1932,9 @@ spec:
   - web
   routes:
   - kind: Rule
-    match: Host(`llm.telheira`)
+    match: (Host(`llm.telheira`) || Host(`192.168.0.240`)) && (PathPrefix(`/v1/`)
+      || Path(`/api/chat`) || Path(`/api/generate`) || Path(`/api/tags`) || Path(`/api/show`)
+      || Path(`/api/version`) || Path(`/api/ps`) || Path(`/`))
     services:
     - kind: Service
       name: llm
