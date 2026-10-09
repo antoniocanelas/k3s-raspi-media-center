@@ -6,7 +6,7 @@
 # - Motion detection runs on the CPU all the time; the TensorRT object detector
 #   (YOLOv7-320, generated once into /config/model_cache) only runs where there
 #   is motion, so the GPU stays mostly free for the LLM.
-# - Recording: only person alerts/detections (7 days); the Synology keeps the
+# - Recording: only alerts/detections (30 days); the Synology keeps the
 #   continuous recordings.
 # - Events, per-camera person counts and snapshots go to the Home Assistant
 #   Mosquitto (Secret ai/mqtt) under frigate/.
@@ -100,11 +100,13 @@ data:
     birdseye:
       enabled: false
 
+    # Kept 30 days so the HA "Deteções" gallery covers the last month
+    # (alert clips are short; the NVMe has >100 GB free).
     snapshots:
       enabled: true
       bounding_box: true
       retain:
-        default: 7
+        default: 30
 
     record:
       enabled: true
@@ -114,10 +116,10 @@ data:
         days: 0
       alerts:
         retain:
-          days: 7
+          days: 30
       detections:
         retain:
-          days: 7
+          days: 30
 
     review:
       alerts:

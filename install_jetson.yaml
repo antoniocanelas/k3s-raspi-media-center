@@ -86,11 +86,13 @@ data:
     birdseye:
       enabled: false
 
+    # Kept 30 days so the HA "Deteções" gallery covers the last month
+    # (alert clips are short; the NVMe has >100 GB free).
     snapshots:
       enabled: true
       bounding_box: true
       retain:
-        default: 7
+        default: 30
 
     record:
       enabled: true
@@ -100,10 +102,10 @@ data:
         days: 0
       alerts:
         retain:
-          days: 7
+          days: 30
       detections:
         retain:
-          days: 7
+          days: 30
 
     review:
       alerts:
