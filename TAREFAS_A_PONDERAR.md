@@ -71,6 +71,6 @@ Alternativas: Scrypted NVR (mais focado em HomeKit), Viseron (semelhante, comuni
 - **Modelos**: reavaliar quando houver modelos 3-4B melhores em pt-PT com tool calling; um 7-8B so cabe sem o video ligado.
 
 ## Infraestrutura
-- **Certificado HTTPS externo**: Let's Encrypt falha por bugs no DNS da TP-Link; opcoes em [TLS_CERTIFICATES.md](TLS_CERTIFICATES.md) (ZeroSSL recomendado).
+- **Certificados**: Tailscale HTTPS ativo (`https://homeassistant.tailed34f9.ts.net`); publico `telheira.tplinkdns.com` passou para ZeroSSL em 2026-10-09 (primeira emissao por confirmar). Se o ZeroSSL tambem falhar pelo DNS da TP-Link: DuckDNS + Let's Encrypt, ou Tailscale `funnel`. Detalhes em [TLS_CERTIFICATES.md](TLS_CERTIFICATES.md).
 - **Reserva DHCP** para o IP `eth0` do `pi-master-00` (`192.168.0.18`), que e o InternalIP do k3s.
 - **JetPack 7.2** quando a Waveshare publicar receita para a `JETSON-ORIN-IO-BASE` (ver [JETSON_ORIN_NANO_FIRMWARE.md](JETSON_ORIN_NANO_FIRMWARE.md)).
