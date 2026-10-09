@@ -965,6 +965,88 @@ spec:
         persistentVolumeClaim:
           claimName: jetson-ai-pvc
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: voice
+  name: voice
+  namespace: ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: voice
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: voice
+    spec:
+      containers:
+      - args:
+        - --model
+        - small-int8
+        - --language
+        - pt
+        - --beam-size
+        - "1"
+        - --uri
+        - tcp://0.0.0.0:10300
+        - --data-dir
+        - /data
+        image: rhasspy/wyoming-whisper:3.8.1
+        name: whisper
+        ports:
+        - containerPort: 10300
+          hostPort: 10300
+          name: stt
+        resources:
+          limits:
+            memory: 1536Mi
+          requests:
+            cpu: 500m
+            memory: 512Mi
+        volumeMounts:
+        - mountPath: /data
+          name: models
+          subPath: models/voice/whisper
+      - args:
+        - --voice
+        - pt_PT-tugão-medium
+        - --uri
+        - tcp://0.0.0.0:10200
+        - --data-dir
+        - /data
+        image: rhasspy/wyoming-piper:2.5.2
+        name: piper
+        ports:
+        - containerPort: 10200
+          hostPort: 10200
+          name: tts
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            cpu: 200m
+            memory: 128Mi
+        volumeMounts:
+        - mountPath: /data
+          name: models
+          subPath: models/voice/piper
+      nodeSelector:
+        kubernetes.io/hostname: jetson-orin-01
+      tolerations:
+      - effect: NoSchedule
+        key: workload
+        operator: Equal
+        value: jetson
+      volumes:
+      - name: models
+        persistentVolumeClaim:
+          claimName: jetson-ai-pvc
+---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:

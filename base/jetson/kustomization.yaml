@@ -8,3 +8,4 @@ resources:
 - people-detector.yaml
 - go2rtc.yaml
 - jetson-monitor.yaml
+- voice.yaml
