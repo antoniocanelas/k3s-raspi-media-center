@@ -9,3 +9,4 @@ resources:
 - go2rtc.yaml
 - jetson-monitor.yaml
 - voice.yaml
+- frigate.yaml

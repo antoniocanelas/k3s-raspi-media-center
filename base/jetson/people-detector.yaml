@@ -333,7 +333,9 @@ metadata:
   labels:
     app: people-detector
 spec:
-  replicas: 1
+  # Replaced by Frigate (base/jetson/frigate.yaml) on 2026-10-09; kept for
+  # rollback: set replicas back to 1 (and scale frigate to 0).
+  replicas: 0
   strategy:
     type: Recreate
   selector:

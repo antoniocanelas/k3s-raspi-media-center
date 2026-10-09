@@ -21,6 +21,118 @@ metadata:
 ---
 apiVersion: v1
 data:
+  config.yml: |
+    mqtt:
+      enabled: true
+      host: 192.168.0.100
+      port: 1883
+      user: "{FRIGATE_MQTT_USER}"
+      password: "{FRIGATE_MQTT_PASSWORD}"
+      topic_prefix: frigate
+      client_id: frigate-jetson
+
+    detectors:
+      tensorrt:
+        type: tensorrt
+        device: 0
+
+    model:
+      path: /config/model_cache/tensorrt/yolov7-320.trt
+      labelmap_path: /labelmap/coco-80.txt
+      input_tensor: nchw
+      input_pixel_format: rgb
+      width: 320
+      height: 320
+
+    ffmpeg:
+      hwaccel_args: preset-jetson-h264
+      input_args: preset-rtsp-restream
+
+    detect:
+      enabled: true
+      width: 640
+      height: 480
+      fps: 5
+
+    objects:
+      track:
+        - person
+      filters:
+        person:
+          min_score: 0.5
+          threshold: 0.7
+
+    motion:
+      mask:
+        timestamp:
+          friendly_name: Data e hora da camera
+          enabled: true
+          coordinates: "0.090,0.030,0.660,0.030,0.660,0.115,0.090,0.115"
+
+    snapshots:
+      enabled: true
+      bounding_box: true
+      retain:
+        default: 7
+
+    record:
+      enabled: true
+      continuous:
+        days: 0
+      motion:
+        days: 0
+      alerts:
+        retain:
+          days: 7
+      detections:
+        retain:
+          days: 7
+
+    review:
+      alerts:
+        labels:
+          - person
+
+    cameras:
+      cam60:
+        friendly_name: Entrada Geral
+        ffmpeg:
+          inputs:
+            - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam60
+              roles: [detect]
+            - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam60_hd
+              roles: [record]
+      cam62:
+        friendly_name: Entrada Porta
+        ffmpeg:
+          inputs:
+            - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam62
+              roles: [detect]
+            - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam62_hd
+              roles: [record]
+      cam63:
+        friendly_name: Entrada Portão
+        ffmpeg:
+          inputs:
+            - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam63
+              roles: [detect]
+            - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam63_hd
+              roles: [record]
+        objects:
+          filters:
+            person:
+              mask:
+                caminho:
+                  friendly_name: Caminho fora da propriedade
+                  enabled: true
+                  coordinates: "0.734,0.000,1.000,0.000,1.000,0.146,0.734,0.146"
+kind: ConfigMap
+metadata:
+  name: frigate
+  namespace: ai
+---
+apiVersion: v1
+data:
   run.sh: |
     #!/bin/sh
     set -e
@@ -517,6 +629,24 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
+    app: frigate
+  name: frigate
+  namespace: ai
+spec:
+  ports:
+  - name: api
+    port: 5000
+    targetPort: api
+  - name: ui
+    port: 8971
+    targetPort: ui
+  selector:
+    app: frigate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
     app: go2rtc
   name: go2rtc
   namespace: ai
@@ -955,6 +1085,108 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app: frigate
+  name: frigate
+  namespace: ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frigate
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: frigate
+    spec:
+      containers:
+      - command:
+        - bash
+        - -c
+        - |
+          set -e
+          # RTSP login for go2rtc = camera login, kept URL-encoded (it goes into URLs).
+          cred="${CAM1_URL#*://}"; cred="${cred%%@*}"
+          export FRIGATE_RTSP_USER="${cred%%:*}" FRIGATE_RTSP_PASSWORD="${cred#*:}"
+          unset CAM1_URL
+          cp /frigate-config/config.yml /config/config.yml
+          exec /init
+        env:
+        - name: CAM1_URL
+          valueFrom:
+            secretKeyRef:
+              key: CAM1_URL
+              name: camera-rtsp
+        - name: FRIGATE_MQTT_USER
+          valueFrom:
+            secretKeyRef:
+              key: MQTT_USER
+              name: mqtt
+        - name: FRIGATE_MQTT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: MQTT_PASS
+              name: mqtt
+        - name: YOLO_MODELS
+          value: yolov7-320
+        - name: TZ
+          value: Europe/Lisbon
+        image: ghcr.io/blakeblackshear/frigate:0.18.0-tensorrt-jp6
+        name: frigate
+        ports:
+        - containerPort: 8971
+          hostPort: 8971
+          name: ui
+        - containerPort: 5000
+          name: api
+        resources:
+          limits:
+            memory: 3Gi
+          requests:
+            cpu: "1"
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /frigate-config
+          name: config-src
+        - mountPath: /config
+          name: data
+          subPath: frigate/config
+        - mountPath: /media/frigate
+          name: data
+          subPath: frigate/media
+        - mountPath: /tmp/cache
+          name: cache
+        - mountPath: /dev/shm
+          name: shm
+      nodeSelector:
+        kubernetes.io/hostname: jetson-orin-01
+      runtimeClassName: nvidia
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - effect: NoSchedule
+        key: workload
+        operator: Equal
+        value: jetson
+      volumes:
+      - configMap:
+          name: frigate
+        name: config-src
+      - name: data
+        persistentVolumeClaim:
+          claimName: jetson-ai-pvc
+      - emptyDir:
+          sizeLimit: 2Gi
+        name: cache
+      - emptyDir:
+          medium: Memory
+          sizeLimit: 256Mi
+        name: shm
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
     app: go2rtc
   name: go2rtc
   namespace: ai
@@ -1164,7 +1396,7 @@ metadata:
   name: people-detector
   namespace: ai
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: people-detector

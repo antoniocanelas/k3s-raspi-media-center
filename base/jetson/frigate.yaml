@@ -1,0 +1,249 @@
+# Frigate NVR on jetson-orin-01: person detection for the 3 entrance cameras,
+# replacing people-detector (kept at replicas: 0 for rollback).
+# - Cameras are read from our go2rtc (one camera session each): substream camNN
+#   for detection, main stream camNN_hd for event clips. RTSP login = camera
+#   login, taken from Secret ai/camera-rtsp (CAM1_URL, already URL-encoded).
+# - Motion detection runs on the CPU all the time; the TensorRT object detector
+#   (YOLOv7-320, generated once into /config/model_cache) only runs where there
+#   is motion, so the GPU stays mostly free for the LLM.
+# - Recording: only person alerts/detections (7 days); the Synology keeps the
+#   continuous recordings.
+# - Events, per-camera person counts and snapshots go to the Home Assistant
+#   Mosquitto (Secret ai/mqtt) under frigate/.
+# - UI: https://192.168.0.250:8971 (hostPort, Frigate login; the admin password
+#   is printed in the pod log on first start).
+# config.yml is copied from this ConfigMap on every start (GitOps): changes made
+# in the Frigate UI are lost on restart; put them here instead.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frigate
+  namespace: ai
+data:
+  config.yml: |
+    mqtt:
+      enabled: true
+      host: 192.168.0.100
+      port: 1883
+      user: "{FRIGATE_MQTT_USER}"
+      password: "{FRIGATE_MQTT_PASSWORD}"
+      topic_prefix: frigate
+      client_id: frigate-jetson
+
+    detectors:
+      tensorrt:
+        type: tensorrt
+        device: 0
+
+    model:
+      path: /config/model_cache/tensorrt/yolov7-320.trt
+      labelmap_path: /labelmap/coco-80.txt
+      input_tensor: nchw
+      input_pixel_format: rgb
+      width: 320
+      height: 320
+
+    ffmpeg:
+      hwaccel_args: preset-jetson-h264
+      input_args: preset-rtsp-restream
+
+    detect:
+      enabled: true
+      width: 640
+      height: 480
+      fps: 5
+
+    objects:
+      track:
+        - person
+      filters:
+        person:
+          min_score: 0.5
+          threshold: 0.7
+
+    motion:
+      mask:
+        timestamp:
+          friendly_name: Data e hora da camera
+          enabled: true
+          coordinates: "0.090,0.030,0.660,0.030,0.660,0.115,0.090,0.115"
+
+    snapshots:
+      enabled: true
+      bounding_box: true
+      retain:
+        default: 7
+
+    record:
+      enabled: true
+      continuous:
+        days: 0
+      motion:
+        days: 0
+      alerts:
+        retain:
+          days: 7
+      detections:
+        retain:
+          days: 7
+
+    review:
+      alerts:
+        labels:
+          - person
+
+    cameras:
+      cam60:
+        friendly_name: Entrada Geral
+        ffmpeg:
+          inputs:
+            - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam60
+              roles: [detect]
+            - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam60_hd
+              roles: [record]
+      cam62:
+        friendly_name: Entrada Porta
+        ffmpeg:
+          inputs:
+            - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam62
+              roles: [detect]
+            - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam62_hd
+              roles: [record]
+      cam63:
+        friendly_name: Entrada Portão
+        ffmpeg:
+          inputs:
+            - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam63
+              roles: [detect]
+            - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam63_hd
+              roles: [record]
+        objects:
+          filters:
+            person:
+              mask:
+                caminho:
+                  friendly_name: Caminho fora da propriedade
+                  enabled: true
+                  coordinates: "0.734,0.000,1.000,0.000,1.000,0.146,0.734,0.146"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frigate
+  namespace: ai
+  labels:
+    app: frigate
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: frigate
+  template:
+    metadata:
+      labels:
+        app: frigate
+    spec:
+      runtimeClassName: nvidia
+      nodeSelector:
+        kubernetes.io/hostname: jetson-orin-01
+      tolerations:
+      - key: workload
+        operator: Equal
+        value: jetson
+        effect: NoSchedule
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: frigate
+        image: ghcr.io/blakeblackshear/frigate:0.18.0-tensorrt-jp6
+        command:
+        - bash
+        - -c
+        - |
+          set -e
+          # RTSP login for go2rtc = camera login, kept URL-encoded (it goes into URLs).
+          cred="${CAM1_URL#*://}"; cred="${cred%%@*}"
+          export FRIGATE_RTSP_USER="${cred%%:*}" FRIGATE_RTSP_PASSWORD="${cred#*:}"
+          unset CAM1_URL
+          cp /frigate-config/config.yml /config/config.yml
+          exec /init
+        env:
+        - name: CAM1_URL
+          valueFrom:
+            secretKeyRef:
+              name: camera-rtsp
+              key: CAM1_URL
+        - name: FRIGATE_MQTT_USER
+          valueFrom:
+            secretKeyRef:
+              name: mqtt
+              key: MQTT_USER
+        - name: FRIGATE_MQTT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mqtt
+              key: MQTT_PASS
+        # TensorRT engine generated on first start into /config/model_cache.
+        - name: YOLO_MODELS
+          value: yolov7-320
+        - name: TZ
+          value: Europe/Lisbon
+        ports:
+        - name: ui
+          containerPort: 8971
+          hostPort: 8971
+        - name: api
+          containerPort: 5000
+        resources:
+          requests:
+            cpu: "1"
+            memory: 1Gi
+          limits:
+            memory: 3Gi
+        volumeMounts:
+        - name: config-src
+          mountPath: /frigate-config
+        - name: data
+          mountPath: /config
+          subPath: frigate/config
+        - name: data
+          mountPath: /media/frigate
+          subPath: frigate/media
+        - name: cache
+          mountPath: /tmp/cache
+        - name: shm
+          mountPath: /dev/shm
+      volumes:
+      - name: config-src
+        configMap:
+          name: frigate
+      - name: data
+        persistentVolumeClaim:
+          claimName: jetson-ai-pvc
+      - name: cache
+        emptyDir:
+          sizeLimit: 2Gi
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 256Mi
+---
+# In-cluster API (port 5000, no auth) for other pods, e.g. jetson-monitor.
+apiVersion: v1
+kind: Service
+metadata:
+  name: frigate
+  namespace: ai
+  labels:
+    app: frigate
+spec:
+  selector:
+    app: frigate
+  ports:
+  - name: api
+    port: 5000
+    targetPort: api
+  - name: ui
+    port: 8971
+    targetPort: ui
