@@ -58,7 +58,10 @@ No Jetson: imagem oficial `ghcr.io/blakeblackshear/frigate:stable-tensorrt-jp6` 
 
 Alternativas: Scrypted NVR (mais focado em HomeKit), Viseron (semelhante, comunidade menor), DeepStream com app servidor (controlo total, muito mais trabalho).
 
-### Rever no Home Assistant as deteccoes de pessoas do dia
+### Rever no Home Assistant as deteccoes de pessoas do dia (feito em 2026-10-09)
+
+Feito com a integracao Frigate v5.15.6 + Advanced Camera Card v8.1.0 (vista "Deteções" no dashboard do HA). Detalhes no guia do Jetson.
+
 
 **Ideia:** ver no HA (app ou browser) a lista das pessoas detetadas no dia, com snapshot e clip de cada evento, sem ter de abrir o Frigate.
 

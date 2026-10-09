@@ -375,6 +375,10 @@ Configurar os add-ons por SSH no Pi do HA: o CLI `ha apps` instala e arranca, ma
 
 - MQTT para o HA: `frigate/<cam>/person` (contagem), `frigate/<cam>/person/snapshot` (JPEG com a caixa), `frigate/stats`, `frigate/available`.
 - HA: `sensor.jetson_pessoas_camNN` e `binary_sensor.pessoa_camNN` (mesmos ids de antes), `image.frigate_camNN_person` (ultimo snapshot, usado na notificacao), fps e inferencia via `jetson-monitor`.
+- **Integracao Frigate no HA** (repositorio `telheira-ha`: `custom_components/frigate` v5.15.6, `www/community/advanced-camera-card` v8.1.0): ligada a `https://192.168.0.250:8971` (sem validar o certificado proprio do Frigate) com o utilizador Frigate `homeassistant`, perfil **viewer** (so leitura; criado pela API interna, password aleatoria guardada apenas na config da integracao). Cria `camera.cam60/62/63`, presenca/contagens por objeto, snapshots, interruptores e o Frigate no *Media* do HA. Vista **"Deteções"** no dashboard: Advanced Camera Card nas tres cameras, a abrir na galeria de *reviews* (alertas de pessoa com clip e snapshot), com menu para clips, snapshots, linha temporal e ao vivo.
+- **Vista ao vivo do Frigate**: o go2rtc interno do Frigate reaproveita o nosso go2rtc (`camNN_hd` com copia AAC do audio, e `camNN`), com seletor "Alta qualidade"/"Baixa qualidade" por camera.
+- **Objetos**: pessoa, carro, gato e cao (uma unica passagem do YOLOv7, sem custo extra de GPU); so pessoas geram alertas.
+- **OSD**: a data/hora sobreposta foi removida nas cameras `.60/.62/.63` por ONVIF (`DeleteOSD` do token `timeOSD`, porta 2020); a `.61` nao respondia.
 - UI: `https://192.168.0.250:8971` (certificado proprio; utilizador `admin`, password gerada no primeiro arranque: `kubectl -n ai logs deploy/frigate | grep -i password`).
 - Medido: inferencia ~20 ms, 3 cameras a 5 fps, CPU 11-21%; memoria do Jetson com LLM + Frigate + voz ~7,0/7,6 GB.
 - `config.yml` e copiado do ConfigMap em cada arranque: alteracoes na UI do Frigate perdem-se; fazer as alteracoes no repositorio.
