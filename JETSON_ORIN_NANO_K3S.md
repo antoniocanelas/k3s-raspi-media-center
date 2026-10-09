@@ -353,9 +353,13 @@ Com o `qwen3:4b-instruct` carregado e o video ativo, o Jetson fica em ~5,3 GB de
 
 ### Voz local (Assist)
 
-`base/jetson/voice.yaml`: Wyoming **Whisper** (`rhasspy/wyoming-whisper:3.8.1`, `small-int8`, `pt`, `beam-size 5`, `--initial-prompt` com vocabulario da casa) e **Piper** (`rhasspy/wyoming-piper:2.5.2`, voz `pt_PT-tugão-medium`), ambos no CPU para nao disputarem a GPU. Modelos em `jetson-ai-pvc` (`models/voice`). O HA liga-se por `hostPort`: `192.168.0.250:10300` (STT, `stt.faster_whisper`) e `:10200` (TTS, `tts.piper`). O pipeline "Jetson" (preferido) usa Whisper `pt` + agente Qwen3 + Piper `pt_PT`.
+Desde 2026-10-09 a voz corre nos **add-ons oficiais do Home Assistant**, no Raspberry Pi 5 (8 GB) do HA, e ja nao no Jetson: **Whisper** (`core_whisper` 3.5.3: `small-int8`, `pt`, `beam_size 5`) e **Piper** (`core_piper` 2.5.2: voz `pt_PT-tugão-medium`). As integracoes Wyoming foram descobertas automaticamente; entidades `stt.faster_whisper` e `tts.piper`, usadas pelo pipeline "Jetson" (preferido) com o agente Qwen3 do Jetson. Vantagens: a voz funciona mesmo com o cluster ou o Jetson em baixo, entra nos backups do HA e libertou ~0,6 GB no Jetson (de ~330 MB para ~910 MB disponiveis).
 
-Teste de ida e volta (frases do Piper, comprimidas em MP3, convertidas para 16 kHz): Piper ~0,3 s por frase; Whisper ~4,5 s por frase de ~2 s; reconhecimento razoavel mas com erros em frases rapidas ("escritorio as dez" -> "quitos la desde"). Avaliar com voz real antes de mudar de modelo; alternativas: `medium-int8` no CPU (mais lento) ou `dustynv/wyoming-whisper:2.3.0-r36.4.0` com GPU (imagem de 9,5 GB, compete com o LLM pela memoria).
+Limitacao: o add-on do Whisper nao tem `initial prompt` (vocabulario da casa) e o CPU do Pi 5 e mais lento que o do Jetson. No teste sintetico (frases do Piper em MP3) o reconhecimento piorou e demora ~7 s por frase (no Jetson, com vocabulario, ~4,5 s). Falta avaliar com voz real; alternativas no ficheiro de tarefas.
+
+Historico: de inicio corria no Jetson (`base/jetson/voice.yaml`, removido), com Wyoming Whisper/Piper no CPU e `hostPort` 10300/10200.
+
+Configurar os add-ons por SSH no Pi do HA: o CLI `ha apps` instala e arranca, mas nao altera opcoes; as opcoes mudam-se pela API do supervisor (`POST http://supervisor/addons/<slug>/options` com o token do supervisor), sempre sem imprimir o token.
 
 ### Monitorizacao no HA
 

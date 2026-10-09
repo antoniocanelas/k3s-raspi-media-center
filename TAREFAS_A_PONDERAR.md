@@ -65,7 +65,7 @@ Alternativas: Scrypted NVR (mais focado em HomeKit), Viseron (semelhante, comuni
 - **Reconhecimento facial** (fase 4): so cameras porta (`cam62`) e portao (`cam63`); falta decidir quem entra na galeria (com fotos e conhecimento das pessoas) e o que fazer com desconhecidos.
 
 ## Assistente (LLM / voz)
-- **Reconhecimento de voz**: testar o Whisper `small-int8` com voz real; se falhar muito, `medium-int8` (CPU, mais lento) ou a imagem GPU `dustynv/wyoming-whisper:2.3.0-r36.4.0` (9,5 GB, compete com o LLM pela memoria).
+- **Reconhecimento de voz** (avaliar com voz real): hoje o Whisper `small-int8` corre no add-on do HA, sem vocabulario da casa e a ~7 s por frase. Opcoes se falhar muito: (1) Whisper com `--initial-prompt` no `pi-master-00` (Pi 5 do cluster, parado; mesma velocidade, melhores palavras), mantendo o Piper no add-on; (2) modelo `medium` no add-on (o Pi do HA tem ~6,5 GB livres; mais preciso, ~12-15 s por frase); (3) Whisper na GPU do Jetson (~1 s e preciso, mas volta a apertar a memoria do Jetson).
 - **Satelite de voz** (ex.: ESP32-S3 / Voice PE) a usar o pipeline "Jetson" com STT/TTS locais.
 - **Controlo da casa pelo LLM**: rever com o uso real se as instrucoes e aliases chegam, ou se e preciso restringir mais a lista exposta.
 - **Modelos**: reavaliar quando houver modelos 3-4B melhores em pt-PT com tool calling; um 7-8B so cabe sem o video ligado.
