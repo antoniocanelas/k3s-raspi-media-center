@@ -52,11 +52,19 @@ spec:
           # qwen3-jetson = qwen3:4b-instruct without mmap. On the Orin (CPU and
           # GPU share RAM) a mmapped model stays resident twice: ~4.2 GB on the
           # GPU plus ~2.5 GB of mapped file. use_mmap false saves ~1.9 GB.
-          printf 'FROM qwen3:4b-instruct\nPARAMETER use_mmap false\nPARAMETER num_ctx 8192\n' > /tmp/Modelfile.qwen3-jetson
+          # num_gpu 99 forces every layer onto the GPU: Ollama estimates free
+          # GPU memory with the page cache counted as used (Jetson unified
+          # memory) and otherwise splits the model ~50/50 with the CPU.
+          printf 'FROM qwen3:4b-instruct\nPARAMETER use_mmap false\nPARAMETER num_ctx 8192\nPARAMETER num_gpu 99\n' > /tmp/Modelfile.qwen3-jetson
           ollama create qwen3-jetson -f /tmp/Modelfile.qwen3-jetson
-          # Load the HA agent's model right away (and keep it), so the first
-          # Assist request after a restart does not wait for the load.
-          ollama run --keepalive -1 qwen3-jetson "" >/dev/null 2>&1 || true
+          # Load the HA agent's model right away and keep it (empty prompt =
+          # load only). Plain HTTP over bash: the image has no curl, and
+          # "ollama run" with an empty prompt does not load anything.
+          body='{"model":"qwen3-jetson:latest","prompt":"","keep_alive":-1}'
+          exec 3<>/dev/tcp/127.0.0.1/11434
+          printf 'POST /api/generate HTTP/1.0\r\nContent-Type: application/json\r\nContent-Length: %s\r\n\r\n%s' "${#body}" "$body" >&3
+          head -1 <&3 || true
+          exec 3>&-
           wait $pid
         env:
         - name: OLLAMA_HOST

@@ -68,6 +68,10 @@ data:
           enabled: true
           coordinates: "0.090,0.030,0.660,0.030,0.660,0.115,0.090,0.115"
 
+    # Combined all-cameras view: unused, costs an encoder/output process.
+    birdseye:
+      enabled: false
+
     snapshots:
       enabled: true
       bounding_box: true
