@@ -19,3 +19,11 @@ jobs:
           yq_version: "v4.20.2"
       - name: Validate manifests
         run: ./scripts/validate.sh
+      - name: Notify Home Assistant on failure
+        if: failure()
+        env:
+          HOOK: ${{ secrets.HA_CI_WEBHOOK_ID }}
+        run: |
+          curl -fsS -m 20 --retry 3 -X POST -H "Content-Type: application/json" \
+            -d "{\"repo\":\"${{ github.event.repository.name }}\",\"workflow\":\"${{ github.workflow }}\",\"ref\":\"${{ github.ref_name }}\",\"commit\":\"${GITHUB_SHA:0:7}\",\"url\":\"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+            "https://telheira.duckdns.org:8123/api/webhook/${HOOK}" || echo "HA webhook not reachable"
