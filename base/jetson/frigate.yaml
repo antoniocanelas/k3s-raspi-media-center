@@ -107,6 +107,30 @@ data:
               roles: [record]
       cam62:
         friendly_name: Entrada Porta
+        # Plants along the passage kept triggering motion; the path itself
+        # stays unmasked (people walk there). Pixels of the 640x480 frame.
+        motion:
+          mask:
+            timestamp:
+              friendly_name: Data e hora da camera
+              enabled: true
+              coordinates: "58,14,422,14,422,55,58,55"
+            jardim_fundo:
+              friendly_name: Palmeira e jardim ao fundo
+              enabled: true
+              coordinates: "200,0,440,0,440,50,200,50"
+            canteiro:
+              friendly_name: Canteiro a esquerda
+              enabled: true
+              coordinates: "205,150,270,150,335,480,215,480"
+            vasos:
+              friendly_name: Vasos a direita
+              enabled: true
+              coordinates: "412,225,505,225,505,425,412,425"
+            plantas_baixo:
+              friendly_name: Plantas em baixo a direita
+              enabled: true
+              coordinates: "480,370,640,370,640,480,480,480"
         ffmpeg:
           inputs:
             - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam62
