@@ -2379,6 +2379,46 @@ spec:
           type: CharDevice
         name: tun
 ---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: duckdns-updater
+  namespace: kube-system
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 120
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+          - command:
+            - sh
+            - -c
+            - |
+              r=$(curl -fsS -m 30 "https://www.duckdns.org/update?domains=telheira&token=${DUCKDNS_TOKEN}&ip=")
+              echo "duckdns: $r"
+              [ "$r" = "OK" ]
+            env:
+            - name: DUCKDNS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: DUCKDNS_TOKEN
+                  name: duckdns
+            image: curlimages/curl:8.10.1
+            name: update
+            resources:
+              limits:
+                memory: 32Mi
+              requests:
+                cpu: 5m
+                memory: 8Mi
+          restartPolicy: Never
+  schedule: '*/5 * * * *'
+  successfulJobsHistoryLimit: 1
+---
 addressType: IPv4
 apiVersion: discovery.k8s.io/v1
 endpoints:
@@ -2577,6 +2617,28 @@ kind: IngressRoute
 metadata:
   labels:
     app: media
+  name: homeassistant-external-duckdns
+  namespace: media
+spec:
+  entryPoints:
+  - homeassistantsecure
+  routes:
+  - kind: Rule
+    match: Host(`telheira.duckdns.org`)
+    priority: 1
+    services:
+    - kind: Service
+      name: homeassistant-external
+      namespace: media
+      port: 8123
+  tls:
+    certResolver: letsencrypt
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app: media
   name: media
   namespace: media
 spec:
@@ -2769,6 +2831,95 @@ kind: IngressRoute
 metadata:
   labels:
     app: media
+  name: media-external-duckdns
+  namespace: media
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host(`telheira.duckdns.org`) && PathPrefix(`/prowlarr`)
+    priority: 200
+    services:
+    - kind: Service
+      name: prowlarr
+      namespace: media
+      port: 9696
+  - kind: Rule
+    match: Host(`telheira.duckdns.org`) && PathPrefix(`/radarr`)
+    priority: 200
+    services:
+    - kind: Service
+      name: radarr
+      namespace: media
+      port: 7878
+  - kind: Rule
+    match: Host(`telheira.duckdns.org`) && PathPrefix(`/sonarr`)
+    priority: 200
+    services:
+    - kind: Service
+      name: sonarr
+      namespace: media
+      port: 8989
+  - kind: Rule
+    match: Host(`telheira.duckdns.org`) && PathPrefix(`/bazarr`)
+    priority: 200
+    services:
+    - kind: Service
+      name: bazarr
+      namespace: media
+      port: 6767
+  - kind: Rule
+    match: Host(`telheira.duckdns.org`) && PathPrefix(`/changedetection`)
+    middlewares:
+    - name: strip-changedetection
+      namespace: media
+    priority: 200
+    services:
+    - kind: Service
+      name: changedetection
+      namespace: media
+      port: 5000
+  - kind: Rule
+    match: Host(`telheira.duckdns.org`) && PathPrefix(`/jellyfin`)
+    middlewares:
+    - name: jellyfin-redirect
+      namespace: media
+    - name: strip-jellyfin
+      namespace: media
+    priority: 200
+    services:
+    - kind: Service
+      name: jellyfin-external
+      namespace: media
+      port: 8096
+  - kind: Rule
+    match: Host(`telheira.duckdns.org`) && PathPrefix(`/qbittorrent`)
+    middlewares:
+    - name: strip-qbittorrent
+      namespace: media
+    priority: 200
+    services:
+    - kind: Service
+      name: qbittorrent
+      namespace: media
+      port: 8080
+  - kind: Rule
+    match: Host(`telheira.duckdns.org`)
+    priority: 1
+    services:
+    - kind: Service
+      name: qbittorrent
+      namespace: media
+      port: 8080
+  tls:
+    certResolver: letsencrypt
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app: media
   name: plex-external
   namespace: media
 spec:
@@ -2785,6 +2936,28 @@ spec:
       port: 32400
   tls:
     certResolver: zerossl
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app: media
+  name: plex-external-duckdns
+  namespace: media
+spec:
+  entryPoints:
+  - plexsecure
+  routes:
+  - kind: Rule
+    match: Host(`telheira.duckdns.org`)
+    priority: 1
+    services:
+    - kind: Service
+      name: plex-external
+      namespace: media
+      port: 32400
+  tls:
+    certResolver: letsencrypt
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware

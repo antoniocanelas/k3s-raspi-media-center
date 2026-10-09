@@ -1,0 +1,43 @@
+# Keeps telheira.duckdns.org pointing at the home public IP. DuckDNS takes
+# the IP from the request source (ip= left empty). Token in Secret
+# kube-system/duckdns (DUCKDNS_TOKEN), created by hand, never in git.
+# The router keeps updating telheira.tplinkdns.com on its own.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: duckdns-updater
+  namespace: kube-system
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 120
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: update
+            image: curlimages/curl:8.10.1
+            command:
+            - sh
+            - -c
+            - |
+              r=$(curl -fsS -m 30 "https://www.duckdns.org/update?domains=telheira&token=${DUCKDNS_TOKEN}&ip=")
+              echo "duckdns: $r"
+              [ "$r" = "OK" ]
+            env:
+            - name: DUCKDNS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: duckdns
+                  key: DUCKDNS_TOKEN
+            resources:
+              requests:
+                cpu: 5m
+                memory: 8Mi
+              limits:
+                memory: 32Mi

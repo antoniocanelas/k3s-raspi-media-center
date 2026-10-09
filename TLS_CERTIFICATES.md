@@ -6,6 +6,7 @@ Ha dois caminhos HTTPS para o Home Assistant, independentes um do outro:
 |---|---|---|---|
 | **Tailscale** (add-on do HA, modo `serve`) | `https://homeassistant.tailed34f9.ts.net` | Let's Encrypt emitido e renovado pelo Tailscale (DNS do Tailscale) | dispositivos no tailnet |
 | **Publico** (Traefik no cluster) | `https://telheira.tplinkdns.com:8123` | **ZeroSSL** por ACME (resolver `zerossl` no Traefik) | qualquer pessoa na internet (porta 8123 encaminhada no router) |
+| **Publico DuckDNS** (Traefik no cluster) | `https://telheira.duckdns.org:8123` | **Let's Encrypt** (resolver `letsencrypt`) | qualquer pessoa na internet (mesmas portas do router) |
 
 ## Tailscale HTTPS (ativo desde 2026-10-09)
 
@@ -37,6 +38,21 @@ echo | openssl s_client -connect telheira.tplinkdns.com:8123 -servername telheir
 **Resultado em 2026-10-09:** duas tentativas do ZeroSSL (15:19 e 15:37 UTC) terminaram com `the server didn't respond to our request (status=pending)`: a validacao ficou pendente ate o Traefik desistir. A porta 80 responde a partir da internet (teste de fora de casa: `404` do handler ACME do Traefik), por isso a causa provavel e o mesmo DNS da TP-Link. O resolver `zerossl` fica configurado e o Traefik volta a tentar sozinho (diariamente e a cada reinicio).
 
 **Decisao (2026-10-09):** manter `telheira.tplinkdns.com` por agora, sem certificado publico valido; o acesso seguro do dia a dia e o do Tailscale. **Tailscale Funnel avaliado e rejeitado** (nao se quer o HA publicado por essa via). Registar outro nome no `tplinkdns` nao resolve: os bugs (ns4/ns5 sensiveis a maiusculas na zona, NXDOMAIN para AAAA) afetam toda a zona `tplinkdns.com`. Quando se quiser HTTPS publico fiavel: **DuckDNS + Let's Encrypt** (add-on oficial DuckDNS no HA ou atualizador no cluster; novo endereco `<nome>.duckdns.org`) ou **Tailscale `funnel`** (sem portas abertas no router). Ambas mudam o endereco externo da app e das notificacoes.
+
+## DuckDNS: telheira.duckdns.org (configurado em 2026-10-09)
+
+- **IP:** CronJob `kube-system/duckdns-updater` (`base/duckdns/`) chama `https://www.duckdns.org/update?domains=telheira&token=...&ip=` a cada 5 minutos (a DuckDNS usa o IP de origem do pedido). O token vive no Secret `kube-system/duckdns` (chave `DUCKDNS_TOKEN`, criado a mao, nunca no Git). O router continua a atualizar o `tplinkdns`.
+- **Rotas:** `homeassistant-external-duckdns`, `media-external-duckdns` e `plex-external-duckdns` em `base/ingress-routes.yaml`, copias das rotas `tplinkdns` com `Host(\`telheira.duckdns.org\`)` e `certResolver: letsencrypt`. Sao rotas separadas para o pedido de certificado nao incluir o nome `tplinkdns` (que falharia a validacao e bloquearia o certificado inteiro).
+- Mesmas portas encaminhadas no router (80 para o HTTP-01, 443, 8123, 32443).
+
+Verificar:
+
+```bash
+kubectl --context raspi -n kube-system create job duckdns-manual --from=cronjob/duckdns-updater
+kubectl --context raspi -n kube-system logs job/duckdns-manual   # duckdns: OK
+dig +short telheira.duckdns.org
+echo | openssl s_client -connect telheira.duckdns.org:8123 -servername telheira.duckdns.org 2>/dev/null | openssl x509 -noout -issuer -enddate
+```
 
 ## Historico: porque o Let's Encrypt deixou de funcionar
 

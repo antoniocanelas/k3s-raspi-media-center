@@ -7,6 +7,8 @@ resources:
 - ../../base/jetson
 # Traefik (kube-system HelmChartConfig: ACME resolver, persistence, entrypoints).
 - ../../base/traefik
+# DuckDNS updater for telheira.duckdns.org (kube-system CronJob).
+- ../../base/duckdns
 
 images:
   - name: linuxserver/jackett
