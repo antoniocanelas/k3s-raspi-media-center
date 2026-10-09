@@ -171,31 +171,36 @@ data:
             Alta qualidade: cam62_hd
             Baixa qualidade: cam62
         # Plants along the passage kept triggering motion; the path itself
-        # stays unmasked (people walk there). Pixels of the 640x480 frame.
+        # stays unmasked (people walk there). Pixels of the 1280x720 detect frame.
         motion:
           mask:
             jardim_fundo:
               friendly_name: Palmeira e jardim ao fundo
               enabled: true
-              coordinates: "200,0,440,0,440,50,200,50"
+              coordinates: "400,0,880,0,880,75,400,75"
             canteiro:
               friendly_name: Canteiro a esquerda
               enabled: true
-              coordinates: "205,150,270,150,335,480,215,480"
+              coordinates: "410,225,540,225,670,720,430,720"
             vasos:
               friendly_name: Vasos a direita
               enabled: true
-              coordinates: "412,225,505,225,505,425,412,425"
+              coordinates: "824,338,1010,338,1010,638,824,638"
             plantas_baixo:
               friendly_name: Plantas em baixo a direita
               enabled: true
-              coordinates: "480,370,640,370,640,480,480,480"
+              coordinates: "960,555,1280,555,1280,720,960,720"
         ffmpeg:
           inputs:
-            - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam62
-              roles: [detect]
             - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam62_hd
-              roles: [record]
+              roles: [detect, record]
+        # Detect on the main stream at 1280x720 (since 2026-10-09) so faces have
+        # enough pixels for face recognition; the main stream is 720p today.
+        # Masks are pixels of this 1280x720 frame (converted from the old
+        # 640x480 sub stream: x*2, y*1.5, same field of view).
+        detect:
+          width: 1280
+          height: 720
       cam63:
         friendly_name: Portão
         live:
@@ -204,20 +209,25 @@ data:
             Baixa qualidade: cam63
         # The hedge/plants along the back wall and the sunlit wooden fence on
         # the right kept the detector busy (~5 detections/s with nobody there).
-        # Pixels of the 640x480 detect frame: 0.18 rejects relative
+        # Pixels of the 1280x720 detect frame: 0.18 rejects relative
         # coordinates in camera-level masks ("invalid literal for int()").
         motion:
           mask:
             sebe:
               friendly_name: Sebe, plantas e vedacao
               enabled: true
-              coordinates: "102,0,640,0,640,158,550,158,467,106,397,86,333,58,102,36"
+              coordinates: "204,0,1280,0,1280,237,1100,237,934,159,794,129,666,87,204,54"
         ffmpeg:
           inputs:
-            - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam63
-              roles: [detect]
             - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam63_hd
-              roles: [record]
+              roles: [detect, record]
+        # Detect on the main stream at 1280x720 (since 2026-10-09) so faces have
+        # enough pixels for face recognition; the main stream is 720p today.
+        # Masks are pixels of this 1280x720 frame (converted from the old
+        # 640x480 sub stream: x*2, y*1.5, same field of view).
+        detect:
+          width: 1280
+          height: 720
         objects:
           filters:
             person:
@@ -225,9 +235,9 @@ data:
                 caminho:
                   friendly_name: Caminho fora da propriedade
                   enabled: true
-                  # Pixels of the 640x480 detect frame (0.18 rejected relative
+                  # Pixels of the 1280x720 detect frame (0.18 rejected relative
                   # coordinates here: "invalid literal for int()").
-                  coordinates: "470,0,640,0,640,70,470,70"
+                  coordinates: "940,0,1280,0,1280,105,940,105"
 kind: ConfigMap
 metadata:
   name: frigate
