@@ -79,12 +79,18 @@ spec:
           value: "1"
         # Measured 2026-10-09 on a ~7k-token prompt: flash attention is neutral
         # (~300 tok/s prompt, ~7 tok/s generation); a q8_0 KV cache saves
-        # 0.6 GB but drops generation to ~6 tok/s, so the cache stays f16.
-        # The limit is GPU compute shared with the people-detector.
+        # 0.6 GB but drops generation to ~6 tok/s. Since 2026-10-09 the cache is
+        # q8_0 anyway: with Frigate on the Jetson the memory matters more.
         - name: OLLAMA_FLASH_ATTENTION
           value: "1"
         - name: OLLAMA_KV_CACHE_TYPE
-          value: f16
+          value: q8_0
+        # llama-server (started by Ollama, which does not pass --cache-ram)
+        # keeps a prompt cache in host RAM, 8 GB by default: one ~4.6k-token
+        # HA request took 650 MiB on 2026-10-09. 0 turns it off; the slot still
+        # reuses the common prefix of the previous request.
+        - name: LLAMA_ARG_CACHE_RAM
+          value: "0"
         # 8192: with house control the HA agent sends ~5k tokens (Assist tools
         # + exposed entities); 4096 made Ollama reject the request.
         - name: OLLAMA_CONTEXT_LENGTH

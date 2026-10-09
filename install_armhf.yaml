@@ -1442,7 +1442,9 @@ spec:
         - name: OLLAMA_FLASH_ATTENTION
           value: "1"
         - name: OLLAMA_KV_CACHE_TYPE
-          value: f16
+          value: q8_0
+        - name: LLAMA_ARG_CACHE_RAM
+          value: "0"
         - name: OLLAMA_CONTEXT_LENGTH
           value: "8192"
         - name: PULL_MODELS
