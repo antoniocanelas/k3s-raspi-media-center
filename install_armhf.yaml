@@ -325,6 +325,8 @@ data:
                    state_class="measurement", icon="mdi:memory"),
             sensor("gpu_load", "Carga GPU", unit_of_measurement="%", state_class="measurement",
                    icon="mdi:expansion-card"),
+            sensor("cpu_load", "Carga CPU", unit_of_measurement="%", state_class="measurement",
+                   icon="mdi:cpu-64-bit"),
             sensor("llm_model", "Modelo LLM carregado", icon="mdi:brain"),
             sensor("llm_online", "LLM", comp="binary_sensor", device_class="connectivity",
                    payload_on="on", payload_off="off"),
@@ -358,7 +360,13 @@ data:
             return default
 
 
-    def state():
+    def cpu_times():
+        # Aggregate "cpu" line of /proc/stat: (idle + iowait, total) in jiffies.
+        f = [int(x) for x in open("/proc/stat").readline().split()[1:]]
+        return f[3] + f[4], sum(f)
+
+
+    def state(gpu_avg, cpu_pct):
         temps = {}
         for z in glob.glob("/sys/devices/virtual/thermal/thermal_zone*"):
             t = read(f"{z}/temp")
@@ -368,12 +376,12 @@ data:
         for line in open("/proc/meminfo"):
             k, v = line.split(":")
             mem[k] = int(v.split()[0])
-        gpu = read("/sys/devices/platform/17000000.gpu/load", "0")
         st = {
             "temperature": round(temps.get("tj-thermal", max(temps.values(), default=0)), 1),
             "ram_used": round(100 * (1 - mem["MemAvailable"] / mem["MemTotal"]), 1),
             "ram_available": mem["MemAvailable"] // 1024,
-            "gpu_load": round(int(gpu) / 10, 1),
+            "gpu_load": gpu_avg,
+            "cpu_load": cpu_pct,
             "llm_online": "off",
             "llm_model": "none",
         }
@@ -388,18 +396,30 @@ data:
 
 
     last_discovery = 0
+    cpu_prev = cpu_times()
     while True:
+        # GPU load is an instant value (per mille) and Frigate/the LLM use the
+        # GPU in short bursts, so average one sample per second over the 30 s.
+        samples = []
+        for _ in range(30):
+            g = read("/sys/devices/platform/17000000.gpu/load")
+            if g and g.isdigit():
+                samples.append(int(g) / 10)
+            time.sleep(1)
+        gpu_avg = round(sum(samples) / len(samples), 1) if samples else 0
+        idle, total = cpu_times()
+        cpu_pct = round(100 * (1 - (idle - cpu_prev[0]) / max(total - cpu_prev[1], 1)), 1)
+        cpu_prev = (idle, total)
         try:
             msgs = []
             if time.time() - last_discovery > 3600:
                 msgs += discovery()
-            msgs.append((STATE, json.dumps(state()), False))
+            msgs.append((STATE, json.dumps(state(gpu_avg, cpu_pct)), False))
             publish(msgs)
             if len(msgs) > 1:
                 last_discovery = time.time()
         except Exception as e:
             print(f"monitor: {e}", flush=True)
-        time.sleep(30)
 kind: ConfigMap
 metadata:
   name: jetson-monitor
