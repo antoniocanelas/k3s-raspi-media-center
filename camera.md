@@ -97,6 +97,29 @@ To decide: if Frigate/HA notifications are enough, uncheck **Push notifications*
 in the Smart Event rules (or turn the rules off) to avoid double alerts from the
 VIGI app. Leaving them on costs nothing on the Jetson (it runs in the camera).
 
+### 5. Other settings seen on .60 (keep, unless noted)
+
+| Where | Setting | Value on .60 | Wanted |
+|---|---|---|---|
+| Network Settings → Platform Access | Platform Access Mode | VIGI Cloud VMS, *Access to VIGI Cloud Personal* On, bound to António's TP-Link ID, Connected | keep (VIGI app access). Unbind/off only if the VIGI app is no longer wanted |
+| Network Settings → Platform Access | Join User Experience Improvement Program | Off | keep Off |
+| Network Settings → Network Service → ONVIF | Open Network Video Interface | **On** | keep On |
+| Network Settings → Network Service → ONVIF | Automatically switch to static IP | On | keep |
+| Network Settings → Network Service → ONVIF | Onvif Port (greyed) | 80 | keep; ONVIF also answers on **2020** (used by Claude) |
+| Network Settings → Network Service → ONVIF | Time Verification | Off | keep **Off** (On rejects ONVIF requests whose timestamp drifts) |
+| Network Settings → Network Service | SNMP v1/v2c/v3, RTMP, DDNS (NO-IP), 802.1x | all Off | keep Off (DDNS is done by the cluster, `telheira.duckdns.org`) |
+| Network Settings → Email | Sender/SMTP | empty | keep empty |
+| Network Settings → Port Forwarding | Port Forwarding (UPnP) | Off, all ports Disabled | keep **Off**: cameras must not be exposed to the internet |
+| Network Settings → IP/MAC Restriction | IP/MAC Restriction | Off | keep Off (an allow list would have to include go2rtc's node and the Jetson) |
+| Network Settings → Multicast | Enable Multicast | Off | keep Off |
+| Network Settings → FTP Settings | Server / Upload | Off | keep Off |
+| Network Settings → Openapi | Openapi | Off | **option**: TP-Link's official local API. If turned on, Claude could change these settings by API instead of the web UI — check the docs/security first |
+| Network Settings → Log Server | Log Server | Off | keep Off |
+| System Settings → Date | Time Zone | (UTC-00:00) Dublin, Edinburgh, Lisbon, London; DST Auto | keep (Portugal; device time matched local time) |
+| System Settings → Date | Format / time source | YYYY-MM-DD, 24 hour, NTP Auto every 60 min | keep |
+| System Settings → User Management | Users | `admin` (Administrator) + the TP-Link ID (Operator) | keep; the RTSP/ONVIF account in `ai/camera-rtsp` is `admin` |
+| System Settings → Certificate Management | HTTPS certificates | self-signed RSA + ECC, 2026-06-05 → 2036-06-05 | keep |
+
 ## Verification after changes (Claude)
 
 - Keyframe interval per HD stream (should be ~2 s):
