@@ -247,14 +247,22 @@ data:
             sensor("llm_online", "LLM", comp="binary_sensor", device_class="connectivity",
                    payload_on="on", payload_off="off"),
         ]
+        # Per-camera fps from Frigate's stats (published every 60 s).
         for cam in ("cam60", "cam62", "cam63"):
             cfg = {"name": f"FPS {cam}", "unique_id": f"jetson_orin_fps_{cam}",
                    "default_entity_id": f"sensor.jetson_fps_{cam}",
-                   "state_topic": "jetson/detector/state",
-                   "value_template": "{{ value_json.%s | default(0) }}" % cam,
+                   "state_topic": "frigate/stats",
+                   "value_template": "{{ value_json.cameras.%s.camera_fps | default(0) }}" % cam,
                    "unit_of_measurement": "fps", "state_class": "measurement",
-                   "icon": "mdi:cctv", "expire_after": 120, "device": DEVICE}
+                   "icon": "mdi:cctv", "expire_after": 180, "device": DEVICE}
             msgs.append((f"homeassistant/sensor/jetson_orin/fps_{cam}/config", json.dumps(cfg), True))
+        cfg = {"name": "Inferência Frigate", "unique_id": "jetson_orin_frigate_inference",
+               "default_entity_id": "sensor.jetson_frigate_inference",
+               "state_topic": "frigate/stats",
+               "value_template": "{{ value_json.detectors.tensorrt.inference_speed | default(0) }}",
+               "unit_of_measurement": "ms", "state_class": "measurement",
+               "icon": "mdi:timer-outline", "expire_after": 180, "device": DEVICE}
+        msgs.append(("homeassistant/sensor/jetson_orin/frigate_inference/config", json.dumps(cfg), True))
         return msgs
 
 
