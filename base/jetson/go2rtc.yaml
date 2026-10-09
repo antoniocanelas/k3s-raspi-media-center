@@ -3,10 +3,15 @@
 # sessions until they time out; every people-detector restart or manual test
 # used to open new camera sessions and starve them (0 fps). go2rtc keeps one
 # session per camera and serves any number of local consumers:
-#   rtsp://go2rtc.ai.svc.cluster.local:8554/cam60   (video only)
+#   rtsp://USER:PASS@go2rtc.ai.svc.cluster.local:8554/cam60
 # Stream names come from the camera IP's last octet, matching the detector's
 # sensorId. Camera URLs come from Secret ai/camera-rtsp (CAM1_URL..CAM3_URL).
-# ClusterIP only: the restreams have no authentication.
+#   camNN     substream (stream2), video only - people-detector
+#   camNN_hd  main stream (stream1), video + audio - Home Assistant / LAN
+# RTSP is also published on the LAN at rtsp://192.168.0.250:8554/<name>
+# (hostPort, Jetson only) and requires the cameras' own user/password, taken
+# from CAM1_URL. The HTTP API (1984) can add arbitrary sources: ClusterIP only,
+# never exposed.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -16,16 +21,36 @@ data:
   run.sh: |
     #!/bin/sh
     set -e
+    # RTSP login = camera login (URL-decoded user:pass of CAM1_URL), written
+    # as YAML single-quoted strings ('' escapes a quote).
+    yq() { awk -v s="$1" 'BEGIN {
+      h = "0123456789abcdef"; o = ""
+      for (i = 1; i <= length(s); i++) {
+        c = substr(s, i, 1)
+        if (c == "%" && i + 2 <= length(s)) {
+          c = sprintf("%c", (index(h, tolower(substr(s, i+1, 1))) - 1) * 16 + index(h, tolower(substr(s, i+2, 1))) - 1)
+          i += 2
+        }
+        if (c == "\047") c = "\047\047"
+        o = o c
+      }
+      printf "\047%s\047", o }'; }
+    cred="${CAM1_URL#*://}"; cred="${cred%%@*}"
     {
       echo 'rtsp:'
       echo '  listen: ":8554"'
+      echo "  username: $(yq "${cred%%:*}")"
+      echo "  password: $(yq "${cred#*:}")"
       echo 'api:'
       echo '  listen: ":1984"'
+      echo 'webrtc:'
+      echo '  listen: ""'
       echo 'streams:'
       for u in "$CAM1_URL" "$CAM2_URL" "$CAM3_URL"; do
         [ -n "$u" ] || continue
         h="${u##*@}"; h="${h%%[:/]*}"
         printf '  cam%s: "%s#media=video"\n' "${h##*.}" "$u"
+        printf '  cam%s_hd: "%s"\n' "${h##*.}" "${u%/stream2}/stream1"
       done
     } > /tmp/go2rtc.yaml
     exec go2rtc -config /tmp/go2rtc.yaml
@@ -66,6 +91,8 @@ spec:
         ports:
         - name: rtsp
           containerPort: 8554
+          # LAN access for Home Assistant: rtsp://192.168.0.250:8554/<stream>
+          hostPort: 8554
         - name: api
           containerPort: 1984
         readinessProbe:

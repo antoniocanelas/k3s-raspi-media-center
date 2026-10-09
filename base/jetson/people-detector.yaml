@@ -44,7 +44,8 @@ data:
     # Streams come from go2rtc (base/jetson/go2rtc.yaml), which holds a single
     # session per camera, so detector restarts no longer open camera sessions.
     # rtspt:// forces RTP over TCP (UDP RTP does not cross the pod network NAT).
-    G="${GO2RTC_RTSP:-rtspt://go2rtc.ai.svc.cluster.local:8554}"
+    # go2rtc requires the cameras' login, reused from the camera URL.
+    G="${GO2RTC_HOST:-go2rtc.ai.svc.cluster.local:8554}"
     n=0
     : > /tmp/sources.txt
     : > /tmp/msgconv.txt
@@ -53,7 +54,8 @@ data:
       # Sensor id / go2rtc stream name from the camera IP's last octet
       # (rtsp://u:p@192.168.0.60:... -> cam60); it is the MQTT sensorId.
       h="${u##*@}"; h="${h%%[:/]*}"
-      u="$G/cam${h##*.}"
+      c="${u#*://}"; c="${c%%@*}"
+      u="rtspt://$c@$G/cam${h##*.}"
       cat >> /tmp/sources.txt <<EOF
     [source$n]
     enable=1
