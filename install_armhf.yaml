@@ -116,6 +116,19 @@ data:
               roles: [record]
       cam63:
         friendly_name: Entrada Portão
+        # The hedge/plants along the back wall and the sunlit wooden fence on
+        # the right kept the detector busy (~5 detections/s with nobody there).
+        # Camera-level masks replace the global ones, so repeat the timestamp.
+        motion:
+          mask:
+            timestamp:
+              friendly_name: Data e hora da camera
+              enabled: true
+              coordinates: "0.090,0.030,0.660,0.030,0.660,0.115,0.090,0.115"
+            sebe:
+              friendly_name: Sebe, plantas e vedacao
+              enabled: true
+              coordinates: "0.160,0.000,1.000,0.000,1.000,0.330,0.860,0.330,0.730,0.220,0.620,0.180,0.520,0.120,0.160,0.075"
         ffmpeg:
           inputs:
             - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam63
