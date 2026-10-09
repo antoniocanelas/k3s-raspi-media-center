@@ -101,12 +101,61 @@ Depois de instalar o sistema pelo procedimento confirmado da Waveshare, ative o 
 
 ## 3. Preparar o worker
 
-No Jetson, instale o cliente NFS. Ele e necessario porque os PersistentVolumes existentes usam NFS:
+> **Estado em 2026-10-09:** todos os passos desta secao e das secoes 4-5 foram executados. `jetson-orin-01` esta `Ready` (IP `192.168.0.250`, MAC `4c:bb:47:02:3b:f2`), com JetPack 6.2.1 e k3s `v1.34.5+k3s1`.
+
+### 3.1 Acesso e sudo
+
+No Mac, o acesso e por chave dedicada (`~/.ssh/jetson`) e pelo alias `jetson-orin-01` em `~/.ssh/config`:
+
+```bash
+ssh-keygen -t ed25519 -N "" -C jetson-orin-01 -f ~/.ssh/jetson
+ssh-copy-id -i ~/.ssh/jetson.pub jetson@192.168.0.250
+```
+
+Para automatizar a instalacao por SSH, o utilizador `jetson` tem sudo sem password (como o `admin` dos Pis):
+
+```bash
+ssh -t jetson-orin-01 'echo "jetson ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/90-jetson-nopasswd && sudo chmod 440 /etc/sudoers.d/90-jetson-nopasswd'
+```
+
+### 3.2 Stack NVIDIA (antes do k3s)
+
+O flash Waveshare usa o *sample rootfs* do BSP, que traz so o L4T: sem CUDA, TensorRT nem `nvidia-container-toolkit`. Instala o JetPack **antes** do agente k3s, porque o k3s so deteta o `nvidia-container-runtime` (e cria o runtime `nvidia` no containerd) quando arranca:
 
 ```bash
 sudo apt update
-sudo apt install -y curl nfs-common
+sudo apt install -y nvidia-jetpack nfs-common curl
 ```
+
+Resultado esperado: `nvidia-jetpack 6.2.1`, CUDA 12.6 (`/usr/local/cuda/bin/nvcc --version`), TensorRT 10.3, `nvidia-container-toolkit 1.16.2`. Ver a decisao 6.2.1 vs 7.x em [JETSON_ORIN_NANO_FIRMWARE.md](JETSON_ORIN_NANO_FIRMWARE.md#decisão-jetpack-621-vs-7x).
+
+### 3.3 Modo headless
+
+O Jetson e gerido por SSH; o desktop GNOME so consome RAM partilhada com a GPU. Desliga-o e remove os snaps que so serviam o browser:
+
+```bash
+sudo systemctl set-default multi-user.target
+sudo snap remove --purge chromium cups
+sudo snap remove --purge gnome-46-2404 mesa-2404 gtk-common-themes
+sudo snap remove --purge core24 core26 bare
+sudo reboot
+```
+
+Medido: RAM usada em repouso passou de 1,5 GiB para 374 MiB. Para voltar a ter desktop: `sudo systemctl start gdm` (uma vez) ou `sudo systemctl set-default graphical.target`.
+
+Mensagens de kernel no `tty1` como `overlayfs: idmapped layers are currently not supported` e `tmpfs: Unknown parameter 'noswap'` sao inofensivas (containerd/kubelet a testar funcionalidades de kernels mais recentes que o 5.15).
+
+### 3.4 Diretorios dos PVs locais
+
+Os PVs `local:` nao criam diretorios; cria-os antes de qualquer pod os usar:
+
+```bash
+sudo mkdir -p /var/lib/jetson-data/ai \
+  /var/lib/jetson-data/media-config \
+  /var/lib/jetson-data/transcode
+```
+
+### 3.5 Agente k3s
 
 No `pi-master-00`, leia o token de registro do k3s. Trate-o como uma senha: nao o publique, nao o coloque no Git e nao o envie em mensagens.
 
@@ -114,7 +163,18 @@ No `pi-master-00`, leia o token de registro do k3s. Trate-o como uma senha: nao 
 sudo cat /var/lib/rancher/k3s/server/node-token
 ```
 
-No Jetson, crie a configuracao do agente. Cole o token diretamente no terminal local, substituindo o texto de exemplo:
+Alternativa sem expor o token no ecra (foi o metodo usado): ler no Pi e escrever no Jetson por pipe a partir do Mac:
+
+```bash
+TOKEN=$(ssh pi-master-00 'sudo -n cat /var/lib/rancher/k3s/server/node-token')
+printf 'server: https://192.168.0.240:6443\ntoken: "%s"\nnode-name: jetson-orin-01\nnode-label:\n  - hardware.platform=nvidia-jetson\nnode-taint:\n  - workload=jetson:NoSchedule\n' "$TOKEN" \
+  | ssh jetson-orin-01 'sudo tee /etc/rancher/k3s/config.yaml >/dev/null && sudo chmod 600 /etc/rancher/k3s/config.yaml'
+unset TOKEN
+```
+
+**Nota sobre o IP do control plane:** o `pi-master-00` tem `eth0` = `192.168.0.18` (InternalIP anunciado pelo k3s) e `wlan0` = `192.168.0.240` (IP reservado, usado no kubeconfig e no NFS). O `server:` so serve a API; o trafego entre pods usa os InternalIPs, por isso manter `.240` e aceitavel. Mudar para `.18` so depois de o reservar no router.
+
+Manualmente, no Jetson, crie a configuracao do agente. Cole o token diretamente no terminal local, substituindo o texto de exemplo:
 
 ```bash
 sudo install -d -m 0755 /etc/rancher/k3s
@@ -140,10 +200,11 @@ sudo chmod 600 /etc/rancher/k3s/config.yaml
 curl -sfL https://get.k3s.io | sudo env INSTALL_K3S_VERSION="vX.Y.Z+k3sN" sh -s - agent
 ```
 
-O agente deve iniciar automaticamente. Confira no Jetson:
+O agente deve iniciar automaticamente. Confira no Jetson, incluindo o runtime NVIDIA no containerd:
 
 ```bash
 sudo systemctl status k3s-agent --no-pager
+sudo grep -A3 "runtimes.'nvidia'" /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 ```
 
 Se houver falha, consulte o log com `sudo journalctl -u k3s-agent -b --no-pager` antes de tentar reinstalar.
@@ -183,26 +244,20 @@ O NVMe anunciado como 256 GB tera cerca de 238 GiB utilizaveis antes do sistema.
 
 A biblioteca de filmes nao deve ser copiada para o NVMe; usa o NFS do Synology. O diretorio de transcode e apenas temporario e nao acelera o encode: o Orin Nano nao tem NVENC, portanto a codificacao H.264 usa CPU. Prioriza Direct Play e valida transcodes reais antes de os deixar competir com o LLM.
 
-Depois do Jetson arrancar pelo NVMe e estar `Ready`, confirma que `/` esta no SSD e prepara os diretorios no proprio Jetson:
+Os diretorios sao criados no passo 3.4. Os recursos do Jetson (`base/jetson/`) estao incluidos no overlay `overlays/armhf`, por isso sao aplicados pelo **Flux** como o resto do cluster: edita `base/jetson/`, corre `./update-manifests.sh`, faz push para `main`; o CI publica o artefacto OCI `armhf-latest` e o Flux aplica. Nao uses `kubectl apply -f install_jetson.yaml` (ficaria fora do GitOps); esse ficheiro e o overlay `overlays/jetson` servem apenas para inspecionar o subconjunto do Jetson.
+
+Para forcar o Flux depois do CI terminar (no Mac, contexto `raspi`):
 
 ```bash
-findmnt -no SOURCE /
-sudo mkdir -p /var/lib/jetson-data/ai \
-  /var/lib/jetson-data/media-config \
-  /var/lib/jetson-data/transcode
+kubectl --context raspi -n flux-system annotate ocirepository/k3s-raspi-media-center \
+  kustomization/k3s-raspi-media-center reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite
+kubectl --context raspi get pv | grep jetson
+kubectl --context raspi get pvc -A | grep jetson
 ```
 
-No repositorio, regenera os manifests e aplica apenas a preparacao do Jetson:
+Os tres PVCs devem ficar `Bound`. O `base/jetson` declara a namespace `ai`; a namespace `media` ja e criada pelo stack atual.
 
-```bash
-./update-manifests.sh
-sudo k3s kubectl apply -f install_jetson.yaml
-sudo k3s kubectl get pv
-sudo k3s kubectl get pvc -n ai
-sudo k3s kubectl get pvc -n media
-```
-
-Os tres PVCs devem ficar `Bound`. Este instalador declara a namespace `ai`; a namespace `media` ja e criada pelo stack atual.
+Nota: no Pi usa `sudo k3s kubectl ...`; no Mac usa `kubectl --context raspi ...`. Os comandos deste guia sao equivalentes nas duas formas.
 
 ## 5. Fazer um teste controlado
 
@@ -239,6 +294,21 @@ sudo k3s kubectl delete -f jetson-smoke.yaml
 
 O pod deve ficar `Running`, aparecer no no `jetson-orin-01` e imprimir `aarch64`. Apague o arquivo temporario depois do teste.
 
+### Teste de GPU
+
+Compila e corre um kernel CUDA num pod com `runtimeClassName: nvidia` (a RuntimeClass `nvidia` ja existe no k3s). A imagem `l4t-jetpack` tem cerca de 10 GB; o primeiro pull demora.
+
+```bash
+kubectl --context raspi -n default run jetson-cuda-test --restart=Never \
+  --image=nvcr.io/nvidia/l4t-jetpack:r36.4.0 \
+  --overrides='{"spec":{"runtimeClassName":"nvidia","nodeSelector":{"kubernetes.io/hostname":"jetson-orin-01"},"tolerations":[{"key":"workload","operator":"Equal","value":"jetson","effect":"NoSchedule"}]}}' \
+  --command -- sh -c 'printf "#include <cstdio>\nint main(){cudaDeviceProp p;cudaGetDeviceProperties(&p,0);printf(\"GPU: %%s SMs=%%d CC=%%d.%%d\\\\n\",p.name,p.multiProcessorCount,p.major,p.minor);}\n" > /tmp/t.cu && /usr/local/cuda/bin/nvcc -o /tmp/t /tmp/t.cu && /tmp/t'
+kubectl --context raspi -n default logs jetson-cuda-test
+kubectl --context raspi -n default delete pod jetson-cuda-test
+```
+
+Resultado obtido em 2026-10-09: `GPU: Orin, SMs=8, CC=8.7`, com um kernel de teste a executar sem erro.
+
 ## 6. Integrar workloads do repositorio
 
 O registro do no nao exige editar `install_armhf.yaml` nem aplicar novamente o stack. Esse arquivo e gerado; as alteracoes de manifests devem ser feitas em `base/` ou `overlays/` e regeneradas com `./update-manifests.sh`, conforme `AGENTS.md`.
@@ -252,7 +322,58 @@ Antes de direcionar um Deployment ao Jetson:
 
 O Jellyfin atualmente e um servico externo apontando para o Synology, nao um Deployment gerenciado pelo overlay. Portanto, o join do Jetson nao migra o Jellyfin. Para usar o Jetson como servidor de transcodificacao, primeiro seria necessario planejar essa migracao.
 
-O modo MAXN SUPER tambem nao disponibiliza automaticamente a GPU para pods. Aceleracao NVIDIA em Kubernetes exige configuracao compativel do runtime/container toolkit e do device plugin, alem de uma imagem preparada para JetPack/L4T. Os manifests atuais nao solicitam recursos `nvidia.com/gpu`; valide essa integracao separadamente antes de depender de transcodificacao ou inferencia por GPU.
+### GPU em pods
+
+Um pod usa a GPU do Orin com tres campos: `runtimeClassName: nvidia`, toleration `workload=jetson:NoSchedule` e `nodeSelector` `kubernetes.io/hostname: jetson-orin-01`. Nao e necessario device plugin nem pedidos `nvidia.com/gpu` (a GPU integrada e exposta pelo runtime em modo CSV, montando as bibliotecas L4T do host). Usa imagens construidas para L4T r36.x / CUDA 12.6 (ex.: `nvcr.io/nvidia/l4t-jetpack:r36.4.0`, `dustynv/*:r36.4.0`, `nvcr.io/nvidia/deepstream:7.1-*-multiarch`); evita tags `cu128` ou superiores, que exigem um CUDA mais recente que o driver do JetPack 6.2.
+
+### LLM (implantado)
+
+`base/jetson/llm.yaml` define o servidor `llama.cpp` (`dustynv/llama_cpp:r36.4.0`) em `ai`, com Qwen2.5 1.5B Instruct Q4_K_M. Um init container descarrega o GGUF uma vez para `jetson-ai-pvc` (`/var/lib/jetson-data/ai/models`). API compativel com OpenAI no Service `llm.ai:8080` e na LAN via Traefik em `http://llm.telheira`:
+
+```bash
+curl http://llm.telheira/v1/chat/completions -H 'Content-Type: application/json' \
+  -d '{"model":"qwen2.5-1.5b-instruct","messages":[{"role":"user","content":"Ola"}]}'
+```
+
+Se `llm.telheira` nao resolver no cliente, testa com `curl -H "Host: llm.telheira" http://192.168.0.240/...`. A API nao tem autenticacao: nao a exponhas no IngressRoute externo.
+
+Medido em 2026-10-09 (MAXN SUPER, contexto 4096): 29/29 camadas na GPU, ~1,3 GiB de memoria (modelo 935 MiB + KV 112 MiB + compute 300 MiB), 22-31 tokens/s de geracao e 170-290 tokens/s de prompt, ~53 °C. RAM total usada no Jetson com o LLM: 2,3 GiB (4,9 GiB disponiveis).
+
+Para trocar de modelo, altera `MODEL_URL`/`MODEL_FILE`, `--model` e `--alias` no `llm.yaml`. Antes de passar a Qwen2.5 3B, mede a margem com o pipeline de video ativo.
+
+### Video: detecao de pessoas (piloto)
+
+**Cameras encontradas na LAN** (2026-10-09): `192.168.0.60`, `192.168.0.62`, `192.168.0.63`, todas TP-Link (`realm="TP-LINK IP-Camera"`), RTSP na porta 554 com autenticacao e ONVIF na porta 2020. O Synology (`192.168.0.200`) tambem expoe RTSP (Surveillance Station). URLs TP-Link: `rtsp://USER:PASS@IP:554/stream1` (principal) e `/stream2` (substream, usada pelo Jetson).
+
+**Pipeline:** `base/jetson/people-detector.yaml` corre `deepstream-app` (`nvcr.io/nvidia/deepstream:7.1-samples-multiarch`) com o detetor TrafficCamNet INT8 filtrado para a classe `person`, inferencia a cada 3 frames (`interval=2`) e tracker IOU. O motor TensorRT e construido na primeira execucao (2-8 min, conforme o batch) e guardado em `/var/lib/jetson-data/ai/models/deepstream`. Os URLs vem do Secret `ai/camera-rtsp`; sem ele o pod fica inativo (`sleep`) e nao usa a GPU.
+
+Criar o Secret (no Mac; as credenciais nao passam pelo Git nem pelo historico da shell):
+
+```bash
+read -s CAMPASS
+kubectl --context raspi -n ai create secret generic camera-rtsp \
+  --from-literal=CAM1_URL="rtsp://USER:$CAMPASS@192.168.0.60:554/stream2" \
+  --from-literal=CAM2_URL="rtsp://USER:$CAMPASS@192.168.0.62:554/stream2" \
+  --from-literal=CAM3_URL="rtsp://USER:$CAMPASS@192.168.0.63:554/stream2"
+unset CAMPASS
+kubectl --context raspi -n ai rollout restart deploy/people-detector
+kubectl --context raspi -n ai logs -f deploy/people-detector | grep -E "Starting|PERF|ERROR"
+```
+
+Antes de criar o Secret, confirma em cada camera (app VIGI/Tapo): conta de camera ativa para RTSP, substream ativa e que o Surveillance Station continua a gravar com um segundo cliente ligado.
+
+**Medicoes com o video de exemplo (720p, H.264) em 2026-10-09:**
+
+| Cenario | Detecao | LLM | RAM total | Temperatura |
+|---|---|---|---|---|
+| So detecao (batch 1, todos os frames) | ~62 fps | - | - | - |
+| Detecao + LLM a gerar em simultaneo | ~34 fps | 14-19 tok/s (vs ~30 sozinho) | 4,6 GiB | ~63 °C |
+
+Tres substreams a 10-15 fps com `interval=2` ficam bem abaixo destes limites. O descodificador de hardware (`nvv4l2decoder`) processa o video de exemplo a ~490 fps, por isso nao e o gargalo.
+
+**Armadilha conhecida:** no Jetson, o CUDA conta a page cache como memoria ocupada. Uma construcao de motor TensorRT pode falhar com `Device memory is insufficient` / `Could not find any implementation for node` mesmo com RAM "disponivel". O init container `drop-caches` (privilegiado) limpa a cache so enquanto nao existe motor. Manualmente: `sync; echo 3 | sudo tee /proc/sys/vm/drop_caches`.
+
+**Proximo passo:** enviar eventos de pessoa para o Home Assistant (MQTT via `nvmsgbroker`/`libnvds_mqtt_proto.so`, ja incluido na imagem) e ligar o reconhecimento facial a esses eventos.
 
 ## 7. Verificacao final
 

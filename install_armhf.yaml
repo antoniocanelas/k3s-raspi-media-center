@@ -20,6 +20,117 @@ metadata:
   namespace: media
 ---
 apiVersion: v1
+data:
+  app.txt: |
+    [application]
+    enable-perf-measurement=1
+    perf-measurement-interval-sec=60
+
+    [streammux]
+    gpu-id=0
+    live-source=1
+    batch-size=@BATCH@
+    batched-push-timeout=40000
+    width=960
+    height=544
+    enable-padding=0
+
+    [primary-gie]
+    enable=1
+    gpu-id=0
+    gie-unique-id=1
+    batch-size=@BATCH@
+    # Infer every 3rd frame; the tracker fills the gaps.
+    interval=2
+    config-file=/tmp/pgie.txt
+
+    [tracker]
+    enable=1
+    tracker-width=640
+    tracker-height=384
+    ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so
+    ll-config-file=/opt/nvidia/deepstream/deepstream/samples/configs/deepstream-app/config_tracker_IOU.yml
+
+    [osd]
+    enable=0
+
+    [tiled-display]
+    enable=0
+
+    [sink0]
+    enable=1
+    type=1
+    sync=0
+  pgie.txt: |
+    [property]
+    gpu-id=0
+    net-scale-factor=0.00392156862745098
+    onnx-file=/models/deepstream/resnet18_trafficcamnet_pruned.onnx
+    model-engine-file=/models/deepstream/resnet18_trafficcamnet_pruned.onnx_b@BATCH@_gpu0_int8.engine
+    labelfile-path=/models/deepstream/labels.txt
+    int8-calib-file=/models/deepstream/cal_trt.bin
+    batch-size=@BATCH@
+    process-mode=1
+    model-color-format=0
+    network-mode=1
+    num-detected-classes=4
+    gie-unique-id=1
+    cluster-mode=2
+
+    # labels: car;bicycle;person;road_sign - keep only person (class 2).
+    [class-attrs-all]
+    topk=20
+    nms-iou-threshold=0.5
+    pre-cluster-threshold=1.1
+
+    [class-attrs-2]
+    topk=20
+    nms-iou-threshold=0.5
+    pre-cluster-threshold=0.4
+  run.sh: |
+    #!/bin/bash
+    set -e
+    if [ -z "${CAM1_URL}${CAM2_URL}${CAM3_URL}" ]; then
+      echo "Secret ai/camera-rtsp missing or empty; idling."
+      exec sleep infinity
+    fi
+    # Model files live on the PVC so the TensorRT engine nvinfer builds next
+    # to the ONNX (several minutes on first run) survives restarts.
+    M=/models/deepstream
+    SRC=/opt/nvidia/deepstream/deepstream/samples/models/Primary_Detector
+    mkdir -p "$M"
+    for f in resnet18_trafficcamnet_pruned.onnx cal_trt.bin labels.txt; do
+      [ -s "$M/$f" ] || cp "$SRC/$f" "$M/"
+    done
+    n=0
+    : > /tmp/sources.txt
+    for u in "$CAM1_URL" "$CAM2_URL" "$CAM3_URL"; do
+      [ -n "$u" ] || continue
+      cat >> /tmp/sources.txt <<EOF
+    [source$n]
+    enable=1
+    type=4
+    uri=$u
+    num-sources=1
+    gpu-id=0
+    latency=200
+    select-rtp-protocol=4
+    rtsp-reconnect-interval-sec=30
+
+    EOF
+      n=$((n+1))
+    done
+    sed "s/@BATCH@/$n/" /config/pgie.txt > /tmp/pgie.txt
+    sed "s/@BATCH@/$n/" /config/app.txt > /tmp/app.txt
+    cat /tmp/sources.txt >> /tmp/app.txt
+    echo "Starting deepstream-app with $n camera(s)"
+    exec deepstream-app -c /tmp/app.txt
+kind: ConfigMap
+metadata:
+  name: people-detector
+  namespace: ai
+---
+apiVersion: v1
 kind: Service
 metadata:
   labels:
@@ -535,6 +646,78 @@ spec:
         operator: Equal
         value: jetson
       volumes:
+      - name: models
+        persistentVolumeClaim:
+          claimName: jetson-ai-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: people-detector
+  name: people-detector
+  namespace: ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: people-detector
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: people-detector
+    spec:
+      containers:
+      - command:
+        - bash
+        - /config/run.sh
+        envFrom:
+        - secretRef:
+            name: camera-rtsp
+            optional: true
+        image: nvcr.io/nvidia/deepstream:7.1-samples-multiarch
+        name: deepstream
+        resources:
+          limits:
+            memory: 3Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /models
+          name: models
+          subPath: models
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - |
+          if ls /models/deepstream/*.engine >/dev/null 2>&1; then exit 0; fi
+          sync && echo 3 > /proc/sys/vm/drop_caches
+        image: busybox:1.36
+        name: drop-caches
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /models
+          name: models
+          subPath: models
+      nodeSelector:
+        kubernetes.io/hostname: jetson-orin-01
+      runtimeClassName: nvidia
+      tolerations:
+      - effect: NoSchedule
+        key: workload
+        operator: Equal
+        value: jetson
+      volumes:
+      - configMap:
+          name: people-detector
+        name: config
       - name: models
         persistentVolumeClaim:
           claimName: jetson-ai-pvc

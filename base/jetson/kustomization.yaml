@@ -5,3 +5,4 @@ resources:
 - namespace-ai.yaml
 - storage.yaml
 - llm.yaml
+- people-detector.yaml
