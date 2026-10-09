@@ -153,6 +153,13 @@ data:
         friendly_name: Geral
         face_recognition:
           enabled: false
+        # High camera looking down: real people are 0-3% of the 640x480 frame;
+        # a car entering at night was briefly taken for a person at ~24%
+        # (2026-10-09 23:42). Ignore "persons" larger than ~10%.
+        objects:
+          filters:
+            person:
+              max_area: 30000
         live:
           streams:
             Alta qualidade: cam60_hd
