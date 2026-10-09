@@ -51,36 +51,26 @@ data:
         cam63:
           - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam63
 
-    # YOLOv9-t 320 (trial since 2026-10-09; v9-s was 38 ms and +260 MB RAM), ONNX on the GPU through ONNX
-    # Runtime's TensorRT/CUDA providers. Exported on a Mac from
-    # WongKinYiu/yolov9 (yolov9-t-converted.pt, export.py --imgsz 320
-    # --simplify --include onnx, opset 18) and copied by hand to
-    # /config/model_cache/yolov9-t-320.onnx on the PVC (not in Git).
-    # Rollback to YOLOv7: restore the commented block below.
+    # YOLOv7-320 TensorRT (FP16 engine). Tried on 2026-10-09 via the ONNX
+    # detector (ONNX Runtime + CUDA): YOLOv9-s 38 ms / YOLOv9-t 28 ms, both with
+    # ~+280 MB RAM in the detector process (runtime overhead), leaving ~500 MB
+    # free on the Jetson with the LLM and face recognition (large). Back to
+    # v7 (20 ms). The v9 ONNX files stay in /config/model_cache for retests:
+    #   detectors: {onnx: {type: onnx}}
+    #   model: {model_type: yolo-generic, path: /config/model_cache/yolov9-t-320.onnx,
+    #           input_tensor: nchw, input_dtype: float, width: 320, height: 320}
     detectors:
-      onnx:
-        type: onnx
+      tensorrt:
+        type: tensorrt
+        device: 0
 
     model:
-      model_type: yolo-generic
-      path: /config/model_cache/yolov9-t-320.onnx
+      path: /config/model_cache/tensorrt/yolov7-320.trt
       labelmap_path: /labelmap/coco-80.txt
       input_tensor: nchw
-      input_dtype: float
+      input_pixel_format: rgb
       width: 320
       height: 320
-
-    # detectors:
-    #   tensorrt:
-    #     type: tensorrt
-    #     device: 0
-    # model:
-    #   path: /config/model_cache/tensorrt/yolov7-320.trt
-    #   labelmap_path: /labelmap/coco-80.txt
-    #   input_tensor: nchw
-    #   input_pixel_format: rgb
-    #   width: 320
-    #   height: 320
 
     ffmpeg:
       hwaccel_args: preset-jetson-h264
