@@ -410,7 +410,6 @@ spec:
             echo 'log_dest stdout'
             echo 'log_type error'
             echo 'log_type warning'
-            echo 'log_type notice'
             if [ -n "$MQTT_USER" ]; then
               echo 'connection homeassistant'
               echo "address ${MQTT_HOST:-192.168.0.100}:${MQTT_PORT:-1883}"

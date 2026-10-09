@@ -7,3 +7,4 @@ resources:
 - llm.yaml
 - people-detector.yaml
 - go2rtc.yaml
+- jetson-monitor.yaml

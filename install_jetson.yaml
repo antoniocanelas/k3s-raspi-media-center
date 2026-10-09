@@ -49,6 +49,145 @@ metadata:
 ---
 apiVersion: v1
 data:
+  monitor.py: |
+    import glob
+    import json
+    import os
+    import socket
+    import struct
+    import time
+    import urllib.request
+
+    HOST = os.environ.get("MQTT_HOST", "192.168.0.100")
+    PORT = int(os.environ.get("MQTT_PORT", "1883"))
+    USER, PASS = os.environ.get("MQTT_USER", ""), os.environ.get("MQTT_PASS", "")
+    LLM = os.environ.get("LLM_URL", "http://llm.ai.svc.cluster.local:8080")
+    STATE = "jetson/monitor/state"
+    DEVICE = {"identifiers": ["jetson-orin-01"], "name": "Jetson Orin Nano",
+              "manufacturer": "NVIDIA / Waveshare", "model": "Orin Nano 8GB (JetPack 6.2)"}
+
+
+    def _s(v):
+        b = v.encode()
+        return struct.pack("!H", len(b)) + b
+
+
+    def _len(n):
+        out = b""
+        while True:
+            d, n = n % 128, n // 128
+            out += bytes([d | (0x80 if n else 0)])
+            if not n:
+                return out
+
+
+    def publish(msgs):
+        """Publish [(topic, payload, retain)] over one MQTT 3.1.1 connection."""
+        flags = 0x02 | (0x80 if USER else 0) | (0x40 if PASS else 0)
+        conn = _s("MQTT") + bytes([4, flags]) + struct.pack("!H", 60) + _s("jetson-monitor")
+        if USER:
+            conn += _s(USER)
+        if PASS:
+            conn += _s(PASS)
+        with socket.create_connection((HOST, PORT), timeout=10) as c:
+            c.sendall(bytes([0x10]) + _len(len(conn)) + conn)
+            ack = c.recv(4)
+            if len(ack) < 4 or ack[3] != 0:
+                raise OSError(f"CONNACK {list(ack)}")
+            for topic, payload, retain in msgs:
+                body = _s(topic) + payload.encode()
+                c.sendall(bytes([0x31 if retain else 0x30]) + _len(len(body)) + body)
+            c.sendall(bytes([0xE0, 0]))
+
+
+    def discovery():
+        def sensor(key, name, comp="sensor", **extra):
+            cfg = {"name": name, "unique_id": f"jetson_orin_{key}",
+                   "default_entity_id": f"{comp}.jetson_{key}", "state_topic": STATE,
+                   "value_template": "{{ value_json.%s }}" % key, "expire_after": 120,
+                   "device": DEVICE, **extra}
+            return (f"homeassistant/{comp}/jetson_orin/{key}/config", json.dumps(cfg), True)
+        msgs = [
+            sensor("temperature", "Temperatura", unit_of_measurement="°C",
+                   device_class="temperature", state_class="measurement"),
+            sensor("ram_used", "RAM usada", unit_of_measurement="%", state_class="measurement",
+                   icon="mdi:memory"),
+            sensor("ram_available", "RAM disponível", unit_of_measurement="MB",
+                   state_class="measurement", icon="mdi:memory"),
+            sensor("gpu_load", "Carga GPU", unit_of_measurement="%", state_class="measurement",
+                   icon="mdi:expansion-card"),
+            sensor("llm_model", "Modelo LLM carregado", icon="mdi:brain"),
+            sensor("llm_online", "LLM", comp="binary_sensor", device_class="connectivity",
+                   payload_on="on", payload_off="off"),
+        ]
+        for cam in ("cam60", "cam62", "cam63"):
+            cfg = {"name": f"FPS {cam}", "unique_id": f"jetson_orin_fps_{cam}",
+                   "default_entity_id": f"sensor.jetson_fps_{cam}",
+                   "state_topic": "jetson/detector/state",
+                   "value_template": "{{ value_json.%s | default(0) }}" % cam,
+                   "unit_of_measurement": "fps", "state_class": "measurement",
+                   "icon": "mdi:cctv", "expire_after": 120, "device": DEVICE}
+            msgs.append((f"homeassistant/sensor/jetson_orin/fps_{cam}/config", json.dumps(cfg), True))
+        return msgs
+
+
+    def read(path, default=None):
+        try:
+            with open(path) as f:
+                return f.read().strip()
+        except OSError:
+            return default
+
+
+    def state():
+        temps = {}
+        for z in glob.glob("/sys/devices/virtual/thermal/thermal_zone*"):
+            t = read(f"{z}/temp")
+            if t and t.lstrip("-").isdigit():
+                temps[read(f"{z}/type", z)] = int(t) / 1000
+        mem = {}
+        for line in open("/proc/meminfo"):
+            k, v = line.split(":")
+            mem[k] = int(v.split()[0])
+        gpu = read("/sys/devices/platform/17000000.gpu/load", "0")
+        st = {
+            "temperature": round(temps.get("tj-thermal", max(temps.values(), default=0)), 1),
+            "ram_used": round(100 * (1 - mem["MemAvailable"] / mem["MemTotal"]), 1),
+            "ram_available": mem["MemAvailable"] // 1024,
+            "gpu_load": round(int(gpu) / 10, 1),
+            "llm_online": "off",
+            "llm_model": "none",
+        }
+        try:
+            with urllib.request.urlopen(f"{LLM}/api/ps", timeout=5) as r:
+                models = json.load(r).get("models", [])
+            st["llm_online"] = "on"
+            st["llm_model"] = models[0]["name"] if models else "none"
+        except Exception:
+            pass
+        return st
+
+
+    last_discovery = 0
+    while True:
+        try:
+            msgs = []
+            if time.time() - last_discovery > 3600:
+                msgs += discovery()
+            msgs.append((STATE, json.dumps(state()), False))
+            publish(msgs)
+            if len(msgs) > 1:
+                last_discovery = time.time()
+        except Exception as e:
+            print(f"monitor: {e}", flush=True)
+        time.sleep(30)
+kind: ConfigMap
+metadata:
+  name: jetson-monitor
+  namespace: ai
+---
+apiVersion: v1
+data:
   app.txt: |
     [application]
     enable-perf-measurement=1
@@ -573,6 +712,55 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app: jetson-monitor
+  name: jetson-monitor
+  namespace: ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jetson-monitor
+  template:
+    metadata:
+      labels:
+        app: jetson-monitor
+    spec:
+      containers:
+      - command:
+        - python3
+        - -u
+        - /config/monitor.py
+        envFrom:
+        - secretRef:
+            name: mqtt
+            optional: true
+        image: python:3.12.7-alpine3.20
+        name: monitor
+        resources:
+          limits:
+            memory: 96Mi
+          requests:
+            cpu: 10m
+            memory: 24Mi
+        volumeMounts:
+        - mountPath: /config
+          name: config
+      nodeSelector:
+        kubernetes.io/hostname: jetson-orin-01
+      tolerations:
+      - effect: NoSchedule
+        key: workload
+        operator: Equal
+        value: jetson
+      volumes:
+      - configMap:
+          name: jetson-monitor
+        name: config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
     app: llm
   name: llm
   namespace: ai
@@ -716,7 +904,6 @@ spec:
             echo 'log_dest stdout'
             echo 'log_type error'
             echo 'log_type warning'
-            echo 'log_type notice'
             if [ -n "$MQTT_USER" ]; then
               echo 'connection homeassistant'
               echo "address ${MQTT_HOST:-192.168.0.100}:${MQTT_PORT:-1883}"
