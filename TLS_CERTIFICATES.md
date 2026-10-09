@@ -34,7 +34,9 @@ kubectl --context raspi -n kube-system logs deploy/traefik | grep -iE "zerossl|a
 echo | openssl s_client -connect telheira.tplinkdns.com:8123 -servername telheira.tplinkdns.com 2>/dev/null | openssl x509 -noout -issuer -enddate
 ```
 
-**Por confirmar:** a primeira emissao pelo ZeroSSL (o validador do ZeroSSL tambem consulta o DNS da TP-Link). Se falhar pelos mesmos motivos, as alternativas sao trocar de DNS dinamico (DuckDNS, gratis, com Let's Encrypt) ou publicar o HA com o modo `funnel` do Tailscale (sem portas abertas no router).
+**Resultado em 2026-10-09:** duas tentativas do ZeroSSL (15:19 e 15:37 UTC) terminaram com `the server didn't respond to our request (status=pending)`: a validacao ficou pendente ate o Traefik desistir. A porta 80 responde a partir da internet (teste de fora de casa: `404` do handler ACME do Traefik), por isso a causa provavel e o mesmo DNS da TP-Link. O resolver `zerossl` fica configurado e o Traefik volta a tentar sozinho (diariamente e a cada reinicio).
+
+**Decisao (2026-10-09):** manter `telheira.tplinkdns.com` por agora, sem certificado publico valido; o acesso seguro do dia a dia e o do Tailscale. Quando se quiser HTTPS publico fiavel: **DuckDNS + Let's Encrypt** (add-on oficial DuckDNS no HA ou atualizador no cluster; novo endereco `<nome>.duckdns.org`) ou **Tailscale `funnel`** (sem portas abertas no router). Ambas mudam o endereco externo da app e das notificacoes.
 
 ## Historico: porque o Let's Encrypt deixou de funcionar
 
