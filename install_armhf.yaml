@@ -54,11 +54,25 @@ data:
       height: 480
       fps: 5
 
+    # One YOLOv7 pass detects all COCO classes, so tracking more labels does
+    # not cost GPU; it only adds events. Only people raise alerts (review).
     objects:
       track:
         - person
+        - car
+        - cat
+        - dog
       filters:
         person:
+          min_score: 0.5
+          threshold: 0.7
+        car:
+          min_score: 0.5
+          threshold: 0.7
+        cat:
+          min_score: 0.5
+          threshold: 0.7
+        dog:
           min_score: 0.5
           threshold: 0.7
 
