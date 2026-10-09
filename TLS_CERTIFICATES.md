@@ -44,6 +44,8 @@ echo | openssl s_client -connect telheira.tplinkdns.com:8123 -servername telheir
 - **IP:** CronJob `kube-system/duckdns-updater` (`base/duckdns/`) chama `https://www.duckdns.org/update?domains=telheira&token=...&ip=` a cada 5 minutos (a DuckDNS usa o IP de origem do pedido). O token vive no Secret `kube-system/duckdns` (chave `DUCKDNS_TOKEN`, criado a mao, nunca no Git). O router continua a atualizar o `tplinkdns`.
 - **Rotas:** `homeassistant-external-duckdns`, `media-external-duckdns` e `plex-external-duckdns` em `base/ingress-routes.yaml`, copias das rotas `tplinkdns` com `Host(\`telheira.duckdns.org\`)` e `certResolver: letsencrypt`. Sao rotas separadas para o pedido de certificado nao incluir o nome `tplinkdns` (que falharia a validacao e bloquearia o certificado inteiro).
 - Mesmas portas encaminhadas no router (80 para o HTTP-01, 443, 8123, 32443).
+- Certificado Let's Encrypt emitido a 2026-10-09 (a primeira tentativa falhou porque o DNS ainda tinha o IP antigo; reiniciar o Traefik repetiu o pedido).
+- HA: *Settings > System > Network > Internet* = `https://telheira.duckdns.org:8123` (sem a porta, o 443 vai para o qBittorrent e a app/notificacoes falham fora de casa).
 
 Verificar:
 
