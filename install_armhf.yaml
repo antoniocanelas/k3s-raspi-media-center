@@ -24,7 +24,7 @@ data:
   app.txt: |
     [application]
     enable-perf-measurement=1
-    perf-measurement-interval-sec=60
+    perf-measurement-interval-sec=30
 
     [streammux]
     gpu-id=0
@@ -105,8 +105,8 @@ data:
     # type=3 (uridecodebin), not type=4 (rtspsrc): camera .63 also sends a
     # PCMA audio track, and with type=4 the unlinked audio pad stalls that
     # source at 0 fps. uridecodebin ignores the audio. Without type=4 there is
-    # no built-in RTSP reconnect; a source error ends deepstream-app and
-    # Kubernetes restarts the pod.
+    # no built-in RTSP reconnect: supervisor.py restarts the container when a
+    # camera stays at 0 fps.
     # rtspt:// forces RTP over TCP: UDP RTP from the cameras never reaches the
     # pod (pod network NAT), and the UDP->TCP fallback is unreliable.
     n=0
@@ -144,15 +144,26 @@ data:
     cat /tmp/sources.txt >> /tmp/app.txt
     # Person events to MQTT (Home Assistant Mosquitto) when Secret ai/mqtt
     # exists. Minimal payload, at most one message per camera per second.
+    # deepstream-app exits if the broker refuses the connection, so check the
+    # login first and run without the MQTT sink (detection only) if it fails;
+    # supervisor.py then restarts later to retry.
+    export MQTT_HOST="${MQTT_HOST:-192.168.0.100}" MQTT_PORT="${MQTT_PORT:-1883}"
+    export MQTT_STATE=off
     if [ -n "$MQTT_USER" ]; then
-      printf '[message-broker]\nusername = %s\npassword = %s\nclient-id = jetson-people-detector\n' \
-        "$MQTT_USER" "$MQTT_PASS" > /tmp/mqtt.txt
-      cat /config/sink-mqtt.txt >> /tmp/app.txt
-      echo "MQTT events enabled: ${MQTT_HOST:-192.168.0.100};${MQTT_PORT:-1883} topic jetson/people"
-      sed -i "s/@MQTT@/${MQTT_HOST:-192.168.0.100};${MQTT_PORT:-1883}/" /tmp/app.txt
+      if python3 /config/supervisor.py --check-mqtt; then
+        printf '[message-broker]\nusername = %s\npassword = %s\nclient-id = jetson-people-detector\n' \
+          "$MQTT_USER" "$MQTT_PASS" > /tmp/mqtt.txt
+        cat /config/sink-mqtt.txt >> /tmp/app.txt
+        sed -i "s/@MQTT@/$MQTT_HOST;$MQTT_PORT/" /tmp/app.txt
+        echo "MQTT events enabled: $MQTT_HOST:$MQTT_PORT topic jetson/people"
+        MQTT_STATE=on
+      else
+        echo "MQTT broker unavailable or login refused; detection only, will retry"
+        MQTT_STATE=retry
+      fi
     fi
     echo "Starting deepstream-app with $n camera(s)"
-    exec deepstream-app -c /tmp/app.txt
+    exec python3 /config/supervisor.py /tmp/app.txt
   sink-mqtt.txt: |
     [sink1]
     enable=1
@@ -170,6 +181,103 @@ data:
     msg-broker-conn-str=@MQTT@
     msg-broker-config=/tmp/mqtt.txt
     topic=jetson/people
+  supervisor.py: |
+    """Run deepstream-app and keep it healthy.
+
+    - Restarts (exit 1) when any camera reports 0 fps for STALL_SEC: with
+      uridecodebin a source whose RTSP session stalls never recovers by itself.
+    - Stops deepstream-app with SIGINT (on SIGTERM or before a restart) so the
+      pipeline goes to NULL and sends RTSP TEARDOWN; killed sessions linger on
+      the TP-Link cameras and use up their small concurrent-stream limit.
+    - With MQTT_STATE=retry (broker check failed at start), exits after
+      MQTT_RETRY_SEC so the next start retries the broker.
+    - --check-mqtt: MQTT 3.1.1 CONNECT with MQTT_USER/MQTT_PASS, exit 0 if
+      the broker accepts the login.
+    """
+    import os
+    import re
+    import signal
+    import socket
+    import struct
+    import subprocess
+    import sys
+    import threading
+    import time
+
+    STALL_SEC = int(os.environ.get("STALL_SEC", "180"))
+    MQTT_RETRY_SEC = int(os.environ.get("MQTT_RETRY_SEC", "900"))
+    PERF = re.compile(r"([0-9.]+) \(([0-9.]+)\)")
+
+
+    def check_mqtt():
+        def s(v):
+            b = v.encode()
+            return struct.pack("!H", len(b)) + b
+        user, pw = os.environ["MQTT_USER"], os.environ.get("MQTT_PASS", "")
+        var = s("MQTT") + bytes([4, 0xC2]) + struct.pack("!H", 30)
+        payload = s("jetson-people-detector-check") + s(user) + s(pw)
+        body = var + payload
+        try:
+            with socket.create_connection(
+                    (os.environ["MQTT_HOST"], int(os.environ["MQTT_PORT"])), timeout=5) as c:
+                c.sendall(bytes([0x10, len(body)]) + body)
+                ack = c.recv(4)
+                c.sendall(bytes([0xE0, 0]))
+        except OSError as e:
+            print(f"mqtt check: {e}", flush=True)
+            return 1
+        rc = ack[3] if len(ack) == 4 and ack[0] == 0x20 else -1
+        print(f"mqtt check: CONNACK {rc}", flush=True)
+        return 0 if rc == 0 else 1
+
+
+    def main(cfg):
+        proc = subprocess.Popen(["deepstream-app", "-c", cfg], stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT, text=True, bufsize=1)
+        zero_since = {}
+
+        def reader():
+            for line in proc.stdout:
+                sys.stdout.write(line)
+                sys.stdout.flush()
+                if not line.startswith("**PERF:") or "FPS" in line:
+                    continue
+                now = time.monotonic()
+                for i, (cur, _avg) in enumerate(PERF.findall(line)):
+                    if float(cur) > 0:
+                        zero_since.pop(i, None)
+                    else:
+                        zero_since.setdefault(i, now)
+
+        def stop(reason, code):
+            print(f"supervisor: {reason}; stopping deepstream-app", flush=True)
+            if proc.poll() is None:
+                proc.send_signal(signal.SIGINT)
+                try:
+                    proc.wait(timeout=20)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+            sys.exit(code)
+
+        signal.signal(signal.SIGTERM, lambda *_: stop("SIGTERM", 0))
+        threading.Thread(target=reader, daemon=True).start()
+        started = time.monotonic()
+        while proc.poll() is None:
+            time.sleep(5)
+            now = time.monotonic()
+            # Before any camera produced frames, allow STALL_SEC from start.
+            for i, t0 in list(zero_since.items()):
+                if now - max(t0, started) > STALL_SEC:
+                    stop(f"camera {i} at 0 fps for {STALL_SEC}s", 1)
+            if os.environ.get("MQTT_STATE") == "retry" and now - started > MQTT_RETRY_SEC:
+                stop("retrying MQTT broker", 0)
+        sys.exit(proc.returncode or 1)
+
+
+    if __name__ == "__main__":
+        if sys.argv[1] == "--check-mqtt":
+            sys.exit(check_mqtt())
+        main(sys.argv[1])
 kind: ConfigMap
 metadata:
   name: people-detector
@@ -757,6 +865,7 @@ spec:
       nodeSelector:
         kubernetes.io/hostname: jetson-orin-01
       runtimeClassName: nvidia
+      terminationGracePeriodSeconds: 40
       tolerations:
       - effect: NoSchedule
         key: workload
