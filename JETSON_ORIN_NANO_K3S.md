@@ -341,11 +341,18 @@ Medido em 2026-10-09 (MAXN SUPER, contexto 4096): 29/29 camadas na GPU, ~1,3 GiB
 
 Para trocar de modelo, altera `MODEL_URL`/`MODEL_FILE`, `--model` e `--alias` no `llm.yaml`. Antes de passar a Qwen2.5 3B, mede a margem com o pipeline de video ativo.
 
-### Video: detecao de pessoas (piloto)
+### Video: detecao de pessoas
 
 **Cameras encontradas na LAN** (2026-10-09): `192.168.0.60`, `192.168.0.62`, `192.168.0.63`, todas TP-Link (`realm="TP-LINK IP-Camera"`), RTSP na porta 554 com autenticacao e ONVIF na porta 2020. O Synology (`192.168.0.200`) tambem expoe RTSP (Surveillance Station). URLs TP-Link: `rtsp://USER:PASS@IP:554/stream1` (principal) e `/stream2` (substream, usada pelo Jetson).
 
-**Pipeline:** `base/jetson/people-detector.yaml` corre `deepstream-app` (`nvcr.io/nvidia/deepstream:7.1-samples-multiarch`) com o detetor TrafficCamNet INT8 filtrado para a classe `person`, inferencia a cada 3 frames (`interval=2`) e tracker IOU. O motor TensorRT e construido na primeira execucao (2-8 min, conforme o batch) e guardado em `/var/lib/jetson-data/ai/models/deepstream`. Os URLs vem do Secret `ai/camera-rtsp`; sem ele o pod fica inativo (`sleep`) e nao usa a GPU.
+**Pipeline:** `base/jetson/people-detector.yaml` corre `deepstream-app` (`nvcr.io/nvidia/deepstream:7.1-samples-multiarch`) com o **NVIDIA PeopleNet** (ResNet34 INT8, modelo publico do NGC `nvidia/tao/peoplenet:deployable_quantized_onnx_v2.6.3`, classes `person`/`bag`/`face`; ficam ativas `person` e `face`), inferencia a cada 3 frames (`interval=2`), tracker IOU e streammux a 640x480 (resolucao nativa das substreams). O modelo e descarregado uma vez e o motor TensorRT e construido na primeira execucao (10+ min) e guardados em `/var/lib/jetson-data/ai/models/deepstream/peoplenet`. Os URLs vem do Secret `ai/camera-rtsp`; sem ele o pod fica inativo (`sleep`) e nao usa a GPU. O TrafficCamNet (amostra do DeepStream, usado no piloto) foi substituido porque falhava pessoas vistas de cima (camera `.60`).
+
+**Supervisor (`supervisor.py` no ConfigMap):** envolve o `deepstream-app` e
+- reinicia o container quando uma camera fica a 0 fps durante 3 min (`STALL_SEC`): com `uridecodebin`, uma sessao RTSP bloqueada nunca recupera sozinha;
+- para o `deepstream-app` com SIGINT (no SIGTERM do pod e antes de cada reinicio, `terminationGracePeriodSeconds: 40`), para o pipeline enviar RTSP TEARDOWN; sessoes mortas ficam penduradas nas cameras TP-Link e esgotam o limite de streams;
+- testa o login MQTT antes de ativar o envio (`--check-mqtt`); se o broker recusar, corre so a detecao e tenta de novo a cada 15 min (antes, uma falha MQTT deixava o pod em CrashLoop e sem detecao).
+
+**Cameras e vistas** (snapshots de 2026-10-09): `cam60` patio visto quase na vertical (pergola ao centro); `cam62` passagem lateral entre a casa e o muro; `cam63` patio/estacionamento com sebe ao fundo e um caminho fora da propriedade no canto superior direito.
 
 Criar o Secret (no Mac, zsh; as credenciais nao passam pelo Git nem pelo historico da shell). Utilizador e password sao codificados para URL, porque caracteres como `@ : / #` na password partem o URL e as cameras respondem `Unauthorized`:
 
@@ -405,7 +412,18 @@ unset MQUSER MQPASS && kubectl --context raspi -n ai delete pod -l app=people-de
 
 No arranque, o log mostra `mqtt connection success; ready to send data`. Para ver as mensagens: `mosquitto_sub -h 192.168.0.100 -u USER -P PASS -t 'jetson/#' -v`.
 
-**Proximo passo:** ligar o reconhecimento facial aos eventos de pessoa.
+**Home Assistant (repositorio `telheira-ha`):**
+- `includes/mqtt.yaml`: `sensor.jetson_pessoas_cam60/62/63` contam so objetos `person` (as caras tambem chegam no payload); na `cam63` ignora pessoas com centro da caixa em `x > 470 e y < 70` (caminho alem da sebe). Indisponiveis apos 30 s sem mensagens.
+- `includes/templates/people_detection.yaml`: `binary_sensor.pessoa_cam60/62/63` (ocupacao, `delay_off` 10 s). Nomes descritivos; os entity_ids mantem o sufixo `camNN`.
+- `automations/people_detection.yaml`: notifica `notify.antonio` quando uma camera ve uma pessoa, `binary_sensor.someone_home` esta `off` e o horario da empregada nao esta ativo; no maximo um alerta a cada 5 min. Ainda sem fotografia: falta mapear cada camera Jetson para a entidade `camera.*` do HA.
+- `dashboards/video.yaml`: cartao "Detecao de pessoas (Jetson)".
+
+**Proximos passos (por ordem):**
+1. **Ler as cameras atraves do Synology Surveillance Station** (RTSP em `192.168.0.200:554`) em vez de diretamente, para o Jetson deixar de contar para o limite de streams das cameras. Precisa de confirmar a partilha RTSP no Surveillance Station e de um utilizador para o Jetson.
+2. **Fotografia nas notificacoes:** mapear `cam60/62/63` para `camera.entrada_*`/`camera.jardim_*` e usar `camera.snapshot` como em `automations/security.yaml`.
+3. **Afinar limiares** (`pre-cluster-threshold` de `person`) e zonas com dados reais de alguns dias (falsos positivos/negativos).
+4. **Reconhecimento facial:** as caras ja sao detetadas pelo PeopleNet. Falta um SGIE de embeddings (ArcFace/InsightFace em TensorRT), uma galeria local com fotografias das pessoas da casa (com o conhecimento delas) e a publicacao `pessoa conhecida/desconhecida` por MQTT. Medir memoria junto com o LLM.
+5. **LLM no HA Assist (opcional):** o `llama.cpp` expoe API compativel com OpenAI, que a integracao "OpenAI Conversation" do HA nao deixa apontar para outro URL. Opcoes: integracao customizada (ex. Extended OpenAI Conversation, via HACS) ou trocar o servidor por Ollama (integracao nativa do HA; imagem `dustynv/ollama:r36.4.0`).
 
 ## 7. Verificacao final
 
