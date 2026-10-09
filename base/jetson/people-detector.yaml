@@ -227,8 +227,10 @@ data:
     gpu-id=0
     gie-unique-id=1
     batch-size=@BATCH@
-    # Infer every 3rd frame; the tracker fills the gaps.
-    interval=2
+    # Infer every 6th frame (~4 detections/s per camera); the tracker fills
+    # the gaps. With interval=2 PeopleNet kept the GPU at 99% and the LLM
+    # (priority workload) dropped to ~7 tokens/s.
+    interval=5
     config-file=/tmp/pgie.txt
 
     [tracker]
