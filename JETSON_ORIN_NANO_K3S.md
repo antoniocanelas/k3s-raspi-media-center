@@ -298,7 +298,7 @@ O pod deve ficar `Running`, aparecer no no `jetson-orin-01` e imprimir `aarch64`
 
 Compila e corre um kernel CUDA num pod com `runtimeClassName: nvidia` (a RuntimeClass `nvidia` ja existe no k3s). A imagem `l4t-jetpack` tem cerca de 10 GB; o primeiro pull demora.
 
-```bash
+——```bash
 kubectl --context raspi -n default run jetson-cuda-test --restart=Never \
   --image=nvcr.io/nvidia/l4t-jetpack:r36.4.0 \
   --overrides='{"spec":{"runtimeClassName":"nvidia","nodeSelector":{"kubernetes.io/hostname":"jetson-orin-01"},"tolerations":[{"key":"workload","operator":"Equal","value":"jetson","effect":"NoSchedule"}]}}' \
@@ -428,7 +428,7 @@ No arranque, o log mostra `mqtt connection success; ready to send data`. Para ve
    | `camNN` | substream `stream2`, so video | people-detector (`rtsp://USER:PASS@go2rtc.ai.svc.cluster.local:8554/camNN`) |
    | `camNN_hd` | `stream1`, video + audio | Home Assistant / LAN (`rtsp://USER:PASS@192.168.0.250:8554/camNN_hd`) |
 
-   O RTSP e publicado na LAN como `hostPort: 8554` so no Jetson (`192.168.0.250`); sem credenciais responde `401 Unauthorized`. O go2rtc so abre a sessao HD na camera enquanto houver um cliente a ver. Para o HA usar o go2rtc, adiciona em *Definicoes > Dispositivos e servicos > Adicionar integracao > Generic Camera* uma camera por stream `camNN_hd` (URL RTSP acima, transporte TCP) e troca as entidades nos dashboards/automacoes.
+   O RTSP e publicado na LAN como `hostPort: 8554` so no Jetson (`192.168.0.250`); sem credenciais responde `401 Unauthorized`. O go2rtc so abre a sessao HD na camera enquanto houver um cliente a ver. No HA existem (criadas em 2026-10-09 pela API, integracao *Generic Camera*, transporte TCP) `camera.jetson_entrada_geral` (`cam60_hd`), `camera.jetson_entrada_porta` (`cam62_hd`) e `camera.jetson_entrada_portao` (`cam63_hd`). O dashboard de video e o clip da entrada (`camera.record`) usam-nas; os snapshots continuam nas entidades ONVIF (`camera.entrada_*_mainstream`), que obtem a imagem por HTTP. As entidades Generic Camera nao tem `still_image_url`: so produzem imagem fixa com a stream ativa, por isso nao servem para `camera.snapshot`.
 2. **Fotografia nas notificacoes:** mapear `cam60/62/63` para `camera.entrada_*`/`camera.jardim_*` e usar `camera.snapshot` como em `automations/security.yaml`.
 3. **Afinar limiares** (`pre-cluster-threshold` de `person`) e zonas com dados reais de alguns dias (falsos positivos/negativos).
 4. **Reconhecimento facial:** as caras ja sao detetadas pelo PeopleNet. Falta um SGIE de embeddings (ArcFace/InsightFace em TensorRT), uma galeria local com fotografias das pessoas da casa (com o conhecimento delas) e a publicacao `pessoa conhecida/desconhecida` por MQTT. Medir memoria junto com o LLM.
