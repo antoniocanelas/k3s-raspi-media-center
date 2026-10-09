@@ -88,9 +88,13 @@ data:
 
     # Kept 30 days so the HA "Deteções" gallery covers the last month
     # (alert clips are short; the NVMe has >100 GB free).
+    # Date/time drawn on snapshots only (cheap, once per snapshot). Clips are
+    # stream copies; burning a timestamp in would need CPU re-encoding (no
+    # NVENC on the Orin Nano), and players show the time anyway.
     snapshots:
       enabled: true
       bounding_box: true
+      timestamp: true
       retain:
         default: 30
 
