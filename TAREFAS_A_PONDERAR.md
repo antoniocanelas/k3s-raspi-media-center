@@ -37,10 +37,11 @@ Ideias e melhorias em aberto para o Jetson, o video e o Home Assistant. Nao sao 
 ### Outras
 - **Abrandar a detecao quando ha pessoas em casa** (controlado pelo HA por MQTT): mais GPU para o LLM nas horas em que e usado. Adiado a pedido; a ideia acima pode substitui-la.
 - **Afinar limiares e zonas** com dados reais de alguns dias (falsos positivos/negativos por camera).
-- **Notificacao com a pessoa marcada** (caixa/recorte a partir da detecao do Jetson).
+- **Notificacao com a pessoa marcada** (caixa/recorte a partir da detecao do Jetson): exige que o detetor guarde/publique o frame com a caixa (ex.: imagem por MQTT para uma entidade `image` do HA); hoje a notificacao usa o snapshot ONVIF da camera inteira.
 - **Reconhecimento facial** (fase 4): so cameras porta (`cam62`) e portao (`cam63`); falta decidir quem entra na galeria (com fotos e conhecimento das pessoas) e o que fazer com desconhecidos.
 
 ## Assistente (LLM / voz)
+- **Reconhecimento de voz**: testar o Whisper `small-int8` com voz real; se falhar muito, `medium-int8` (CPU, mais lento) ou a imagem GPU `dustynv/wyoming-whisper:2.3.0-r36.4.0` (9,5 GB, compete com o LLM pela memoria).
 - **Satelite de voz** (ex.: ESP32-S3 / Voice PE) a usar o pipeline "Jetson" com STT/TTS locais.
 - **Controlo da casa pelo LLM**: rever com o uso real se as instrucoes e aliases chegam, ou se e preciso restringir mais a lista exposta.
 - **Modelos**: reavaliar quando houver modelos 3-4B melhores em pt-PT com tool calling; um 7-8B so cabe sem o video ligado.

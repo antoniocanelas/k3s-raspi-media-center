@@ -351,6 +351,20 @@ Otimizacoes do Ollama medidas (prompt de ~7k tokens): *flash attention* neutra (
 
 Com o `qwen3:4b-instruct` carregado e o video ativo, o Jetson fica em ~5,3 GB de 7,4 GB e ~66 °C. Com o detetor a `interval=2` a GPU ficava a 99% e os modelos perdiam ~30% de velocidade; com `interval=5` recuperam. Um modelo 7-8B nao cabe ao lado do video.
 
+### Voz local (Assist)
+
+`base/jetson/voice.yaml`: Wyoming **Whisper** (`rhasspy/wyoming-whisper:3.8.1`, `small-int8`, `pt`, `beam-size 5`, `--initial-prompt` com vocabulario da casa) e **Piper** (`rhasspy/wyoming-piper:2.5.2`, voz `pt_PT-tugão-medium`), ambos no CPU para nao disputarem a GPU. Modelos em `jetson-ai-pvc` (`models/voice`). O HA liga-se por `hostPort`: `192.168.0.250:10300` (STT, `stt.faster_whisper`) e `:10200` (TTS, `tts.piper`). O pipeline "Jetson" (preferido) usa Whisper `pt` + agente Qwen3 + Piper `pt_PT`.
+
+Teste de ida e volta (frases do Piper, comprimidas em MP3, convertidas para 16 kHz): Piper ~0,3 s por frase; Whisper ~4,5 s por frase de ~2 s; reconhecimento razoavel mas com erros em frases rapidas ("escritorio as dez" -> "quitos la desde"). Avaliar com voz real antes de mudar de modelo; alternativas: `medium-int8` no CPU (mais lento) ou `dustynv/wyoming-whisper:2.3.0-r36.4.0` com GPU (imagem de 9,5 GB, compete com o LLM pela memoria).
+
+### Monitorizacao no HA
+
+`base/jetson/jetson-monitor.yaml` publica a cada 30 s, por MQTT discovery (dispositivo "Jetson Orin Nano"): `sensor.jetson_temperature`, `sensor.jetson_ram_used`, `sensor.jetson_ram_available`, `sensor.jetson_gpu_load`, `sensor.jetson_llm_model`, `binary_sensor.jetson_llm_online` e `sensor.jetson_fps_cam60/62/63` (estes alimentados pelo supervisor do detetor em `jetson/detector/state`). No `telheira-ha`, `automations/jetson_health.yaml` avisa quando: temperatura > 85 °C durante 5 min; uma camera fica sem imagem 15 min; o LLM ou o monitor ficam em baixo 10 min. Cartao "Jetson" no dashboard de video.
+
+**Memoria do LLM:** o Ollama oficial com *mmap* deixava o modelo residente duas vezes (4,2 GB na GPU + 2,5 GB de ficheiro mapeado; Jetson a 7,4/7,6 GB e em swap). O modelo `qwen3-jetson` (criado no arranque a partir do `qwen3:4b-instruct`, `use_mmap false`, `num_ctx 8192`) poupa ~1,9 GB e e o usado pelo agente do HA, carregado logo no arranque do pod.
+
+**MQTT do detetor:** o `deepstream-app` publica num Mosquitto local (sidecar `mqtt-bridge`, `127.0.0.1:1883`) que faz ponte de `jetson/#` para o broker do HA com reconexao automatica; antes, cada falha do broker do HA terminava o `deepstream-app`.
+
 ### Video: detecao de pessoas
 
 **Cameras encontradas na LAN** (2026-10-09): `192.168.0.60`, `192.168.0.62`, `192.168.0.63`, todas TP-Link (`realm="TP-LINK IP-Camera"`), RTSP na porta 554 com autenticacao e ONVIF na porta 2020. O Synology (`192.168.0.200`) tambem expoe RTSP (Surveillance Station). URLs TP-Link: `rtsp://USER:PASS@IP:554/stream1` (principal) e `/stream2` (substream, usada pelo Jetson).
