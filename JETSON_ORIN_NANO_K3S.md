@@ -336,7 +336,7 @@ Acesso na LAN pelo Traefik (sem autenticacao), so endpoints de conversa/inferenc
 
 Gerir modelos so por dentro do cluster: `kubectl --context raspi -n ai exec deploy/llm -- ollama list|pull|rm|stop|ps`.
 
-**Home Assistant:** integracao Ollama (URL `http://192.168.0.240`) com o agente de conversa `conversation.jetson_qwen2_5_3b`, criado em 2026-10-09 so para conversa. Para usar o Qwen3 Instruct com controlo da casa: no agente, modelo `qwen3:4b-instruct`, `think` desligado e *Control Home Assistant* = Assist; o LLM so controla as entidades expostas ao Assist (*Definicoes > Assistentes de voz > Expor*). No pipeline, *Preferir processar comandos localmente* deixa os comandos simples no motor do HA e o resto para o LLM.
+**Home Assistant** (configurado em 2026-10-09 pela API): integracao Ollama (URL `http://192.168.0.240`) com o agente **`conversation.jetson_qwen3_4b`** ("Jetson (Qwen3 4B)"): modelo `qwen3:4b-instruct`, *Control Home Assistant* = Assist, `think` desligado, `num_ctx` 8192, `keep_alive -1`, instrucoes em pt-PT. Pipeline do Assist **"Jetson"** (texto, idioma `pt`, *Preferir processar comandos localmente* ligado): comandos simples ficam no motor do HA e o resto vai para o LLM. O pipeline preferido continua a ser "Home Assistant". O LLM so ve e controla as entidades expostas ao Assist (*Definicoes > Assistentes de voz > Expor*); a lista enviada (ferramentas + entidades) tem ~5k tokens, por isso o primeiro pedido demora ~25 s e os seguintes 6-11 s (cache de prefixo do Ollama). Expor menos entidades torna-o mais rapido.
 
 **Comparacao em 2026-10-09** (MAXN SUPER, com o people-detector ativo, 5 perguntas em pt-PT + 3 pedidos de controlo):
 
