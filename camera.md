@@ -61,7 +61,7 @@ or in the cluster after the UI changes.
 | # | Where | Setting | Value |
 |---|---|---|---|
 | C1 | System Settings → Firmware Update | Firmware | latest, same on all cameras |
-| C2 | Information → Device Information | Device Name | Frigate name: **Entrada Geral** (.60, today "Frente"), **Entrada Porta** (.62), **Entrada Portão** (.63) |
+| C2 | Information → Device Information | Device Name | **Geral** (.60, today "Frente"), **Porta** (.62), **Portão** (.63) |
 | C3 | Camera → Display → OSD | Date, Day of Week, Channel Name, Custom 1-2 | **all Off** (re-check after firmware updates) |
 | C4 | System Settings → Date | Time zone / time | Lisbon (UTC±0 with DST Auto), NTP Auto, 24 h |
 | C5 | Network Settings → Internet Connection | IP | Static 192.168.0.6x /24, gateway/DNS 192.168.0.1 |
