@@ -594,8 +594,8 @@ spec:
         - name: OLLAMA_CONTEXT_LENGTH
           value: "4096"
         - name: PULL_MODELS
-          value: qwen2.5:3b qwen3:4b
-        image: dustynv/ollama:0.6.8-r36.4-cu126-22.04
+          value: qwen3:4b-instruct qwen2.5:3b
+        image: ollama/ollama:0.35.1
         livenessProbe:
           httpGet:
             path: /api/version

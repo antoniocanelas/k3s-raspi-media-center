@@ -1,6 +1,8 @@
-# LLM inference on jetson-orin-01: Ollama (dustynv Jetson build, CUDA 12.6 =
-# JetPack 6.2) with an OpenAI-compatible API (/v1) plus the native Ollama API
-# used by the Home Assistant Ollama integration.
+# LLM inference on jetson-orin-01: official Ollama image (ships a JetPack 6
+# CUDA build, cuda_jetpack6, works with the JetPack 6.2 driver 12.6) with an
+# OpenAI-compatible API (/v1) plus the native Ollama API used by the Home
+# Assistant Ollama integration. The dustynv 0.6.8 build used first could not
+# switch Qwen3 thinking off (minutes per answer).
 # Models live on the Jetson NVMe (jetson-ai-pvc, /models/ollama); the ones in
 # PULL_MODELS are pulled at start if missing. Only one model is loaded at a
 # time and it stays loaded (keep_alive -1) so answers start immediately.
@@ -36,7 +38,7 @@ spec:
         effect: NoSchedule
       containers:
       - name: ollama
-        image: dustynv/ollama:0.6.8-r36.4-cu126-22.04
+        image: ollama/ollama:0.35.1
         command:
         - bash
         - -c
@@ -61,8 +63,11 @@ spec:
           value: "1"
         - name: OLLAMA_CONTEXT_LENGTH
           value: "4096"
+        # qwen3:4b-instruct (Qwen3-4B-Instruct-2507, no thinking): default for
+        # the HA agent, reliable tool calls for house control. qwen2.5:3b:
+        # faster fallback, weaker answers.
         - name: PULL_MODELS
-          value: qwen2.5:3b qwen3:4b
+          value: qwen3:4b-instruct qwen2.5:3b
         ports:
         - name: http
           containerPort: 11434
