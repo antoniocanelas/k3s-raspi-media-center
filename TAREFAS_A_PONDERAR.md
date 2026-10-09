@@ -58,6 +58,17 @@ No Jetson: imagem oficial `ghcr.io/blakeblackshear/frigate:stable-tensorrt-jp6` 
 
 Alternativas: Scrypted NVR (mais focado em HomeKit), Viseron (semelhante, comunidade menor), DeepStream com app servidor (controlo total, muito mais trabalho).
 
+### Rever no Home Assistant as deteccoes de pessoas do dia
+
+**Ideia:** ver no HA (app ou browser) a lista das pessoas detetadas no dia, com snapshot e clip de cada evento, sem ter de abrir o Frigate.
+
+O Frigate ja guarda tudo o que e preciso: snapshot com a caixa e clip HD de cada alerta de pessoa (7 dias). Opcoes, da mais completa a mais simples:
+- **Integracao Frigate para o HA** (via HACS, `blakeblackshear/frigate-hass-integration`) + **Advanced Camera Card** (HACS): cartao com linha temporal do dia, miniaturas, clips e snapshots por camera; a integracao tambem acrescenta o Frigate ao *Media* do HA (pasta de clips e snapshots por camera/dia) e entidades/eventos nativos. Pre-requisito: o HA alcancar a API do Frigate (porta 5000 sem autenticacao so dentro do cluster; usar a 8971 com utilizador proprio para o HA, ou expor a 5000 so para o IP do HA).
+- **Painel lateral com a interface do Frigate** (*Review* do Frigate dentro do HA, por iframe/painel web): rapido de montar, mas e a interface do Frigate, com o login dele.
+- **Sem componentes novos:** guardar o snapshot de cada alerta numa pasta por dia (`/local/frigate/AAAA-MM-DD/`) a partir da automacao atual e mostrar uma galeria simples num dashboard (so imagens, sem clips).
+
+Recomendacao: integracao Frigate + Advanced Camera Card; e a forma padrao na comunidade e cobre imagens e videos com filtro por dia, camera e tipo (pessoa, carro, gato, cao).
+
 ### Outras
 - **Abrandar a detecao quando ha pessoas em casa** (controlado pelo HA por MQTT): mais GPU para o LLM nas horas em que e usado. Adiado a pedido; a ideia acima pode substitui-la.
 - **Afinar limiares e zonas** com dados reais de alguns dias (falsos positivos/negativos por camera).
