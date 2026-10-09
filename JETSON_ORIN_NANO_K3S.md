@@ -366,7 +366,14 @@ Para reiniciar o detetor usa `delete pod`, nao `rollout restart`: o Flux reverte
 
 Para testar credenciais RTSP no Mac (o `curl` do macOS nao suporta RTSP), envia um `DESCRIBE` com autenticacao Basic/Digest por socket (script Python simples) e espera `RTSP/1.0 200 OK`. As credenciais que funcionam sao as da propria camera (utilizador `admin`), nao as da conta TP-Link.
 
-**Estado em 2026-10-09:** as tres cameras estao ligadas, cada substream a ~25 fps (H.264). A camera `.63` envia tambem audio PCMA; com `type=4` (rtspsrc) essa fonte ficava a 0 fps sem erro, por isso o pipeline usa `type=3` (uridecodebin), que ignora o audio. Com `type=3` nao ha reconexao RTSP integrada: um erro numa fonte termina o `deepstream-app` e o Kubernetes reinicia o pod.
+**Estado em 2026-10-09:** `.60` e `.63` processadas a ~25 fps cada (substream H.264). `.62` aceita a sessao RTSP (negocia H.264 + PCMA) mas nao envia frames em `stream1` nem `stream2`, sem erro; funcionou a ~25 fps no inicio do dia, por isso o problema esta do lado da camera (modo privacidade, limite de sessoes ou camera bloqueada). As cameras `.62` e `.63` enviam tambem audio PCMA; com `type=4` (rtspsrc) uma fonte com audio pode ficar a 0 fps sem erro, por isso o pipeline usa `type=3` (uridecodebin), que ignora o audio, com `rtspt://` para forcar RTP sobre TCP (o UDP das cameras nao chega ao pod por causa do NAT da rede de pods). Com `type=3` nao ha reconexao RTSP integrada: um erro numa fonte termina o `deepstream-app` e o Kubernetes reinicia o pod.
+
+Teste rapido de uma camera a partir do pod (deve terminar em ~2 s com `Execution ended`):
+
+```bash
+kubectl --context raspi -n ai exec deploy/people-detector -c deepstream -- bash -c \
+  'timeout 20 gst-launch-1.0 rtspsrc location="$CAM2_URL" protocols=tcp ! rtph264depay ! h264parse ! nvv4l2decoder ! fakesink num-buffers=50 2>&1 | grep -E "Execution ended|ERROR"'
+```
 
 **Medicoes com o video de exemplo (720p, H.264) em 2026-10-09:**
 
