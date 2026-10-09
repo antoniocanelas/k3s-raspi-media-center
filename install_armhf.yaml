@@ -62,13 +62,6 @@ data:
           min_score: 0.5
           threshold: 0.7
 
-    motion:
-      mask:
-        timestamp:
-          friendly_name: Data e hora da camera
-          enabled: true
-          coordinates: "0.090,0.030,0.660,0.030,0.660,0.115,0.090,0.115"
-
     # Combined all-cameras view: unused, costs an encoder/output process.
     birdseye:
       enabled: false
@@ -112,10 +105,6 @@ data:
         # stays unmasked (people walk there). Pixels of the 640x480 frame.
         motion:
           mask:
-            timestamp:
-              friendly_name: Data e hora da camera
-              enabled: true
-              coordinates: "58,14,422,14,422,55,58,55"
             jardim_fundo:
               friendly_name: Palmeira e jardim ao fundo
               enabled: true
@@ -142,15 +131,10 @@ data:
         friendly_name: Entrada Portão
         # The hedge/plants along the back wall and the sunlit wooden fence on
         # the right kept the detector busy (~5 detections/s with nobody there).
-        # Camera-level masks replace the global ones, so repeat the timestamp.
         # Pixels of the 640x480 detect frame: 0.18 rejects relative
         # coordinates in camera-level masks ("invalid literal for int()").
         motion:
           mask:
-            timestamp:
-              friendly_name: Data e hora da camera
-              enabled: true
-              coordinates: "58,14,422,14,422,55,58,55"
             sebe:
               friendly_name: Sebe, plantas e vedacao
               enabled: true
