@@ -347,6 +347,8 @@ Gerir modelos so por dentro do cluster: `kubectl --context raspi -n ai exec depl
 | `gemma3:4b` (GGUF do Hugging Face) | 5,2 GB | ~7,4 tok/s | ~5 s | certos, respostas uteis | sem tool calling no Ollama |
 | `qwen3:4b` original (com thinking) | 4,1 GB | ~6,6 tok/s | ~3 min | certos | inutilizavel (raciocina em ingles antes de responder) |
 
+Otimizacoes do Ollama medidas (prompt de ~7k tokens): *flash attention* neutra (~300 tok/s no prompt, ~7 tok/s a gerar); cache KV `q8_0` poupa 0,6 GB mas baixa a geracao para ~6 tok/s, por isso fica `f16`. O limite e o calculo da GPU partilhada com o detetor; a primeira resposta do agente do HA (~25 s) vem de processar ~4-5k tokens de ferramentas e entidades, e as seguintes reutilizam a cache de prefixo.
+
 Com o `qwen3:4b-instruct` carregado e o video ativo, o Jetson fica em ~5,3 GB de 7,4 GB e ~66 °C. Com o detetor a `interval=2` a GPU ficava a 99% e os modelos perdiam ~30% de velocidade; com `interval=5` recuperam. Um modelo 7-8B nao cabe ao lado do video.
 
 ### Video: detecao de pessoas

@@ -61,12 +61,14 @@ spec:
           value: "1"
         - name: OLLAMA_NUM_PARALLEL
           value: "1"
-        # Flash attention + 8-bit KV cache: faster prompt processing (the HA
-        # agent sends ~4-5k tokens) and less memory for the 8192 context.
+        # Measured 2026-10-09 on a ~7k-token prompt: flash attention is neutral
+        # (~300 tok/s prompt, ~7 tok/s generation); a q8_0 KV cache saves
+        # 0.6 GB but drops generation to ~6 tok/s, so the cache stays f16.
+        # The limit is GPU compute shared with the people-detector.
         - name: OLLAMA_FLASH_ATTENTION
           value: "1"
         - name: OLLAMA_KV_CACHE_TYPE
-          value: q8_0
+          value: f16
         # 8192: with house control the HA agent sends ~5k tokens (Assist tools
         # + exposed entities); 4096 made Ollama reject the request.
         - name: OLLAMA_CONTEXT_LENGTH
