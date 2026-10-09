@@ -365,7 +365,19 @@ Teste de ida e volta (frases do Piper, comprimidas em MP3, convertidas para 16 k
 
 **MQTT do detetor:** o `deepstream-app` publica num Mosquitto local (sidecar `mqtt-bridge`, `127.0.0.1:1883`) que faz ponte de `jetson/#` para o broker do HA com reconexao automatica; antes, cada falha do broker do HA terminava o `deepstream-app`.
 
-### Video: detecao de pessoas
+### Video: Frigate (desde 2026-10-09)
+
+`base/jetson/frigate.yaml` corre o **Frigate 0.18.0** (`ghcr.io/blakeblackshear/frigate:0.18.0-tensorrt-jp6`) e substitui o `people-detector` (que fica com `replicas: 0` para rollback: voltar a 1 e por o Frigate a 0). Le as cameras do nosso go2rtc (`camNN` para detecao a 5 fps, `camNN_hd` para clips), faz detecao de movimento no CPU e so corre o detetor TensorRT **YOLOv7-320** (gerado uma vez em `/var/lib/jetson-data/ai/frigate/config/model_cache`) onde ha movimento. So pessoas; mascara da data nas imagens e do caminho fora da propriedade na `cam63` (em pixeis: a 0.18 rejeitou coordenadas relativas nessa mascara). Grava so alertas/detecoes de pessoa (7 dias; a gravacao continua fica no Synology). Birdseye desligado.
+
+- MQTT para o HA: `frigate/<cam>/person` (contagem), `frigate/<cam>/person/snapshot` (JPEG com a caixa), `frigate/stats`, `frigate/available`.
+- HA: `sensor.jetson_pessoas_camNN` e `binary_sensor.pessoa_camNN` (mesmos ids de antes), `image.frigate_camNN_person` (ultimo snapshot, usado na notificacao), fps e inferencia via `jetson-monitor`.
+- UI: `https://192.168.0.250:8971` (certificado proprio; utilizador `admin`, password gerada no primeiro arranque: `kubectl -n ai logs deploy/frigate | grep -i password`).
+- Medido: inferencia ~20 ms, 3 cameras a 5 fps, CPU 11-21%; memoria do Jetson com LLM + Frigate + voz ~7,0/7,6 GB.
+- `config.yml` e copiado do ConfigMap em cada arranque: alteracoes na UI do Frigate perdem-se; fazer as alteracoes no repositorio.
+
+**LLM ao lado do Frigate:** o Ollama estima a memoria livre da GPU contando a page cache como ocupada e chegou a dividir o modelo ~45/55 CPU/GPU; o `qwen3-jetson` tem `num_gpu 99` para ficar 100% na GPU, e e pre-carregado por HTTP no arranque do pod.
+
+### Video: detecao de pessoas (DeepStream, substituido pelo Frigate)
 
 **Cameras encontradas na LAN** (2026-10-09): `192.168.0.60`, `192.168.0.62`, `192.168.0.63`, todas TP-Link (`realm="TP-LINK IP-Camera"`), RTSP na porta 554 com autenticacao e ONVIF na porta 2020. O Synology (`192.168.0.200`) tambem expoe RTSP (Surveillance Station). URLs TP-Link: `rtsp://USER:PASS@IP:554/stream1` (principal) e `/stream2` (substream, usada pelo Jetson).
 

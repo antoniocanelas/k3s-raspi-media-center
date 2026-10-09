@@ -34,7 +34,19 @@ Ideias e melhorias em aberto para o Jetson, o video e o Home Assistant. Nao sao 
 
 **Combinacao sugerida:** detecao em tempo real (continua ou por evento) para o alerta imediato + clip HD da Synology para reconhecimento facial e resumo, com alguns segundos de atraso.
 
-### Avaliar o Frigate em vez do pipeline proprio (recomendado antes de investir no DeepStream)
+### Frigate: avaliar o YOLOv7 e decidir o modelo (em curso desde 2026-10-09)
+
+O Frigate 0.18 substituiu o `people-detector` em 2026-10-09 com o YOLOv7-320 (TensorRT, gerado automaticamente; ~20 ms por inferencia; 3 cameras a 5 fps). Deixar a recolher dados alguns dias e avaliar no Frigate (*Review*, *Explore*, *System > Metrics*) e no HA:
+- **pessoas falhadas** (passagens conhecidas sem alerta) e **falsos alarmes** (sombras, plantas, animais) por camera;
+- **tempo de inferencia** e **deteccoes saltadas** (*skipped*);
+- **memoria do Jetson** com LLM + Frigate + voz (hoje ~350 MB livres; alerta no HA abaixo de 300 MB).
+
+Opcoes de modelo se o YOLOv7 nao chegar:
+- **YOLOv9-s 320** (`model_type: yolo-generic`, detetor ONNX que usa TensorRT na imagem `-jp6`): **oficial e recomendado** pela documentacao do Frigate; exportar o ONNX uma vez com a receita da documentacao.
+- **YOLO26-s 320** (Ultralytics): **nao oficial**, via `yolo-generic`; so funciona se o ONNX exportado tiver saida estilo YOLOv8 `[1, 84, N]` (a saida nativa `[1, 300, 6]` sem NMS nao e lida pelo Frigate). Licenca AGPL-3.0: sem problema para uso domestico. Exportar e verificar a forma da saida antes de mudar o Frigate.
+- Em ambos os casos, confirmar o consumo de memoria antes de deixar ativo.
+
+### Avaliar o Frigate em vez do pipeline proprio (feito: Frigate adotado em 2026-10-09)
 
 O [Frigate](https://frigate.video) e o NVR open source mais usado com o Home Assistant e faz por omissao o "so analisar quando ha evento": detecao de movimento continua e barata no CPU sobre a substream, e detecao de objetos (TensorRT) so nas zonas com movimento. Nao depende do evento da camera.
 
