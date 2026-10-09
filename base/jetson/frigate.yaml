@@ -194,7 +194,9 @@ data:
             - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam62_hd
               roles: [detect, record]
         # Detect on the main stream at 1280x720 (since 2026-10-09) so faces have
-        # enough pixels for face recognition; the main stream is 720p today.
+        # enough pixels for face recognition. The main stream is 2560x1440
+        # (Portao after fw 2.2.3); Frigate scales it down (~10% of a core,
+        # ~-165 MB RAM measured). 1440p detect would cost ~200-300 MB more.
         # Masks are pixels of this 1280x720 frame (converted from the old
         # 640x480 sub stream: x*2, y*1.5, same field of view).
         detect:
@@ -221,7 +223,9 @@ data:
             - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam63_hd
               roles: [detect, record]
         # Detect on the main stream at 1280x720 (since 2026-10-09) so faces have
-        # enough pixels for face recognition; the main stream is 720p today.
+        # enough pixels for face recognition. The main stream is 2560x1440
+        # (Portao after fw 2.2.3); Frigate scales it down (~10% of a core,
+        # ~-165 MB RAM measured). 1440p detect would cost ~200-300 MB more.
         # Masks are pixels of this 1280x720 frame (converted from the old
         # 640x480 sub stream: x*2, y*1.5, same field of view).
         detect:
