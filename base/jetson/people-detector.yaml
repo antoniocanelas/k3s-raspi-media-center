@@ -1,6 +1,7 @@
 # Person detection on jetson-orin-01 (DeepStream 7.1, NVIDIA PeopleNet
-# ResNet34 INT8: person + face, IOU tracker). Reads the cameras' RTSP *substreams* directly
-# (rtsp://USER:PASS@192.168.0.6x:554/stream2) from Secret ai/camera-rtsp,
+# ResNet34 INT8: person + face, IOU tracker). Reads the cameras' RTSP
+# *substreams* through go2rtc; camera URLs
+# (rtsp://USER:PASS@192.168.0.6x:554/stream2) come from Secret ai/camera-rtsp,
 # keys CAM1_URL..CAM3_URL. The Secret is created by hand (never in git); while
 # it is missing the pod idles without touching the GPU. After creating or
 # changing it: kubectl -n ai delete pod -l app=people-detector
@@ -40,17 +41,19 @@ data:
     # source at 0 fps. uridecodebin ignores the audio. Without type=4 there is
     # no built-in RTSP reconnect: supervisor.py restarts the container when a
     # camera stays at 0 fps.
-    # rtspt:// forces RTP over TCP: UDP RTP from the cameras never reaches the
-    # pod (pod network NAT), and the UDP->TCP fallback is unreliable.
+    # Streams come from go2rtc (base/jetson/go2rtc.yaml), which holds a single
+    # session per camera, so detector restarts no longer open camera sessions.
+    # rtspt:// forces RTP over TCP (UDP RTP does not cross the pod network NAT).
+    G="${GO2RTC_RTSP:-rtspt://go2rtc.ai.svc.cluster.local:8554}"
     n=0
     : > /tmp/sources.txt
     : > /tmp/msgconv.txt
     for u in "$CAM1_URL" "$CAM2_URL" "$CAM3_URL"; do
       [ -n "$u" ] || continue
-      u="rtspt:${u#rtsp:}"
-      # Sensor id from the camera IP's last octet (rtsp://u:p@192.168.0.60:...
-      # -> cam60); it is the sensorId in the MQTT payload.
+      # Sensor id / go2rtc stream name from the camera IP's last octet
+      # (rtsp://u:p@192.168.0.60:... -> cam60); it is the MQTT sensorId.
       h="${u##*@}"; h="${h%%[:/]*}"
+      u="$G/cam${h##*.}"
       cat >> /tmp/sources.txt <<EOF
     [source$n]
     enable=1

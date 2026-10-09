@@ -6,6 +6,29 @@ metadata:
 ---
 apiVersion: v1
 data:
+  run.sh: |
+    #!/bin/sh
+    set -e
+    {
+      echo 'rtsp:'
+      echo '  listen: ":8554"'
+      echo 'api:'
+      echo '  listen: ":1984"'
+      echo 'streams:'
+      for u in "$CAM1_URL" "$CAM2_URL" "$CAM3_URL"; do
+        [ -n "$u" ] || continue
+        h="${u##*@}"; h="${h%%[:/]*}"
+        printf '  cam%s: "%s#media=video"\n' "${h##*.}" "$u"
+      done
+    } > /tmp/go2rtc.yaml
+    exec go2rtc -config /tmp/go2rtc.yaml
+kind: ConfigMap
+metadata:
+  name: go2rtc
+  namespace: ai
+---
+apiVersion: v1
+data:
   app.txt: |
     [application]
     enable-perf-measurement=1
@@ -104,17 +127,19 @@ data:
     # source at 0 fps. uridecodebin ignores the audio. Without type=4 there is
     # no built-in RTSP reconnect: supervisor.py restarts the container when a
     # camera stays at 0 fps.
-    # rtspt:// forces RTP over TCP: UDP RTP from the cameras never reaches the
-    # pod (pod network NAT), and the UDP->TCP fallback is unreliable.
+    # Streams come from go2rtc (base/jetson/go2rtc.yaml), which holds a single
+    # session per camera, so detector restarts no longer open camera sessions.
+    # rtspt:// forces RTP over TCP (UDP RTP does not cross the pod network NAT).
+    G="${GO2RTC_RTSP:-rtspt://go2rtc.ai.svc.cluster.local:8554}"
     n=0
     : > /tmp/sources.txt
     : > /tmp/msgconv.txt
     for u in "$CAM1_URL" "$CAM2_URL" "$CAM3_URL"; do
       [ -n "$u" ] || continue
-      u="rtspt:${u#rtsp:}"
-      # Sensor id from the camera IP's last octet (rtsp://u:p@192.168.0.60:...
-      # -> cam60); it is the sensorId in the MQTT payload.
+      # Sensor id / go2rtc stream name from the camera IP's last octet
+      # (rtsp://u:p@192.168.0.60:... -> cam60); it is the MQTT sensorId.
       h="${u##*@}"; h="${h%%[:/]*}"
+      u="$G/cam${h##*.}"
       cat >> /tmp/sources.txt <<EOF
     [source$n]
     enable=1
@@ -292,6 +317,24 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
+    app: go2rtc
+  name: go2rtc
+  namespace: ai
+spec:
+  ports:
+  - name: rtsp
+    port: 8554
+    targetPort: rtsp
+  - name: api
+    port: 1984
+    targetPort: api
+  selector:
+    app: go2rtc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
     app: llm
   name: llm
   namespace: ai
@@ -422,6 +465,64 @@ spec:
       storage: 30Gi
   storageClassName: jetson-local
   volumeName: jetson-transcode-pv
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: go2rtc
+  name: go2rtc
+  namespace: ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go2rtc
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: go2rtc
+    spec:
+      containers:
+      - command:
+        - sh
+        - /config/run.sh
+        envFrom:
+        - secretRef:
+            name: camera-rtsp
+        image: alexxit/go2rtc:1.9.14
+        name: go2rtc
+        ports:
+        - containerPort: 8554
+          name: rtsp
+        - containerPort: 1984
+          name: api
+        readinessProbe:
+          periodSeconds: 10
+          tcpSocket:
+            port: rtsp
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        volumeMounts:
+        - mountPath: /config
+          name: config
+      nodeSelector:
+        kubernetes.io/hostname: jetson-orin-01
+      tolerations:
+      - effect: NoSchedule
+        key: workload
+        operator: Equal
+        value: jetson
+      volumes:
+      - configMap:
+          name: go2rtc
+        name: config
 ---
 apiVersion: apps/v1
 kind: Deployment

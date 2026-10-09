@@ -1,0 +1,105 @@
+# RTSP restreamer between the cameras and the Jetson workloads.
+# The TP-Link cameras serve only a few concurrent RTSP streams and keep dead
+# sessions until they time out; every people-detector restart or manual test
+# used to open new camera sessions and starve them (0 fps). go2rtc keeps one
+# session per camera and serves any number of local consumers:
+#   rtsp://go2rtc.ai.svc.cluster.local:8554/cam60   (video only)
+# Stream names come from the camera IP's last octet, matching the detector's
+# sensorId. Camera URLs come from Secret ai/camera-rtsp (CAM1_URL..CAM3_URL).
+# ClusterIP only: the restreams have no authentication.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: go2rtc
+  namespace: ai
+data:
+  run.sh: |
+    #!/bin/sh
+    set -e
+    {
+      echo 'rtsp:'
+      echo '  listen: ":8554"'
+      echo 'api:'
+      echo '  listen: ":1984"'
+      echo 'streams:'
+      for u in "$CAM1_URL" "$CAM2_URL" "$CAM3_URL"; do
+        [ -n "$u" ] || continue
+        h="${u##*@}"; h="${h%%[:/]*}"
+        printf '  cam%s: "%s#media=video"\n' "${h##*.}" "$u"
+      done
+    } > /tmp/go2rtc.yaml
+    exec go2rtc -config /tmp/go2rtc.yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go2rtc
+  namespace: ai
+  labels:
+    app: go2rtc
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: go2rtc
+  template:
+    metadata:
+      labels:
+        app: go2rtc
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: jetson-orin-01
+      tolerations:
+      - key: workload
+        operator: Equal
+        value: jetson
+        effect: NoSchedule
+      containers:
+      - name: go2rtc
+        image: alexxit/go2rtc:1.9.14
+        command: ["sh", "/config/run.sh"]
+        envFrom:
+        - secretRef:
+            name: camera-rtsp
+        ports:
+        - name: rtsp
+          containerPort: 8554
+        - name: api
+          containerPort: 1984
+        readinessProbe:
+          tcpSocket:
+            port: rtsp
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+        volumeMounts:
+        - name: config
+          mountPath: /config
+      volumes:
+      - name: config
+        configMap:
+          name: go2rtc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go2rtc
+  namespace: ai
+  labels:
+    app: go2rtc
+spec:
+  selector:
+    app: go2rtc
+  ports:
+  - name: rtsp
+    port: 8554
+    targetPort: rtsp
+  - name: api
+    port: 1984
+    targetPort: api
