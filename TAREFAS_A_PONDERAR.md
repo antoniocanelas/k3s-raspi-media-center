@@ -82,6 +82,7 @@ Recomendacao: integracao Frigate + Advanced Camera Card; e a forma padrao na com
 - **Reconhecimento de voz** (avaliar com voz real): hoje o Whisper `small-int8` corre no add-on do HA, sem vocabulario da casa e a ~7 s por frase. Opcoes se falhar muito: (1) Whisper com `--initial-prompt` no `pi-master-00` (Pi 5 do cluster, parado; mesma velocidade, melhores palavras), mantendo o Piper no add-on; (2) modelo `medium` no add-on (o Pi do HA tem ~6,5 GB livres; mais preciso, ~12-15 s por frase); (3) Whisper na GPU do Jetson (~1 s e preciso, mas volta a apertar a memoria do Jetson).
 - **Satelite de voz** (ex.: ESP32-S3 / Voice PE) a usar o pipeline "Jetson" com STT/TTS locais.
 - **Controlo da casa pelo LLM**: rever com o uso real se as instrucoes e aliases chegam, ou se e preciso restringir mais a lista exposta.
+- **Cache de prompts do LLM em RAM** (diagnosticado 2026-10-09, adiado): o `llama-server` lancado pelo Ollama guarda cada conversa do Assist num cache em RAM (~650 MiB para um prompt de 4617 tokens) com limite por omissao de 8 GB, e o Ollama nao passa `--cache-ram`. Um unico pedido do HA as 18:09 UTC baixou a RAM disponivel do Jetson de ~780 MB para ~155 MB. Correcao proposta: `LLAMA_ARG_CACHE_RAM=0` no deployment `llm` (verificar `limits: 0` no log); custo: ~+1 s nos pedidos seguidos da mesma conversa.
 - **Modelos**: reavaliar quando houver modelos 3-4B melhores em pt-PT com tool calling; um 7-8B so cabe sem o video ligado.
 
 ## Infraestrutura
