@@ -2626,6 +2626,16 @@ metadata:
 spec:
   failurePolicy: reinstall
   valuesContent: |-
+    # Keep the client IP: with the default externalTrafficPolicy Cluster the
+    # service NATs the source and Home Assistant sees every external request as
+    # the svclb pod (10.42.x), so its login ban would block everyone. Local
+    # needs Traefik on the node the router forwards to (pi-master-00), hence
+    # the nodeSelector.
+    service:
+      spec:
+        externalTrafficPolicy: Local
+    nodeSelector:
+      kubernetes.io/hostname: pi-master-00
     additionalArguments:
       - "--certificatesresolvers.letsencrypt.acme.email=antoniocanelas@gmail.com"
       - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
