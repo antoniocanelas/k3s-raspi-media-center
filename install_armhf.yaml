@@ -111,9 +111,13 @@ data:
     # pod (pod network NAT), and the UDP->TCP fallback is unreliable.
     n=0
     : > /tmp/sources.txt
+    : > /tmp/msgconv.txt
     for u in "$CAM1_URL" "$CAM2_URL" "$CAM3_URL"; do
       [ -n "$u" ] || continue
       u="rtspt:${u#rtsp:}"
+      # Sensor id from the camera IP's last octet (rtsp://u:p@192.168.0.60:...
+      # -> cam60); it is the sensorId in the MQTT payload.
+      h="${u##*@}"; h="${h%%[:/]*}"
       cat >> /tmp/sources.txt <<EOF
     [source$n]
     enable=1
@@ -123,13 +127,49 @@ data:
     gpu-id=0
 
     EOF
+      cat >> /tmp/msgconv.txt <<EOF
+    [sensor$n]
+    enable=1
+    type=Camera
+    id=cam${h##*.}
+    location=0;0;0
+    description=$h
+    coordinate=0;0;0
+
+    EOF
       n=$((n+1))
     done
     sed "s/@BATCH@/$n/" /config/pgie.txt > /tmp/pgie.txt
     sed "s/@BATCH@/$n/" /config/app.txt > /tmp/app.txt
     cat /tmp/sources.txt >> /tmp/app.txt
+    # Person events to MQTT (Home Assistant Mosquitto) when Secret ai/mqtt
+    # exists. Minimal payload, at most one message per camera per second.
+    if [ -n "$MQTT_USER" ]; then
+      printf '[message-broker]\nusername = %s\npassword = %s\nclient-id = jetson-people-detector\n' \
+        "$MQTT_USER" "$MQTT_PASS" > /tmp/mqtt.txt
+      cat /config/sink-mqtt.txt >> /tmp/app.txt
+      echo "MQTT events enabled: ${MQTT_HOST:-192.168.0.100};${MQTT_PORT:-1883} topic jetson/people"
+      sed -i "s/@MQTT@/${MQTT_HOST:-192.168.0.100};${MQTT_PORT:-1883}/" /tmp/app.txt
+    fi
     echo "Starting deepstream-app with $n camera(s)"
     exec deepstream-app -c /tmp/app.txt
+  sink-mqtt.txt: |
+    [sink1]
+    enable=1
+    # MsgConvBroker: nvmsgconv builds the payload straight from frame/object
+    # metadata (msg2p new API), nvmsgbroker publishes it over MQTT.
+    type=6
+    sync=0
+    msg-conv-config=/tmp/msgconv.txt
+    # 1 = minimal schema: sensorId + "trackingId|left|top|right|bottom|person"
+    msg-conv-payload-type=1
+    msg-conv-msg2p-new-api=1
+    # Streams run at ~25 fps: one message per camera per second at most.
+    msg-conv-frame-interval=25
+    msg-broker-proto-lib=/opt/nvidia/deepstream/deepstream/lib/libnvds_mqtt_proto.so
+    msg-broker-conn-str=@MQTT@
+    msg-broker-config=/tmp/mqtt.txt
+    topic=jetson/people
 kind: ConfigMap
 metadata:
   name: people-detector
@@ -681,6 +721,9 @@ spec:
         envFrom:
         - secretRef:
             name: camera-rtsp
+            optional: true
+        - secretRef:
+            name: mqtt
             optional: true
         image: nvcr.io/nvidia/deepstream:7.1-samples-multiarch
         name: deepstream

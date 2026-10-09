@@ -386,7 +386,26 @@ Tres substreams a 10-15 fps com `interval=2` ficam bem abaixo destes limites. O 
 
 **Armadilha conhecida:** no Jetson, o CUDA conta a page cache como memoria ocupada. Uma construcao de motor TensorRT pode falhar com `Device memory is insufficient` / `Could not find any implementation for node` mesmo com RAM "disponivel". O init container `drop-caches` (privilegiado) limpa a cache so enquanto nao existe motor. Manualmente: `sync; echo 3 | sudo tee /proc/sys/vm/drop_caches`.
 
-**Proximo passo:** enviar eventos de pessoa para o Home Assistant (MQTT via `nvmsgbroker`/`libnvds_mqtt_proto.so`, ja incluido na imagem) e ligar o reconhecimento facial a esses eventos.
+**Eventos para o Home Assistant (MQTT):** com o Secret `ai/mqtt` (`MQTT_USER`, `MQTT_PASS`; opcional `MQTT_HOST`, por omissao `192.168.0.100`), o detetor publica no Mosquitto do HA, topico `jetson/people`, uma mensagem por camera por segundo (`msg-conv-frame-interval=25`), mesmo sem pessoas:
+
+```json
+{"version": "4.0", "sensorId": "cam60", "objects": ["<trackId>|left|top|right|bottom|person"]}
+```
+
+`sensorId` vem do ultimo octeto do IP da camera. No repositorio `telheira-ha`, `includes/mqtt.yaml` cria `sensor.jetson_pessoas_camNN` (contagem; indisponivel apos 30 s sem mensagens) e `includes/templates/people_detection.yaml` cria `binary_sensor.pessoa_camNN` (ocupacao, `delay_off` 10 s).
+
+Criar o Secret (utilizador dedicado no HA, ex. `jetson`, em Definicoes > Pessoas > Utilizadores; o Mosquitto aceita utilizadores do HA):
+
+```bash
+read "MQUSER?Utilizador MQTT: " && read -s "MQPASS?Password MQTT: " && echo && \
+kubectl --context raspi -n ai create secret generic mqtt \
+  --from-literal=MQTT_USER="$MQUSER" --from-literal=MQTT_PASS="$MQPASS" && \
+unset MQUSER MQPASS && kubectl --context raspi -n ai delete pod -l app=people-detector
+```
+
+No arranque, o log mostra `mqtt connection success; ready to send data`. Para ver as mensagens: `mosquitto_sub -h 192.168.0.100 -u USER -P PASS -t 'jetson/#' -v`.
+
+**Proximo passo:** ligar o reconhecimento facial aos eventos de pessoa.
 
 ## 7. Verificacao final
 
