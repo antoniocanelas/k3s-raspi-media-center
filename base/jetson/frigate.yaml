@@ -124,7 +124,9 @@ data:
                 caminho:
                   friendly_name: Caminho fora da propriedade
                   enabled: true
-                  coordinates: "0.734,0.000,1.000,0.000,1.000,0.146,0.734,0.146"
+                  # Pixels of the 640x480 detect frame (0.18 rejected relative
+                  # coordinates here: "invalid literal for int()").
+                  coordinates: "470,0,640,0,640,70,470,70"
 ---
 apiVersion: apps/v1
 kind: Deployment
