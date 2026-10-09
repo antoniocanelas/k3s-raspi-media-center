@@ -34,6 +34,18 @@ Ideias e melhorias em aberto para o Jetson, o video e o Home Assistant. Nao sao 
 
 **Combinacao sugerida:** detecao em tempo real (continua ou por evento) para o alerta imediato + clip HD da Synology para reconhecimento facial e resumo, com alguns segundos de atraso.
 
+### Avaliar o Frigate em vez do pipeline proprio (recomendado antes de investir no DeepStream)
+
+O [Frigate](https://frigate.video) e o NVR open source mais usado com o Home Assistant e faz por omissao o "so analisar quando ha evento": detecao de movimento continua e barata no CPU sobre a substream, e detecao de objetos (TensorRT) so nas zonas com movimento. Nao depende do evento da camera.
+
+Traz de serie o que hoje esta feito a mao ou por fazer: go2rtc incluido, integracao oficial no HA (entidades, eventos, snapshots e clips), snapshot com a pessoa marcada, zonas/mascaras com editor grafico, reconhecimento facial com interface de treino, e descricao de eventos por LLM ("GenAI") que pode usar o Ollama do Jetson.
+
+No Jetson: imagem oficial `ghcr.io/blakeblackshear/frigate:stable-tensorrt-jp6` (JetPack 6, runtime NVIDIA). O Orin Nano nao tem codificador de video, mas descodificacao e TensorRT sao por hardware e as gravacoes copiam a stream sem recodificar; a gravacao pode ficar desligada (o Synology ja grava).
+
+**Proposta de piloto:** Frigate so com detecao nas 3 cameras, a ler do go2rtc atual, em paralelo com o `people-detector`; comparar falsos alarmes, uso de GPU/memoria (ao lado do LLM) e qualidade das notificacoes. Se ganhar, substitui o `people-detector` e resolve de uma vez a afinacao (#5), a pessoa marcada (#6), o reconhecimento facial (#7) e a analise por evento. A confirmar no piloto: se o reconhecimento facial usa a GPU no Jetson.
+
+Alternativas: Scrypted NVR (mais focado em HomeKit), Viseron (semelhante, comunidade menor), DeepStream com app servidor (controlo total, muito mais trabalho).
+
 ### Outras
 - **Abrandar a detecao quando ha pessoas em casa** (controlado pelo HA por MQTT): mais GPU para o LLM nas horas em que e usado. Adiado a pedido; a ideia acima pode substitui-la.
 - **Afinar limiares e zonas** com dados reais de alguns dias (falsos positivos/negativos por camera).
