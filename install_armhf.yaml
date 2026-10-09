@@ -198,6 +198,10 @@ data:
 
     - Restarts (exit 1) when any camera reports 0 fps for STALL_SEC: with
       uridecodebin a source whose RTSP session stalls never recovers by itself.
+      The TP-Link cameras only serve a few concurrent streams and keep dead
+      sessions until they time out, so restarts are rare (10 min) and wait
+      RESTART_DELAY after stopping, letting the cameras free the sessions
+      before the next start reconnects.
     - Stops deepstream-app with SIGINT (on SIGTERM or before a restart) so the
       pipeline goes to NULL and sends RTSP TEARDOWN; killed sessions linger on
       the TP-Link cameras and use up their small concurrent-stream limit.
@@ -216,7 +220,8 @@ data:
     import threading
     import time
 
-    STALL_SEC = int(os.environ.get("STALL_SEC", "180"))
+    STALL_SEC = int(os.environ.get("STALL_SEC", "600"))
+    RESTART_DELAY = int(os.environ.get("RESTART_DELAY", "90"))
     MQTT_RETRY_SEC = int(os.environ.get("MQTT_RETRY_SEC", "900"))
     PERF = re.compile(r"([0-9.]+) \(([0-9.]+)\)")
 
@@ -261,7 +266,7 @@ data:
                     else:
                         zero_since.setdefault(i, now)
 
-        def stop(reason, code):
+        def stop(reason, code, delay=0):
             print(f"supervisor: {reason}; stopping deepstream-app", flush=True)
             if proc.poll() is None:
                 proc.send_signal(signal.SIGINT)
@@ -269,6 +274,9 @@ data:
                     proc.wait(timeout=20)
                 except subprocess.TimeoutExpired:
                     proc.kill()
+            if delay:
+                print(f"supervisor: waiting {delay}s for the cameras to free sessions", flush=True)
+                time.sleep(delay)
             sys.exit(code)
 
         signal.signal(signal.SIGTERM, lambda *_: stop("SIGTERM", 0))
@@ -280,9 +288,9 @@ data:
             # Before any camera produced frames, allow STALL_SEC from start.
             for i, t0 in list(zero_since.items()):
                 if now - max(t0, started) > STALL_SEC:
-                    stop(f"camera {i} at 0 fps for {STALL_SEC}s", 1)
+                    stop(f"camera {i} at 0 fps for {STALL_SEC}s", 1, RESTART_DELAY)
             if os.environ.get("MQTT_STATE") == "retry" and now - started > MQTT_RETRY_SEC:
-                stop("retrying MQTT broker", 0)
+                stop("retrying MQTT broker", 0, RESTART_DELAY)
         sys.exit(proc.returncode or 1)
 
 
