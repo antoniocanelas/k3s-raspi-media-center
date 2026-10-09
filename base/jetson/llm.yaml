@@ -1,0 +1,137 @@
+# LLM inference on jetson-orin-01 (llama.cpp server, OpenAI-compatible API).
+# Model weights live on the Jetson NVMe via jetson-ai-pvc; the init container
+# downloads the GGUF once and skips it on later restarts.
+# GPU access: runtimeClassName nvidia (k3s registers the nvidia containerd
+# runtime when nvidia-container-runtime is present on the host). No device
+# plugin is needed for the Orin integrated GPU.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm
+  namespace: ai
+  labels:
+    app: llm
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: llm
+  template:
+    metadata:
+      labels:
+        app: llm
+    spec:
+      runtimeClassName: nvidia
+      nodeSelector:
+        kubernetes.io/hostname: jetson-orin-01
+      tolerations:
+      - key: workload
+        operator: Equal
+        value: jetson
+        effect: NoSchedule
+      initContainers:
+      - name: fetch-model
+        image: curlimages/curl:8.10.1
+        env:
+        - name: MODEL_URL
+          value: https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf
+        - name: MODEL_FILE
+          value: /models/qwen2.5-1.5b-instruct-q4_k_m.gguf
+        command:
+        - sh
+        - -c
+        - |
+          set -e
+          if [ -s "$MODEL_FILE" ]; then echo "model present"; exit 0; fi
+          curl -fL --retry 5 -o "$MODEL_FILE.part" "$MODEL_URL"
+          mv "$MODEL_FILE.part" "$MODEL_FILE"
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - name: models
+          mountPath: /models
+          subPath: models
+      containers:
+      - name: llama-server
+        image: dustynv/llama_cpp:r36.4.0
+        command:
+        - llama-server
+        args:
+        - --model
+        - /models/qwen2.5-1.5b-instruct-q4_k_m.gguf
+        - --alias
+        - qwen2.5-1.5b-instruct
+        - --host
+        - 0.0.0.0
+        - --port
+        - "8080"
+        - --n-gpu-layers
+        - "99"
+        - --ctx-size
+        - "4096"
+        - --parallel
+        - "1"
+        - --metrics
+        ports:
+        - name: http
+          containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 120
+          periodSeconds: 30
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1536Mi
+          limits:
+            memory: 4Gi
+        volumeMounts:
+        - name: models
+          mountPath: /models
+          subPath: models
+          readOnly: true
+      volumes:
+      - name: models
+        persistentVolumeClaim:
+          claimName: jetson-ai-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm
+  namespace: ai
+  labels:
+    app: llm
+spec:
+  selector:
+    app: llm
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+---
+# LAN only (no auth on the API): http://llm.telheira/v1/chat/completions
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: llm
+  namespace: ai
+spec:
+  entryPoints:
+  - web
+  routes:
+  - kind: Rule
+    match: Host(`llm.telheira`)
+    services:
+    - kind: Service
+      name: llm
+      port: 8080

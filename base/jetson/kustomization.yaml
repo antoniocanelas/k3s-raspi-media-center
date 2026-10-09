@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
 - namespace-ai.yaml
 - storage.yaml
+- llm.yaml
