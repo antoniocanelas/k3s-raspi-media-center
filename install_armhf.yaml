@@ -2445,6 +2445,74 @@ spec:
 apiVersion: batch/v1
 kind: CronJob
 metadata:
+  name: frigate-backup
+  namespace: ai
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 1800
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+          - command:
+            - sh
+            - -c
+            - |
+              set -eu
+              apk add --no-cache sqlite >/dev/null
+              dest="/backup/frigate-backup/$(date +%Y-%m-%d)"
+              mkdir -p "$dest"
+              # Consistent copy of the live SQLite database (WAL mode).
+              sqlite3 /src/config/frigate.db ".backup '$dest/frigate.db'"
+              tar -C /src/config -czf "$dest/config.tgz" \
+                --exclude=./model_cache --exclude='./frigate.db*' --exclude=./backup.db .
+              tar -C /src/faces -czf "$dest/faces.tgz" .
+              ls -1d /backup/frigate-backup/20*/ | sort | head -n -14 | xargs -r rm -rf
+              echo "frigate-backup: $(du -sh "$dest" | cut -f1) in $dest"
+            image: alpine:3.20.3
+            name: backup
+            resources:
+              limits:
+                memory: 256Mi
+              requests:
+                cpu: 10m
+                memory: 32Mi
+            volumeMounts:
+            - mountPath: /src/config
+              name: data
+              readOnly: true
+              subPath: frigate/config
+            - mountPath: /src/faces
+              name: data
+              readOnly: true
+              subPath: frigate/media/clips/faces
+            - mountPath: /backup
+              name: backup
+          nodeSelector:
+            kubernetes.io/hostname: jetson-orin-01
+          restartPolicy: Never
+          tolerations:
+          - effect: NoSchedule
+            key: workload
+            operator: Equal
+            value: jetson
+          volumes:
+          - name: data
+            persistentVolumeClaim:
+              claimName: jetson-ai-pvc
+          - name: backup
+            nfs:
+              path: /volume1/raspik8sconf
+              server: 192.168.0.200
+  schedule: 30 4 * * *
+  successfulJobsHistoryLimit: 1
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
   name: duckdns-updater
   namespace: kube-system
 spec:

@@ -1,0 +1,72 @@
+# Daily backup of what Frigate cannot rebuild from Git: the database (events,
+# reviews, face attempts), the trained Face Library and the runtime files in
+# /config. Goes to the Synology NFS share raspik8sconf (frigate-backup/<date>),
+# 14 days kept. Recordings and snapshots are not copied (30-day rolling data,
+# hundreds of GB); model_cache is skipped (TensorRT engines are rebuilt, the
+# YOLOv9 ONNX trial files are re-exportable).
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: frigate-backup
+  namespace: ai
+spec:
+  schedule: "30 4 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 1800
+      template:
+        spec:
+          restartPolicy: Never
+          # jetson-ai-pvc is local storage on the Jetson (ReadWriteOnce): the
+          # job runs on the same node as Frigate.
+          nodeSelector:
+            kubernetes.io/hostname: jetson-orin-01
+          tolerations:
+          - key: workload
+            operator: Equal
+            value: jetson
+            effect: NoSchedule
+          containers:
+          - name: backup
+            image: alpine:3.20.3
+            command:
+            - sh
+            - -c
+            - |
+              set -eu
+              apk add --no-cache sqlite >/dev/null
+              dest="/backup/frigate-backup/$(date +%Y-%m-%d)"
+              mkdir -p "$dest"
+              # Consistent copy of the live SQLite database (WAL mode).
+              sqlite3 /src/config/frigate.db ".backup '$dest/frigate.db'"
+              tar -C /src/config -czf "$dest/config.tgz" \
+                --exclude=./model_cache --exclude='./frigate.db*' --exclude=./backup.db .
+              tar -C /src/faces -czf "$dest/faces.tgz" .
+              ls -1d /backup/frigate-backup/20*/ | sort | head -n -14 | xargs -r rm -rf
+              echo "frigate-backup: $(du -sh "$dest" | cut -f1) in $dest"
+            resources:
+              requests: {cpu: 10m, memory: 32Mi}
+              limits: {memory: 256Mi}
+            volumeMounts:
+            - name: data
+              mountPath: /src/config
+              subPath: frigate/config
+              readOnly: true
+            - name: data
+              mountPath: /src/faces
+              subPath: frigate/media/clips/faces
+              readOnly: true
+            - name: backup
+              mountPath: /backup
+          volumes:
+          - name: data
+            persistentVolumeClaim:
+              claimName: jetson-ai-pvc
+          - name: backup
+            nfs:
+              server: 192.168.0.200
+              path: /volume1/raspik8sconf
