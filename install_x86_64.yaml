@@ -1171,7 +1171,7 @@ spec:
       namespace: media
       port: 8123
   tls:
-    certResolver: letsencrypt
+    certResolver: zerossl
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
@@ -1363,7 +1363,7 @@ spec:
       namespace: media
       port: 8080
   tls:
-    certResolver: letsencrypt
+    certResolver: zerossl
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
@@ -1385,7 +1385,7 @@ spec:
       namespace: media
       port: 32400
   tls:
-    certResolver: letsencrypt
+    certResolver: zerossl
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware

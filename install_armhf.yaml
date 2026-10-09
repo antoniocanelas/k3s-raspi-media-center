@@ -2384,6 +2384,29 @@ spec:
       - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      # ZeroSSL (used by the external routes): Let's Encrypt kept failing on
+      # telheira.tplinkdns.com because of TP-Link DNS bugs (see
+      # TLS_CERTIFICATES.md). EAB credentials come from Secret
+      # kube-system/traefik-zerossl-eab via env (expanded by Kubernetes).
+      - "--certificatesresolvers.zerossl.acme.email=antoniocanelas@gmail.com"
+      - "--certificatesresolvers.zerossl.acme.storage=/data/acme-zerossl.json"
+      - "--certificatesresolvers.zerossl.acme.caserver=https://acme.zerossl.com/v2/DV90"
+      - "--certificatesresolvers.zerossl.acme.eab.kid=$(ZEROSSL_EAB_KID)"
+      - "--certificatesresolvers.zerossl.acme.eab.hmacencoded=$(ZEROSSL_EAB_HMAC)"
+      - "--certificatesresolvers.zerossl.acme.httpchallenge=true"
+      - "--certificatesresolvers.zerossl.acme.httpchallenge.entrypoint=web"
+
+    env:
+      - name: ZEROSSL_EAB_KID
+        valueFrom:
+          secretKeyRef:
+            name: traefik-zerossl-eab
+            key: EAB_KID
+      - name: ZEROSSL_EAB_HMAC
+        valueFrom:
+          secretKeyRef:
+            name: traefik-zerossl-eab
+            key: EAB_HMAC
 
     # acme.json must survive restarts: with the chart default (emptyDir) every
     # Traefik restart re-requests all certificates, and a restart during a
@@ -2471,7 +2494,7 @@ spec:
       namespace: media
       port: 8123
   tls:
-    certResolver: letsencrypt
+    certResolver: zerossl
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
@@ -2663,7 +2686,7 @@ spec:
       namespace: media
       port: 8080
   tls:
-    certResolver: letsencrypt
+    certResolver: zerossl
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
@@ -2685,7 +2708,7 @@ spec:
       namespace: media
       port: 32400
   tls:
-    certResolver: letsencrypt
+    certResolver: zerossl
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
