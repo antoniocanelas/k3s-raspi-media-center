@@ -328,18 +328,24 @@ Um pod usa a GPU do Orin com tres campos: `runtimeClassName: nvidia`, toleration
 
 ### LLM (implantado)
 
-`base/jetson/llm.yaml` define o servidor `llama.cpp` (`dustynv/llama_cpp:r36.4.0`) em `ai`, com Qwen2.5 1.5B Instruct Q4_K_M. Um init container descarrega o GGUF uma vez para `jetson-ai-pvc` (`/var/lib/jetson-data/ai/models`). API compativel com OpenAI no Service `llm.ai:8080` e na LAN via Traefik em `http://llm.telheira`:
+`base/jetson/llm.yaml` corre o **Ollama** (`dustynv/ollama:0.6.8-r36.4-cu126-22.04`, CUDA 12.6 = JetPack 6.2) em `ai`, substituindo o `llama.cpp` usado no inicio (sem integracao nativa no HA). Modelos em `jetson-ai-pvc` (`/var/lib/jetson-data/ai/models/ollama`), descarregados no arranque se faltarem (`PULL_MODELS`): `qwen2.5:3b` (padrao) e `qwen3:4b`. Um modelo carregado de cada vez, mantido em memoria (`OLLAMA_KEEP_ALIVE=-1`), contexto 4096.
 
-```bash
-curl http://llm.telheira/v1/chat/completions -H 'Content-Type: application/json' \
-  -d '{"model":"qwen2.5-1.5b-instruct","messages":[{"role":"user","content":"Ola"}]}'
-```
+Acesso na LAN pelo Traefik (sem autenticacao), so endpoints de conversa/inferencia (`/v1/*`, `/api/chat`, `/api/generate`, `/api/tags`, `/api/show`, `/api/version`, `/api/ps`); `/api/pull`, `/api/delete`, etc. devolvem 404 na LAN:
+- `http://llm.telheira/v1/chat/completions` (clientes compativeis com OpenAI, modelo `qwen2.5:3b`);
+- `http://192.168.0.240` (integracao Ollama do Home Assistant).
 
-Se `llm.telheira` nao resolver no cliente, testa com `curl -H "Host: llm.telheira" http://192.168.0.240/...`. A API nao tem autenticacao: nao a exponhas no IngressRoute externo.
+Gerir modelos so por dentro do cluster: `kubectl --context raspi -n ai exec deploy/llm -- ollama list|pull|stop|ps`.
 
-Medido em 2026-10-09 (MAXN SUPER, contexto 4096): 29/29 camadas na GPU, ~1,3 GiB de memoria (modelo 935 MiB + KV 112 MiB + compute 300 MiB), 22-31 tokens/s de geracao e 170-290 tokens/s de prompt, ~53 °C. RAM total usada no Jetson com o LLM: 2,3 GiB (4,9 GiB disponiveis).
+**Home Assistant:** integracao Ollama (URL `http://192.168.0.240`) com o agente de conversa `conversation.jetson_qwen2_5_3b` ("Jetson (Qwen2.5 3B)"), criado em 2026-10-09: so conversa (sem `llm_hass_api`, nao controla a casa), `keep_alive -1`, `think` desligado, instrucoes em portugues de Portugal. Para o usar no Assist, escolhe este agente num pipeline em *Definicoes > Assistentes de voz*.
 
-Para trocar de modelo, altera `MODEL_URL`/`MODEL_FILE`, `--model` e `--alias` no `llm.yaml`. Antes de passar a Qwen2.5 3B, mede a margem com o pipeline de video ativo.
+**Medicoes em 2026-10-09** (MAXN SUPER, com o people-detector ativo):
+
+| Modelo | Memoria (GPU) | Velocidade | Notas |
+|---|---|---|---|
+| `qwen2.5:3b` | 2,9 GB | ~10 tok/s (respostas curtas em 3-5 s via HA) | portugues aceitavel mas com erros; erra factos (ex.: confunde diferencial com disjuntor de sobrecarga) |
+| `qwen3:4b` | 4,1 GB | nao medido | com o video ativo deixava ~2,3 GB livres, 99% GPU e 74 °C; descarregado |
+
+Com o detetor a `interval=2` a GPU ficava a 99% e o `qwen2.5:3b` caia para ~7 tok/s; com `interval=5` sobe para ~10 tok/s e a temperatura desce de 75 para 65 °C. Um modelo 7-8B nao cabe ao lado do video.
 
 ### Video: detecao de pessoas
 
