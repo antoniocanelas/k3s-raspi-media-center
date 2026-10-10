@@ -37,6 +37,8 @@ echo | openssl s_client -connect telheira.tplinkdns.com:8123 -servername telheir
 
 **Resultado em 2026-10-09:** duas tentativas do ZeroSSL (15:19 e 15:37 UTC) terminaram com `the server didn't respond to our request (status=pending)`: a validacao ficou pendente ate o Traefik desistir. A porta 80 responde a partir da internet (teste de fora de casa: `404` do handler ACME do Traefik), por isso a causa provavel e o mesmo DNS da TP-Link. O resolver `zerossl` fica configurado e o Traefik volta a tentar sozinho (diariamente e a cada reinicio).
 
+**Atualizacao (2026-10-10):** uma das novas tentativas automaticas do ZeroSSL acabou por passar: `telheira.tplinkdns.com` tem certificado ZeroSSL valido ate 2027-01-07. A renovacao pode voltar a falhar pelos mesmos bugs do DNS da TP-Link; o endereco principal continua a ser `telheira.duckdns.org` (Let's Encrypt), o tplinkdns fica como alternativa.
+
 **Decisao (2026-10-09):** manter `telheira.tplinkdns.com` por agora, sem certificado publico valido; o acesso seguro do dia a dia e o do Tailscale. **Tailscale Funnel avaliado e rejeitado** (nao se quer o HA publicado por essa via). Registar outro nome no `tplinkdns` nao resolve: os bugs (ns4/ns5 sensiveis a maiusculas na zona, NXDOMAIN para AAAA) afetam toda a zona `tplinkdns.com`. Quando se quiser HTTPS publico fiavel: **DuckDNS + Let's Encrypt** (add-on oficial DuckDNS no HA ou atualizador no cluster; novo endereco `<nome>.duckdns.org`) ou **Tailscale `funnel`** (sem portas abertas no router). Ambas mudam o endereco externo da app e das notificacoes.
 
 ## DuckDNS: telheira.duckdns.org (configurado em 2026-10-09)
