@@ -1,5 +1,5 @@
 # Jetson health for Home Assistant: every 30 s publishes temperature, RAM, GPU, CPU
-# load and LLM status to the HA Mosquitto (Secret ai/mqtt), with MQTT discovery
+# load, LLM status and the Frigate faces waiting to be classified to the HA Mosquitto (Secret ai/mqtt), with MQTT discovery
 # so the entities appear under a "Jetson Orin Nano" device. Also declares the
 # per-camera fps and detector inference sensors fed by Frigate (frigate/stats).
 # Each publish is a one-shot connection, so broker restarts need no handling.
@@ -22,6 +22,7 @@ data:
     PORT = int(os.environ.get("MQTT_PORT", "1883"))
     USER, PASS = os.environ.get("MQTT_USER", ""), os.environ.get("MQTT_PASS", "")
     LLM = os.environ.get("LLM_URL", "http://llm.ai.svc.cluster.local:8080")
+    FRIGATE = os.environ.get("FRIGATE_URL", "http://frigate.ai.svc.cluster.local:5000")
     STATE = "jetson/monitor/state"
     DEVICE = {"identifiers": ["jetson-orin-01"], "name": "Jetson Orin Nano",
               "manufacturer": "NVIDIA / Waveshare", "model": "Orin Nano 8GB (JetPack 6.2)"}
@@ -79,6 +80,9 @@ data:
             sensor("cpu_load", "Carga CPU", unit_of_measurement="%", state_class="measurement",
                    icon="mdi:cpu-64-bit"),
             sensor("llm_model", "Modelo LLM carregado", icon="mdi:brain"),
+            # Face attempts in Frigate's Train tab (Faces > Recent recognitions).
+            sensor("faces_pending", "Caras por classificar", state_class="measurement",
+                   icon="mdi:face-recognition"),
             sensor("llm_online", "LLM", comp="binary_sensor", device_class="connectivity",
                    payload_on="on", payload_off="off"),
         ]
@@ -135,7 +139,13 @@ data:
             "cpu_load": cpu_pct,
             "llm_online": "off",
             "llm_model": "none",
+            "faces_pending": 0,
         }
+        try:
+            with urllib.request.urlopen(f"{FRIGATE}/api/faces", timeout=5) as r:
+                st["faces_pending"] = len(json.load(r).get("train", []))
+        except Exception:
+            pass
         try:
             with urllib.request.urlopen(f"{LLM}/api/ps", timeout=5) as r:
                 models = json.load(r).get("models", [])

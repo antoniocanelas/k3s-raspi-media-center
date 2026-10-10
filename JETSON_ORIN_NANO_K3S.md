@@ -363,7 +363,7 @@ Configurar os add-ons por SSH no Pi do HA: o CLI `ha apps` instala e arranca, ma
 
 ### Monitorizacao no HA
 
-`base/jetson/jetson-monitor.yaml` publica a cada 30 s, por MQTT discovery (dispositivo "Jetson Orin Nano"): `sensor.jetson_temperature`, `sensor.jetson_ram_used`, `sensor.jetson_ram_available`, `sensor.jetson_gpu_load`, `sensor.jetson_llm_model`, `binary_sensor.jetson_llm_online` e `sensor.jetson_fps_cam60/62/63` (estes alimentados pelo supervisor do detetor em `jetson/detector/state`). No `telheira-ha`, `automations/jetson_health.yaml` avisa quando: temperatura > 85 °C durante 5 min; uma camera fica sem imagem 15 min; o LLM ou o monitor ficam em baixo 10 min. Cartao "Jetson" no dashboard de video.
+`base/jetson/jetson-monitor.yaml` publica a cada 30 s, por MQTT discovery (dispositivo "Jetson Orin Nano"): `sensor.jetson_temperature`, `sensor.jetson_ram_used`, `sensor.jetson_ram_available`, `sensor.jetson_gpu_load`, `sensor.jetson_llm_model`, `binary_sensor.jetson_llm_online` e `sensor.jetson_cpu_load`, `sensor.jetson_faces_pending`, `sensor.jetson_frigate_inference` e `sensor.jetson_fps_cam60/62/63` (estes dois a partir de `frigate/stats`). No `telheira-ha`, `automations/jetson_health.yaml` avisa quando: temperatura > 85 °C durante 5 min; uma camera fica sem imagem 15 min; o LLM ou o monitor ficam em baixo 10 min. Cartao "Jetson" no dashboard de video.
 
 **Memoria do LLM:** o Ollama oficial com *mmap* deixava o modelo residente duas vezes (4,2 GB na GPU + 2,5 GB de ficheiro mapeado; Jetson a 7,4/7,6 GB e em swap). O modelo `qwen3-jetson` (criado no arranque a partir do `qwen3:4b-instruct`, `use_mmap false`, `num_ctx 8192`) poupa ~1,9 GB e e o usado pelo agente do HA, carregado logo no arranque do pod.
 
@@ -397,6 +397,8 @@ Configurar os add-ons por SSH no Pi do HA: o CLI `ha apps` instala e arranca, ma
 - **LLM**: `OLLAMA_KV_CACHE_TYPE=q8_0` e `LLAMA_ARG_CACHE_RAM=0` (o cache de prompts em RAM esgotava a memoria do Jetson).
 - **Memoria** com LLM + Frigate + caras large: ~600-800 MB livres (grafico de 24 h no dashboard Video do HA).
 - O `people-detector` (DeepStream) foi removido do cluster; a seccao abaixo fica como historico.
+- **LLM do Assist passou para o qwen2.5 3B** (modelo `assist-jetson`; o `qwen3-jetson` continua disponivel): com qwen3 4B + caras `large` ficavam ~115 MB livres e o Frigate parou de detetar (skipped_fps ~ fps da camera). Agora ~1,1 GB livres. A tabela de comparacao acima e de antes desta mudanca.
+- **Caras**: `min_area` 2500 -> 1000 (as caras so se veem de frente quando a pessoa ainda esta longe; com 2500 nada era reconhecido nem guardado para treino), `recognition_threshold 0.95`, `min_faces 2`. O `jetson-monitor` publica `sensor.jetson_faces_pending` (tentativas por classificar em Faces > Recent recognitions) e o HA lembra diariamente as 21:00.
 
 ### Video: detecao de pessoas (DeepStream, substituido pelo Frigate)
 
