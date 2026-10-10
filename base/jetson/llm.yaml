@@ -6,7 +6,7 @@
 # Models live on the Jetson NVMe (jetson-ai-pvc, /models/ollama); the ones in
 # PULL_MODELS are pulled at start if missing. Only one model is loaded at a
 # time and it stays loaded (keep_alive -1) so answers start immediately.
-# Memory budget (8 GB shared CPU/GPU, people-detector also on the GPU):
+# Memory budget (8 GB shared CPU/GPU, Frigate also on the GPU):
 # 3-4B Q4 models fit next to the video pipeline; 7-8B models do not.
 # GPU access: runtimeClassName nvidia (no device plugin on the Orin).
 apiVersion: apps/v1

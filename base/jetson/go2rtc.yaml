@@ -6,7 +6,7 @@
 #   rtsp://USER:PASS@go2rtc.ai.svc.cluster.local:8554/cam60
 # Stream names come from the camera IP's last octet, matching the detector's
 # sensorId. Camera URLs come from Secret ai/camera-rtsp (CAM1_URL..CAM3_URL).
-#   camNN     substream (stream2), video only - people-detector
+#   camNN     substream (stream2), video only - Frigate detect (Geral)
 #   camNN_hd  main stream (stream1), video + audio - Home Assistant / LAN
 # RTSP is also published on the LAN at rtsp://192.168.0.250:8554/<name>
 # (hostPort, Jetson only) and requires the cameras' own user/password, taken

@@ -1,5 +1,5 @@
 # Frigate NVR on jetson-orin-01: person detection for the 3 entrance cameras,
-# replacing people-detector (kept at replicas: 0 for rollback).
+# replacing the DeepStream people-detector (removed 2026-10-10).
 # - Cameras are read from our go2rtc (one camera session each): substream camNN
 #   for detection, main stream camNN_hd for event clips. RTSP login = camera
 #   login, taken from Secret ai/camera-rtsp (CAM1_URL, already URL-encoded).
