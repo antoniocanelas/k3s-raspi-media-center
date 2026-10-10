@@ -8,7 +8,7 @@ we want, so they can be applied to every camera with UI automation.
 
 | IP | Frigate | Name (camera) | Model | Firmware (2026-10-09) |
 |---|---|---|---|---|
-| 192.168.0.60 | `cam60` Entrada Geral | Frente | VIGI C340I (hw 1.0) | 2.2.1 Build 260605 |
+| 192.168.0.60 | `cam60` Geral | Geral | VIGI C340I (hw 1.0) | 2.2.1 Build 260605 |
 | 192.168.0.61 | (offline, not in Frigate) | ? | ? | ? |
 | 192.168.0.62 | `cam62` Entrada Porta | ? | VIGI C340 (hw V2.20) | 2.0.1 Build 231227, update in progress |
 | 192.168.0.63 | `cam63` Entrada Portão | ? | VIGI C340 (hw V2.20) | 2.2.3 Build 260624 |
@@ -61,7 +61,7 @@ or in the cluster after the UI changes.
 | # | Where | Setting | Value |
 |---|---|---|---|
 | C1 | System Settings → Firmware Update | Firmware | latest, same on all cameras |
-| C2 | Information → Device Information | Device Name | **Geral** (.60, today "Frente"), **Porta** (.62), **Portão** (.63) |
+| C2 | Information → Device Information | Device Name | **Geral** (.60, done 2026-10-10), **Porta** (.62), **Portão** (.63) |
 | C3 | Camera → Display → OSD | Date, Day of Week, Channel Name, Custom 1-2 | **all Off** (re-check after firmware updates) |
 | C4 | System Settings → Date | Time zone / time | Lisbon (UTC±0 with DST Auto), NTP Auto, 24 h |
 | C5 | Network Settings → Internet Connection | IP | Static 192.168.0.6x /24, gateway/DNS 192.168.0.1 |
