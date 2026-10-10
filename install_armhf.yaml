@@ -1197,10 +1197,16 @@ spec:
           # memory) and otherwise splits the model ~50/50 with the CPU.
           printf 'FROM qwen3:4b-instruct\nPARAMETER use_mmap false\nPARAMETER num_ctx 8192\nPARAMETER num_gpu 99\n' > /tmp/Modelfile.qwen3-jetson
           ollama create qwen3-jetson -f /tmp/Modelfile.qwen3-jetson
+          # assist-jetson = the model the HA agent uses (generic name, so HA does
+          # not change when the base model changes). Since 2026-10-10 it is
+          # qwen2.5:3b (~2.5 GB with context instead of ~3.3 GB for qwen3 4B):
+          # Frigate face recognition (large) left the Jetson out of memory.
+          printf 'FROM qwen2.5:3b\nPARAMETER use_mmap false\nPARAMETER num_ctx 8192\nPARAMETER num_gpu 99\n' > /tmp/Modelfile.assist-jetson
+          ollama create assist-jetson -f /tmp/Modelfile.assist-jetson
           # Load the HA agent's model right away and keep it (empty prompt =
           # load only). Plain HTTP over bash: the image has no curl, and
           # "ollama run" with an empty prompt does not load anything.
-          body='{"model":"qwen3-jetson:latest","prompt":"","keep_alive":-1}'
+          body='{"model":"assist-jetson:latest","prompt":"","keep_alive":-1}'
           exec 3<>/dev/tcp/127.0.0.1/11434
           printf 'POST /api/generate HTTP/1.0\r\nContent-Type: application/json\r\nContent-Length: %s\r\n\r\n%s' "${#body}" "$body" >&3
           head -1 <&3 || true
