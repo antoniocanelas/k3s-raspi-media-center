@@ -386,6 +386,18 @@ Configurar os add-ons por SSH no Pi do HA: o CLI `ha apps` instala e arranca, ma
 
 **LLM ao lado do Frigate:** o Ollama estima a memoria livre da GPU contando a page cache como ocupada e chegou a dividir o modelo ~45/55 CPU/GPU; o `qwen3-jetson` tem `num_gpu 99` para ficar 100% na GPU, e e pre-carregado por HTTP no arranque do pod.
 
+**Alteracoes de 2026-10-10:**
+- **Reconhecimento facial** (Frigate, modelo `large`/ArcFace) na Porta e no Portao (desligado na Geral). Caras treinadas na *Face Library* da UI do Frigate (Tó, Du, Miguel, André). Os nomes chegam ao HA em `sub_label` e em `frigate/tracked_object_update` (tipo `face`, score >= 0,9).
+- **Deteccao a 1280x720 a partir do stream principal** na Porta e no Portao (o input `camNN_hd` faz `detect` e `record`); a Geral continua no sub stream a 640x480. Mascaras dessas cameras em pixels de 1280x720. Custo medido: ~10% de um nucleo (reducao 1440p->720p) e ~165 MB de RAM.
+- **Zonas `porta` e `portao`** (imagem inteira por agora) com `loitering_time: 20`; a Geral ignora "pessoas" com mais de ~10% da imagem (`max_area: 30000`, um carro foi confundido com pessoa).
+- **Audio nas gravacoes**: `output_args.record: preset-record-generic-audio-aac` (as cameras enviam G.711).
+- **Detetor**: continua o YOLOv7-320 TensorRT; YOLOv9 (ONNX) testado e descartado (mais lento e ~+280 MB).
+- **Utilizador RTSP**: o Secret `ai/camera-rtsp` usa `nvrviewer` (Operator) em vez de `admin` (ver `camera.md`).
+- **Backup diario** (CronJob `ai/frigate-backup`, 04:30): base de dados, Face Library e configuracao para a Synology (`raspik8sconf/frigate-backup`, 14 dias).
+- **LLM**: `OLLAMA_KV_CACHE_TYPE=q8_0` e `LLAMA_ARG_CACHE_RAM=0` (o cache de prompts em RAM esgotava a memoria do Jetson).
+- **Memoria** com LLM + Frigate + caras large: ~600-800 MB livres (grafico de 24 h no dashboard Video do HA).
+- O `people-detector` (DeepStream) foi removido do cluster; a seccao abaixo fica como historico.
+
 ### Video: detecao de pessoas (DeepStream, substituido pelo Frigate)
 
 **Cameras encontradas na LAN** (2026-10-09): `192.168.0.60`, `192.168.0.62`, `192.168.0.63`, todas TP-Link (`realm="TP-LINK IP-Camera"`), RTSP na porta 554 com autenticacao e ONVIF na porta 2020. O Synology (`192.168.0.200`) tambem expoe RTSP (Surveillance Station). URLs TP-Link: `rtsp://USER:PASS@IP:554/stream1` (principal) e `/stream2` (substream, usada pelo Jetson).
