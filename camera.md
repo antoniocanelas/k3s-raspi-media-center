@@ -69,8 +69,9 @@ or in the cluster after the UI changes.
 **Status 2026-10-10** (verified by Claude): .60 and .63 done for V1-V5 and V7
 (H264, keyframes ~1.6 s, 1440p main, sub 640x480 at 10 fps, audio on, Frigate
 clips have AAC). S1 done on .60 and .63: Secret `ai/camera-rtsp` uses `nvrviewer`
-(RTSP verified, Frigate at 5 fps); the previous admin URLs are kept in Secret
-`ai/camera-rtsp-admin-backup` for rollback. Pending: C2 names, and everything
+(RTSP verified, Frigate at 5 fps); the admin password is no longer in the cluster
+(backup Secret deleted 2026-10-10). ONVIF changes that need `admin` are done
+with a password António provides at the time. Pending: C2 names, and everything
 on .62 (offline since the firmware update; it also needs `nvrviewer` with the
 same password, or cam62 stays down).
 
