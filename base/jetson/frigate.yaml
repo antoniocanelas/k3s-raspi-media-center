@@ -75,6 +75,11 @@ data:
     ffmpeg:
       hwaccel_args: preset-jetson-h264
       input_args: preset-rtsp-restream
+      # Clips with sound (2026-10-10): the cameras send G.711 (PCMA), which
+      # MP4 cannot hold, so recordings transcode it to AAC (small CPU cost,
+      # always on). The default record preset drops audio.
+      output_args:
+        record: preset-record-generic-audio-aac
 
     detect:
       enabled: true

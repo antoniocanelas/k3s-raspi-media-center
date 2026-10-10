@@ -36,7 +36,7 @@ or in the cluster after the UI changes.
 | V4 | Sub | Video Encoding | **H264** |
 | V5 | Sub | Resolution / Frame Rate | **640*480 / 10** (today 25; Frigate uses 5) |
 | V6 | Main / Sub | Keyframe interval (GovLength) | **30 / 20** = 2 s *(Claude, ONVIF)* |
-| V7 | — | Audio | **the same on every camera**: Off unless sound is wanted (today .62/.63 send audio, .60 does not; audio makes go2rtc run an ffmpeg transcode per live viewer) |
+| V7 | Main (and Sub) | Audio | **On on every camera** (decided 2026-10-10; today .62/.63 send audio, .60 does not). Frigate records it as AAC (`preset-record-generic-audio-aac`) and go2rtc converts it for live view. Note: CNPD guidance is restrictive on recording sound where the camera covers the street or third parties (Geral) |
 
 **Security**
 
