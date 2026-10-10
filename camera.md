@@ -42,7 +42,7 @@ or in the cluster after the UI changes.
 
 | # | Where | Setting | Value |
 |---|---|---|---|
-| S1 | System Settings → User Management | Dedicated stream user | add **`nvr`** (Operator) for RTSP, with its own strong password; then *(Claude)* switch Secret `ai/camera-rtsp` to it and stop using `admin` for streaming. `admin` only for occasional ONVIF changes, with António's OK |
+| S1 | System Settings → User Management | Dedicated stream user | add **`nvrviewer`** (Operator) for RTSP, with its own strong password; then *(Claude)* switch Secret `ai/camera-rtsp` to it and stop using `admin` for streaming. `admin` only for occasional ONVIF changes, with António's OK |
 | S2 | System Settings → User Management | `admin` password | strong and unique per camera (stored outside Git) |
 | S3 | Network Settings | Port Forwarding, DDNS, Openapi, SNMP, RTMP, FTP, Email, Multicast, 802.1x, Log Server | **Off** |
 | S4 | Camera → Stream → Advance Settings | SRTP | **Off** |
@@ -68,7 +68,7 @@ or in the cluster after the UI changes.
 
 **Status 2026-10-10** (verified by Claude): .60 and .63 done for V1-V5 and V7
 (H264, keyframes ~1.6 s, 1440p main, sub 640x480 at 10 fps, audio on, Frigate
-clips have AAC). Pending: S1 (`nvr` user not created yet, then Claude
+clips have AAC). Pending: S1 (`nvrviewer` user not created yet, then Claude
 switches Secret `ai/camera-rtsp`), C2 names, and everything on .62 (offline
 since the firmware update).
 
