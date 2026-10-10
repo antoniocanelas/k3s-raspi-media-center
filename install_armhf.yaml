@@ -52,14 +52,8 @@ data:
         cam63:
           - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@go2rtc.ai.svc.cluster.local:8554/cam63
 
-    # YOLOv7-320 TensorRT (FP16 engine). Tried on 2026-10-09 via the ONNX
-    # detector (ONNX Runtime + CUDA): YOLOv9-s 38 ms / YOLOv9-t 28 ms, both with
-    # ~+280 MB RAM in the detector process (runtime overhead), leaving ~500 MB
-    # free on the Jetson with the LLM and face recognition (large). Back to
-    # v7 (20 ms). The v9 ONNX files stay in /config/model_cache for retests:
-    #   detectors: {onnx: {type: onnx}}
-    #   model: {model_type: yolo-generic, path: /config/model_cache/yolov9-t-320.onnx,
-    #           input_tensor: nchw, input_dtype: float, width: 320, height: 320}
+    # YOLOv7-320 TensorRT (FP16 engine), ~20 ms. ONNX models (YOLOv9) were
+    # tried and discarded on 2026-10-10: slower and ~+280 MB RAM on the Jetson.
     detectors:
       tensorrt:
         type: tensorrt

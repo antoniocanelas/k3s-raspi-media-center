@@ -2,8 +2,7 @@
 # reviews, face attempts), the trained Face Library and the runtime files in
 # /config. Goes to the Synology NFS share raspik8sconf (frigate-backup/<date>),
 # 14 days kept. Recordings and snapshots are not copied (30-day rolling data,
-# hundreds of GB); model_cache is skipped (TensorRT engines are rebuilt, the
-# YOLOv9 ONNX trial files are re-exportable).
+# hundreds of GB); model_cache is skipped (TensorRT engines are rebuilt).
 apiVersion: batch/v1
 kind: CronJob
 metadata:

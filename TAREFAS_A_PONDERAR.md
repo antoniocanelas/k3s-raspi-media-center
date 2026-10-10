@@ -41,10 +41,7 @@ O Frigate 0.18 substituiu o `people-detector` em 2026-10-09 com o YOLOv7-320 (Te
 - **tempo de inferencia** e **deteccoes saltadas** (*skipped*);
 - **memoria do Jetson** com LLM + Frigate + voz (hoje ~350 MB livres; alerta no HA abaixo de 300 MB).
 
-Opcoes de modelo se o YOLOv7 nao chegar:
-- **YOLOv9-s 320** (`model_type: yolo-generic`, detetor ONNX que usa TensorRT na imagem `-jp6`): **oficial e recomendado** pela documentacao do Frigate; exportar o ONNX uma vez com a receita da documentacao.
-- **YOLO26-s 320** (Ultralytics): **nao oficial**, via `yolo-generic`; so funciona se o ONNX exportado tiver saida estilo YOLOv8 `[1, 84, N]` (a saida nativa `[1, 300, 6]` sem NMS nao e lida pelo Frigate). Licenca AGPL-3.0: sem problema para uso domestico. Exportar e verificar a forma da saida antes de mudar o Frigate.
-- Em ambos os casos, confirmar o consumo de memoria antes de deixar ativo.
+Se o YOLOv7-320 nao chegar: **YOLOv7-416** (TensorRT nativo, ~1,5x o tempo). Modelos ONNX (YOLOv9/YOLO26) foram **descartados** em 2026-10-10: testado o YOLOv9, mais lento (28-38 ms) e ~+280 MB de RAM no Jetson.
 
 ### Avaliar o Frigate em vez do pipeline proprio (feito: Frigate adotado em 2026-10-09)
 
