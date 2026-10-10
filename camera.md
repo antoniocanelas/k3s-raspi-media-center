@@ -47,7 +47,7 @@ or in the cluster after the UI changes.
 | S3 | Network Settings | Port Forwarding, DDNS, Openapi, SNMP, RTMP, FTP, Email, Multicast, 802.1x, Log Server | **Off** |
 | S4 | Camera → Stream → Advance Settings | SRTP | **Off** |
 | S5 | Network Settings → Network Service → ONVIF | ONVIF / Time Verification | **On / Off** |
-| S6 | Network Settings → Platform Access | VIGI Cloud | *optional*: Off reduces internet exposure but removes VIGI app remote access (HA already covers it) — not decided, keep On for now |
+| S6 | Network Settings → Platform Access | VIGI Cloud | **Off** (decided 2026-10-10): less internet exposure; no VIGI app access from outside, Home Assistant covers it |
 
 **Camera events**
 
@@ -156,7 +156,7 @@ VIGI app. Leaving them on costs nothing on the Jetson (it runs in the camera).
 
 | Where | Setting | Value on .60 | Wanted |
 |---|---|---|---|
-| Network Settings → Platform Access | Platform Access Mode | VIGI Cloud VMS, *Access to VIGI Cloud Personal* On, bound to António's TP-Link ID, Connected | keep (VIGI app access). Unbind/off only if the VIGI app is no longer wanted |
+| Network Settings → Platform Access | Platform Access Mode | VIGI Cloud VMS, *Access to VIGI Cloud Personal* On, bound to António's TP-Link ID, Connected (2026-10-09) | **Off** since 2026-10-10 (see S6) |
 | Network Settings → Platform Access | Join User Experience Improvement Program | Off | keep Off |
 | Network Settings → Network Service → ONVIF | Open Network Video Interface | **On** | keep On |
 | Network Settings → Network Service → ONVIF | Automatically switch to static IP | On | keep |
