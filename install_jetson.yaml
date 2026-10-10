@@ -402,6 +402,15 @@ data:
                    "unit_of_measurement": "fps", "state_class": "measurement",
                    "icon": "mdi:cctv", "expire_after": 180, "device": DEVICE}
             msgs.append((f"homeassistant/sensor/jetson_orin/fps_{cam}/config", json.dumps(cfg), True))
+            # Frames Frigate had no time to analyse (detector or memory starved;
+            # 2026-10-10 it reached ~5/s with normal camera fps and nobody noticed).
+            cfg = {"name": f"Saltadas {cam}", "unique_id": f"jetson_orin_skipped_{cam}",
+                   "default_entity_id": f"sensor.jetson_skipped_{cam}",
+                   "state_topic": "frigate/stats",
+                   "value_template": "{{ value_json.cameras.%s.skipped_fps | default(0) }}" % cam,
+                   "unit_of_measurement": "fps", "state_class": "measurement",
+                   "icon": "mdi:debug-step-over", "expire_after": 180, "device": DEVICE}
+            msgs.append((f"homeassistant/sensor/jetson_orin/skipped_{cam}/config", json.dumps(cfg), True))
         cfg = {"name": "Inferência Frigate", "unique_id": "jetson_orin_frigate_inference",
                "default_entity_id": "sensor.jetson_frigate_inference",
                "state_topic": "frigate/stats",
