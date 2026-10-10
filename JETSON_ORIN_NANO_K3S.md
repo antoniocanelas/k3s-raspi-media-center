@@ -398,7 +398,7 @@ Configurar os add-ons por SSH no Pi do HA: o CLI `ha apps` instala e arranca, ma
 - **Memoria** com LLM + Frigate + caras large: ~600-800 MB livres (grafico de 24 h no dashboard Video do HA).
 - O `people-detector` (DeepStream) foi removido do cluster; a seccao abaixo fica como historico.
 - **LLM do Assist passou para o qwen2.5 3B** (modelo `assist-jetson`; o `qwen3-jetson` continua disponivel): com qwen3 4B + caras `large` ficavam ~115 MB livres e o Frigate parou de detetar (skipped_fps ~ fps da camera). Agora ~1,1 GB livres. A tabela de comparacao acima e de antes desta mudanca.
-- **Caras**: `min_area` 2500 -> 1000 (as caras so se veem de frente quando a pessoa ainda esta longe; com 2500 nada era reconhecido nem guardado para treino), `recognition_threshold 0.95`, `min_faces 2`. O `jetson-monitor` publica `sensor.jetson_faces_pending` (tentativas por classificar em Faces > Recent recognitions) e o HA lembra diariamente as 21:00.
+- **Caras**: `min_area` 2500 -> 1600 (40x40) (as caras so se veem de frente quando a pessoa ainda esta longe; com 2500 nada era reconhecido nem guardado para treino), `recognition_threshold 0.95`, `min_faces 2`. O `jetson-monitor` publica `sensor.jetson_faces_pending` (tentativas por classificar em Faces > Recent recognitions) e o HA lembra diariamente as 21:00.
 
 ### Video: detecao de pessoas (DeepStream, substituido pelo Frigate)
 

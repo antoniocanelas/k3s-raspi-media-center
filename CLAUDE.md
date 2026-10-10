@@ -89,7 +89,7 @@ TensorRT engine builds).
 ### Face recognition
 
 - On for `cam62`/`cam63`, off for `cam60`. `model_size: large`,
-  `min_area: 1000` (~32x32; was 2500 until 2026-10-10 and blocked almost all
+  `min_area: 1600` (40x40; was 2500 until 2026-10-10 and blocked almost all
   faces), `recognition_threshold: 0.95`, `min_faces: 2`.
 - Library names: `Tó`, `Du` (Dulce), `Miguel`, `André`, `Maria_José` (neighbour),
   `Augusto`, `Paula`. **No spaces** in names (use `_`). Family for automations:
