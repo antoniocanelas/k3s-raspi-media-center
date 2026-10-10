@@ -68,9 +68,11 @@ or in the cluster after the UI changes.
 
 **Status 2026-10-10** (verified by Claude): .60 and .63 done for V1-V5 and V7
 (H264, keyframes ~1.6 s, 1440p main, sub 640x480 at 10 fps, audio on, Frigate
-clips have AAC). Pending: S1 (`nvrviewer` user not created yet, then Claude
-switches Secret `ai/camera-rtsp`), C2 names, and everything on .62 (offline
-since the firmware update).
+clips have AAC). S1 done on .60 and .63: Secret `ai/camera-rtsp` uses `nvrviewer`
+(RTSP verified, Frigate at 5 fps); the previous admin URLs are kept in Secret
+`ai/camera-rtsp-admin-backup` for rollback. Pending: C2 names, and everything
+on .62 (offline since the firmware update; it also needs `nvrviewer` with the
+same password, or cam62 stays down).
 
 ## Changes wanted
 
@@ -169,7 +171,7 @@ VIGI app. Leaving them on costs nothing on the Jetson (it runs in the camera).
 | Network Settings → Log Server | Log Server | Off | keep Off |
 | System Settings → Date | Time Zone | (UTC-00:00) Dublin, Edinburgh, Lisbon, London; DST Auto | keep (Portugal; device time matched local time) |
 | System Settings → Date | Format / time source | YYYY-MM-DD, 24 hour, NTP Auto every 60 min | keep |
-| System Settings → User Management | Users | `admin` (Administrator) + the TP-Link ID (Operator) | keep; the RTSP/ONVIF account in `ai/camera-rtsp` is `admin` |
+| System Settings → User Management | Users | `admin` (Administrator) + the TP-Link ID (Operator) + `nvrviewer` (Operator) | keep; RTSP in `ai/camera-rtsp` uses `nvrviewer`, `admin` only for ONVIF changes |
 | System Settings → Certificate Management | HTTPS certificates | self-signed RSA + ECC, 2026-06-05 → 2036-06-05 | keep |
 
 ## Verification after changes (Claude)
