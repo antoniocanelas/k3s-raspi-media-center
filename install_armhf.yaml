@@ -215,6 +215,16 @@ data:
         detect:
           width: 1280
           height: 720
+        # Whole frame for now (refine in the Frigate zone editor to the area at
+        # the door). A person staying 20 s is "loitering": Home Assistant
+        # alerts on it (automations/security_alerts.yaml).
+        zones:
+          porta:
+            friendly_name: Porta
+            coordinates: "0,0,1280,0,1280,720,0,720"
+            objects:
+              - person
+            loitering_time: 20
       cam63:
         friendly_name: Portão
         live:
@@ -244,6 +254,16 @@ data:
         detect:
           width: 1280
           height: 720
+        # Whole frame for now (refine in the Frigate zone editor to the area at
+        # the gate). A person staying 20 s is "loitering": Home Assistant
+        # alerts on it (automations/security_alerts.yaml).
+        zones:
+          portao:
+            friendly_name: Portão
+            coordinates: "0,0,1280,0,1280,720,0,720"
+            objects:
+              - person
+            loitering_time: 20
         objects:
           filters:
             person:
