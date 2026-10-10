@@ -35,7 +35,7 @@ or in the cluster after the UI changes.
 | V3 | Main | Bit Rate Type / Image Quality / Max Bit Rate | **VBR / High / 4096** |
 | V4 | Sub | Video Encoding | **H264** |
 | V5 | Sub | Resolution / Frame Rate | **640*480 / 10** (today 25; Frigate uses 5) |
-| V6 | Main / Sub | Keyframe interval (GovLength) | **30 / 20** = 2 s *(Claude, ONVIF)* |
+| V6 | Main / Sub | Keyframe interval (GovLength) | **no change needed**: with H264 the cameras send a keyframe every ~1.6 s (GovLength 25-30), measured 2026-10-10 on .60 and .63 |
 | V7 | Main (and Sub) | Audio | **On on every camera** (decided 2026-10-10; today .62/.63 send audio, .60 does not). Frigate records it as AAC (`preset-record-generic-audio-aac`) and go2rtc converts it for live view. Note: CNPD guidance is restrictive on recording sound where the camera covers the street or third parties (Geral) |
 
 **Security**
@@ -66,9 +66,11 @@ or in the cluster after the UI changes.
 | C4 | System Settings → Date | Time zone / time | Lisbon (UTC±0 with DST Auto), NTP Auto, 24 h |
 | C5 | Network Settings → Internet Connection | IP | Static 192.168.0.6x /24, gateway/DNS 192.168.0.1 |
 
-**After the UI changes (Claude)**: GovLength over ONVIF (V6), Secret with the
-`frigate` user (S1), check Frigate config for the new main resolution (V2),
-then the verification list at the end of this file.
+**Status 2026-10-10** (verified by Claude): .60 and .63 done for V1-V5 and V7
+(H264, keyframes ~1.6 s, 1440p main, sub 640x480 at 10 fps, audio on, Frigate
+clips have AAC). Pending: S1 (`frigate` user not created yet, then Claude
+switches Secret `ai/camera-rtsp`), C2 names, and everything on .62 (offline
+since the firmware update).
 
 ## Changes wanted
 
