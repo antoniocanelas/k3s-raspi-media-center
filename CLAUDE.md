@@ -45,9 +45,11 @@ External access: `https://telheira.duckdns.org:8123` (HA, Let's Encrypt via
   `kubectl --context raspi -n flux-system annotate ocirepository/k3s-raspi-media-center kustomization/k3s-raspi-media-center reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite`
 - CI failures POST to an HA webhook → phone notification (`../telheira-ha/automations/ci_alerts.yaml`).
 - `*.telheira` hosts don't resolve from the Mac; test with `-H "Host: x.telheira" http://192.168.0.240`.
-- Known limit: ServiceLB (klipper) SNATs client IPs even with
-  `externalTrafficPolicy: Local`, so HA sees external clients as `10.42.x.x`
-  (blocks the HA login ban; plan in `TAREFAS_A_PONDERAR.md`).
+- Traefik (`base/traefik/traefik-config.yaml`) binds 80/443/8123/32443 with
+  `hostPort` on `pi-master-00` and its service is `ClusterIP` (no ServiceLB:
+  klipper svclb masqueraded client IPs). HA therefore sees real client IPs
+  and has `login_attempts_threshold: 5`. Traefik must stay on pi-master-00
+  (the router forwards to 192.168.0.18).
 
 ## Jetson (namespace `ai`) — current state (2026-10-10)
 
