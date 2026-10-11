@@ -2264,14 +2264,14 @@ metadata:
 spec:
   failurePolicy: reinstall
   valuesContent: |-
-    # Keep the client IP: with the default externalTrafficPolicy Cluster the
-    # service NATs the source and Home Assistant sees every external request as
-    # the svclb pod (10.42.x), so its login ban would block everyone. Local
-    # needs Traefik on the node the router forwards to (pi-master-00), hence
-    # the nodeSelector.
+    # Keep the client IP (needed for Home Assistant's login ban): ServiceLB
+    # (klipper svclb) masquerades even with externalTrafficPolicy Local, so
+    # HA saw every external request as 10.42.x. Since 2026-10-11 Traefik takes
+    # the ports itself on pi-master-00 (hostPort on all its interfaces: eth0
+    # 192.168.0.18, where the router forwards, and wlan 192.168.0.240, used on
+    # the LAN) and the service is ClusterIP, so there is no svclb in the path.
     service:
-      spec:
-        externalTrafficPolicy: Local
+      type: ClusterIP
     nodeSelector:
       kubernetes.io/hostname: pi-master-00
     additionalArguments:
@@ -2326,16 +2326,19 @@ spec:
 
     ports:
       web:
+        hostPort: 80
         redirections:
           entryPoint:
             to: websecure
             scheme: https
             permanent: true
       websecure:
+        hostPort: 443
         tls:
           enabled: true
       homeassistantsecure:
         port: 8123
+        hostPort: 8123
         exposedPort: 8123
         expose:
           default: true
@@ -2344,6 +2347,7 @@ spec:
           enabled: true
       plexsecure:
         port: 32443
+        hostPort: 32443
         exposedPort: 32443
         expose:
           default: true
